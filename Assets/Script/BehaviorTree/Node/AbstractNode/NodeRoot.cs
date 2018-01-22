@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
     /// <summary>
     /// 节点超类
@@ -24,16 +20,15 @@ namespace BehaviorTree
         }
 
         /// <summary>
-        /// 执行
+        /// 执行节点抽象方法
         /// </summary>
         /// <returns>返回执行结果</returns>
         public abstract ResultType Execute();
 
-        public int NodeIndex { get { return nodeIndex; } }
-
-        public void SetIndex(int index)
+        public int NodeIndex
         {
-            nodeIndex = index;
+            get { return nodeIndex; }
+            set { nodeIndex = value; }
         }
     }
 }

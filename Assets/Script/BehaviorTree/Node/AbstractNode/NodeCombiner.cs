@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace BehaviorTree
 {
@@ -9,17 +7,16 @@ namespace BehaviorTree
     /// </summary>
     public abstract class NodeCombiner : NodeRoot
     {
+        // 保存子节点
         protected List<NodeRoot> nodeChildList = new List<NodeRoot>();
 
         public NodeCombiner(NodeType nodeType) : base(nodeType)
-        {
-
-        }
+        {}
 
         public void AddNode(NodeRoot nodeRoot)
         {
             int count = nodeChildList.Count;
-            nodeRoot.SetIndex(count);
+            nodeRoot.NodeIndex = count;
             nodeChildList.Add(nodeRoot);
         }
     }

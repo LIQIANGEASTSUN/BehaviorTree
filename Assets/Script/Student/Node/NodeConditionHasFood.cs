@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using BehaviorTree;
+﻿using BehaviorTree;
 
 /// <summary>
-/// 是否有饭(条件节点)
+/// 条件节点：是否有饭
 /// </summary>
 public class NodeConditionHasFood : NodeCondition {
     private Student student;
@@ -12,6 +9,7 @@ public class NodeConditionHasFood : NodeCondition {
     public override ResultType Execute()
     {
         ResultType resultType = student.HasFood() ? ResultType.Success : ResultType.Fail;
+
         return resultType;
     }
 

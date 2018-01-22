@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using BehaviorTree;
+﻿using BehaviorTree;
 
 /// <summary>
-/// 是否饿了条件节点
+/// 条件节点：是否饿了
 /// </summary>
 public class NodeConditionHungry : NodeCondition {
 

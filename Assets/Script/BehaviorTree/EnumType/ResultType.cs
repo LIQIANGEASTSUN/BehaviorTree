@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
+    /// <summary>
+    /// 节点执行结果
+    /// </summary>
     public enum ResultType
     {
         /// <summary>

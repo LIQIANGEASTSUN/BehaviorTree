@@ -1,19 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
     /// <summary>
     /// 并行节点(组合节点)
     /// </summary>
     public class NodeParallel : NodeCombiner
     {
-
         public NodeParallel():base(NodeType.Parallel)
-        {
-
-        }
+        { }
 
         /// <summary>
         /// 并行节点同时执行所有节点，直到一个节点返回 Fail 或者全部节点都返回 Success
@@ -48,17 +41,44 @@ namespace BehaviorTree
                 }
             }
 
-            if (resultType == ResultType.Fail)
+            if (resultType != ResultType.Fail)
             {
-                return resultType;
-            }
-            else if (resultType == ResultType.Success)
-            {
-                resultType = (successCount >= nodeChildList.Count) ? resultType : ResultType.Running;
-                return resultType;
+                resultType = (successCount >= nodeChildList.Count) ? ResultType.Success : ResultType.Running;
             }
 
-            return ResultType.Running;
+            return resultType;
         }
     }
 }
+
+
+/*
+    
+    successCount = 0
+
+    for i <- index to N do 
+    
+        Node node =  GetNode(i);
+
+        result = node.execute()
+        
+        if result == fail then
+           return fail;
+        end
+
+        if result == success then
+            ++successCount
+            continue
+        end
+
+        if result == running then
+            continue
+        end
+    end
+
+    if successCount >= childCount then
+        return success
+    end
+
+    return running
+*/

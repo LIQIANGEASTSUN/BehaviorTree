@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
     /// <summary>
     /// 行为节点(叶节点)
@@ -11,8 +7,6 @@ namespace BehaviorTree
     {
         public NodeAction() : base(NodeType.Action)
         {
-
         }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace BehaviorTree
 {
@@ -11,9 +9,7 @@ namespace BehaviorTree
     {
         private NodeRoot lastRunningNode;
         public NodeRandom():base(NodeType.Random)
-        {
-
-        }
+        {   }
 
         public override ResultType Execute()
         {
@@ -82,3 +78,44 @@ namespace BehaviorTree
         }
     }
 }
+
+
+/*
+
+    RandomArr 一个随机数组
+
+    index = 1
+    if != lastRunningNode null then
+        index = lastRunningNode.index
+
+        将 index 添加到随机数组的第一位
+    end
+
+    lastRunningNode = null
+    for i <- 1 to N do 
+            
+        index = RandomArr[i]
+        Node node =  GetNode(index);
+
+        result = node.execute()
+        
+        if result == fail then
+           continue;
+        end
+
+        if result == success then
+             return result
+        end
+
+        if result == running then
+            lastRunningNode = node
+            return running
+        end
+
+    end
+
+    return fail
+
+
+
+*/

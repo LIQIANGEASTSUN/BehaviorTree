@@ -1,76 +1,114 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using UnityEngine;
 using BehaviorTree;
 
 public class Student : MonoBehaviour {
 
-    private NodeSelect nodeSelect = null;
+    private NodeSelect rootNode = new NodeSelect(); // 根节点
 
-    private float energy = 0;
-    private float minEnergy = 50;
-    private float maxEnergy = 100;
+    private float energy = 0;      // 能量值
+    private float minEnergy = 50;  // 能量下限：当能量 <= 能量下限      感到饥饿
+    private float maxEnergy = 100; // 能量上限：当能量 >= 能量上线时    表示吃饱了
 
-    private float food = 0;
-    private float minFood = 0;
-    private float maxFood = 100;
+    private float food = 0;        // 食物量：
+    private float minFood = 0;     // 食物下限：当食物量 <= 食物下限时  没有食物了
+    private float maxFood = 100;   // 食物上限：当食物量 >= 食物上限时  表示饭做好了
 
 	// Use this for initialization
 	void Start () {
         Init();
 	}
-	
+
+    public int index = 0;
+    private float time;
+
+    public static float intervalTime = 0.3f;
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.A))
+        ChangeEnergy(-0.8f); // 每帧执行消耗能量
+
+        if (rootNode != null)
         {
-            energy = 0;
+            rootNode.Execute();  // 每帧调用行为树根节点，行为树入口
         }
 
-        if (nodeSelect != null)
         {
-            nodeSelect.Execute();
+            time += Time.deltaTime;
+            if (time > intervalTime)
+            {
+                time = 0;
+                index++;
+                string path = string.Format("D:\\Gif\\Screenshot{0}.png", index);
+                Application.CaptureScreenshot(path, 0);
+            }
         }
-	}
-
-    private void Init()
-    {
-        nodeSelect = new NodeSelect();
-
-        NodeSequence nodeSequence = new NodeSequence();
-        nodeSelect.AddNode(nodeSequence);
-
-        #region 是否饿了
-        NodeConditionHungry nodeConditionHungry = new NodeConditionHungry();
-        nodeConditionHungry.SetStudent(this);
-        nodeSequence.AddNode(nodeConditionHungry);
-        #endregion
-
-        NodeSelect nodeSelect2 = GetFood();
-        nodeSequence.AddNode(nodeSelect2);
-
-        #region 吃饭
-        NodeActionEat nodeActionEat = new NodeActionEat();
-        nodeActionEat.SetStudent(this);
-        nodeSequence.AddNode(nodeActionEat);
-        #endregion
     }
 
-    // 搞定饭
-    private NodeSelect GetFood()
+    /// <summary>
+    /// 初始化添加行为树节点
+    /// </summary>
+    private void Init()
     {
-        NodeSelect nodeSelect2 = new NodeSelect();
+        // 顺序节点 1
+        NodeSequence nodeSequence_1 = new NodeSequence();
+        // 顺序节点 1 添加到根节点
+        rootNode.AddNode(nodeSequence_1);
 
-        NodeConditionHasFood nodeConditionHasFood = new NodeConditionHasFood();
-        nodeConditionHasFood.SetStudent(this);
-        nodeSelect2.AddNode(nodeConditionHasFood);
+        #region 是否饿了
+        // 条件节点 1.1
+        NodeConditionHungry nodeConditionHungry_1_1 = new NodeConditionHungry();
+        nodeConditionHungry_1_1.SetStudent(this);
+        // 条件节点 1.1 添加到 顺序节点1
+        nodeSequence_1.AddNode(nodeConditionHungry_1_1);
+        #endregion
 
-        NodeActionCooking nodeActionCooking = new NodeActionCooking();
-        nodeActionCooking.SetStudent(this);
-        nodeSelect2.AddNode(nodeActionCooking);
+        #region 选择节点 1.2
+        {
+            // 选择节点1.2
+            NodeSelect nodeSelect_1_2 = new NodeSelect();
+            nodeSequence_1.AddNode(nodeSelect_1_2);
 
-        return nodeSelect2;
+            // 节点 1.2.1 是否有饭
+            NodeConditionHasFood nodeConditionHasFood_1_2_1 = new NodeConditionHasFood();
+            nodeConditionHasFood_1_2_1.SetStudent(this);
+            nodeSelect_1_2.AddNode(nodeConditionHasFood_1_2_1);
+
+            // 顺序节点 1.2.2
+            NodeSequence nodeSequence_1_2_2 = new NodeSequence();
+            nodeSelect_1_2.AddNode(nodeSequence_1_2_2);
+
+            // 行为节点 1.2.2.1 走到厨房
+            NodeActionMove nodeActionMove_1_2_2_1 = new NodeActionMove();
+            nodeActionMove_1_2_2_1.SetStudent(this);
+            nodeActionMove_1_2_2_1.SetTarget("Cooking");
+            nodeActionMove_1_2_2_1.SetTr(transform);
+            nodeSequence_1_2_2.AddNode(nodeActionMove_1_2_2_1);
+
+            // 行为节点 1.2.2.2 做饭
+            NodeActionCooking nodeActionCooking_1_2_2_2 = new NodeActionCooking();
+            nodeActionCooking_1_2_2_2.SetStudent(this);
+            nodeSequence_1_2_2.AddNode(nodeActionCooking_1_2_2_2);
+        }
+        #endregion
+
+        #region 走到餐桌
+        {
+            // 行为节点 1.3 走到餐桌
+            NodeActionMove nodeActionMove_1_3 = new NodeActionMove();
+            nodeActionMove_1_3.SetStudent(this);
+            nodeActionMove_1_3.SetTarget("Food");
+            nodeActionMove_1_3.SetTr(transform);
+            nodeSequence_1.AddNode(nodeActionMove_1_3);
+        }
+        #endregion
+
+        #region 吃饭
+        {
+            // 行为节点 1.4 吃饭
+            NodeActionEat nodeActionEat_1_4 = new NodeActionEat();
+            nodeActionEat_1_4.SetStudent(this);
+            nodeSequence_1.AddNode(nodeActionEat_1_4);
+        }
+        #endregion
     }
 
     #region 饿了吃饭
@@ -81,13 +119,17 @@ public class Student : MonoBehaviour {
 
     public void AddEnergy(float value)
     {
-        energy += value;
+        ChangeEnergy(value);
         Debug.LogError("Eat");
+    }
+
+    private void ChangeEnergy(float value)
+    {
+        energy += value;
     }
 
     public bool IsFull()
     {
-        Debug.LogError("IsFull ：" + (energy >= maxEnergy));
         return energy >= maxEnergy;
     }
     #endregion

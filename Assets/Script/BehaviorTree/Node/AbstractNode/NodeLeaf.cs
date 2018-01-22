@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
     /// <summary>
     /// 叶节点
@@ -10,8 +6,6 @@ namespace BehaviorTree
     public abstract class NodeLeaf : NodeRoot
     {
         public NodeLeaf(NodeType nodeType):base(nodeType)
-        {
-
-        }
+        { }
     }
 }

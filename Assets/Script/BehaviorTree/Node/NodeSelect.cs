@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace BehaviorTree
+﻿namespace BehaviorTree
 {
     /// <summary>
     /// 选择节点(组合节点)
@@ -11,9 +7,7 @@ namespace BehaviorTree
     {
         private NodeRoot lastRunningNode;
         public NodeSelect():base(NodeType.Select)
-        {
-
-        }
+        {    }
 
         /// <summary>
         /// 选择节点依次遍历所有子节点，如果都返回 Fail，则向父节点返回 Fail
@@ -55,6 +49,38 @@ namespace BehaviorTree
 
             return resultType;
         }
-
     }
 }
+
+/*
+ 
+    index = 1
+    if != lastRunningNode null then
+        index = lastRunningNode.index
+    end
+
+    lastRunningNode = null
+    for i <- index to N do 
+    
+        Node node =  GetNode(i);
+
+        result = node.execute()
+        
+        if result == fail then
+           continue;
+        end
+
+        if result == success then
+            return success
+        end
+
+        if result == running then
+            lastRunningNode = node
+            return running
+        end
+
+    end
+
+    return fail
+
+*/
