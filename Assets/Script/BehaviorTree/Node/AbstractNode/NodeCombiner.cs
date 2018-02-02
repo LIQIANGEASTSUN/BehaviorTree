@@ -19,5 +19,10 @@ namespace BehaviorTree
             nodeRoot.NodeIndex = count;
             nodeChildList.Add(nodeRoot);
         }
+
+        public List<NodeRoot> GetChilds()
+        {
+            return nodeChildList;
+        }
     }
 }
