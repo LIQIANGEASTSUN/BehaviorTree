@@ -36,7 +36,6 @@ public static class Node  {
     public static void Clear()
     {
         nodeAsset = null;
-        fileName = string.Empty;
     }
 
     public static void IterationChild(NodeValue nodeValue)

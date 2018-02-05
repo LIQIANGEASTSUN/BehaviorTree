@@ -32,7 +32,7 @@ public class CreateNodeAsset {
         // 自定义资源保存路径
         //将类名 Bullet 转换为字符串
         //拼接保存自定义资源（.asset） 路径
-        string path = string.Format("Assets/NodeAsset/{0}.asset", fileName);
+        string path = string.Format("Assets/Resources/NodeAsset/{0}.asset", fileName);
 
         if (File.Exists(path))
         {

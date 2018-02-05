@@ -15,18 +15,30 @@ public class TreeNodeEditor : EditorWindow {
     // 添加连线
     private bool makeTransitionMode = false;
 
-    private static TreeNodeEditor window;
+    public static TreeNodeEditor window;
     private static bool isInit = false;
     [MenuItem("Window/CreateTree")]
     public static void ShowWindow()
     {
         window = EditorWindow.GetWindow<TreeNodeEditor>();
+        window.position = windowsPosition;
         window.Show();
         isInit = false;
     }
-    
+
+    private static Rect windowsPosition = new Rect(0, 0, 800, 800);
+    private Vector3 scrollPos = Vector2.zero;
+    private Rect contentRect = windowsPosition;
     private void OnGUI()
     {
+        if (window != null)
+        {
+            windowsPosition = window.position;
+        }
+        //创建 scrollView  窗口  
+        scrollPos = GUI.BeginScrollView(new Rect(0, 0, position.width, position.height),
+            scrollPos, contentRect);
+
         if (!isInit)
         {
             isInit = true;
@@ -35,6 +47,8 @@ public class TreeNodeEditor : EditorWindow {
             saveFileName = Node.fileName;
         }
 
+        EditorGUILayout.LabelField("子节点顺序为从左到右");
+
         Event _event = Event.current;
         mousePosition = _event.mousePosition;
 
@@ -42,9 +56,7 @@ public class TreeNodeEditor : EditorWindow {
         {
             int selectIndex = 0;
             selectNodeValue = GetMouseInNode(out selectIndex);
-
-            int menuType = (selectNodeValue != null) ? 1 : 0;
-            ShowMenu(menuType);
+            ShowMenu(selectNodeValue);
         }
 
         // 在连线状态，按下鼠标
@@ -72,44 +84,47 @@ public class TreeNodeEditor : EditorWindow {
 
         DrawNodeWindows();
 
-        DrawSave();
+        NodeEditor.CheckNode(nodeValueList);
 
+        DrawSave();
+        SortChild();
         Repaint();
+
+        ResetScrollPos();
+
+        GUI.EndScrollView();  //结束 ScrollView 窗口  
     }
 
     // 绘制节点
     private void DrawNodeWindows()
     {
-        int rootNodeCount = 0;
         // 开始绘制节点 
         // 注意：必须在  BeginWindows(); 和 EndWindows(); 之间 调用 GUI.Window 才能显示
         BeginWindows();
         for (int i = 0; i < nodeValueList.Count; i++)
         {
             NodeValue nodeValue = nodeValueList[i];
-            string name = Enum.GetName(typeof(NodeType), nodeValue.NodeType);
+            string name = NodeEditor.GetTitle(nodeValue.NodeType); //Enum.GetName(typeof(NodeType), nodeValue.NodeType);
             nodeValue.position = GUI.Window(i, nodeValue.position, DrawNodeWindow, name);
             DrawToChildCurve(nodeValue);
 
             if (nodeValue.isRootNode)
             {
                 rootNodeValue = nodeValue;
-                ++rootNodeCount;
             }
         }
         EndWindows();
+    }
 
-        if (rootNodeCount > 1)
+    public void ShowNotification(bool show, string meg)
+    {
+        if (show)
         {
-            ShowNotification(new GUIContent("只能有一个根节点"));
+            ShowNotification(new GUIContent(meg));
         }
-        else if (rootNodeCount == 1)
+        else
         {
             RemoveNotification();
-        }
-        else if (rootNodeCount == 0)
-        {
-            ShowNotification(new GUIContent("必须有一个根节点"));
         }
     }
 
@@ -140,19 +155,24 @@ public class TreeNodeEditor : EditorWindow {
         return selectNode;
     }
 
-    private void ShowMenu(int type)
-    {  
+    private void ShowMenu(NodeValue nodeValue)
+    {
+        int menuType = (selectNodeValue != null) ? 1 : 0;
+
         GenericMenu menu = new GenericMenu();
-        if (type == 0)
+        if (menuType == 0)
         {
             // 添加一个新节点
             menu.AddItem(new GUIContent("Add Node"), false, AddNode);
         }
         else
-        {
-            // 连线子节点
-            menu.AddItem(new GUIContent("Make Transition"), false, MakeTransition);
-            menu.AddSeparator("");
+        {   
+            if (nodeValue.NodeType != NodeType.Action && nodeValue.NodeType != NodeType.Condition)
+            {
+                // 连线子节点
+                menu.AddItem(new GUIContent("Make Transition"), false, MakeTransition);
+                menu.AddSeparator("");
+            }
             // 删除节点
             menu.AddItem(new GUIContent("Delete Node"), false, DeleteNode);
         }
@@ -217,21 +237,66 @@ public class TreeNodeEditor : EditorWindow {
         Handles.DrawLine(startPos, endPos);
     }
 
+    private void SortChild()
+    {
+        for (int i = 0; i < nodeValueList.Count; ++i)
+        {
+            NodeValue nodeValue = nodeValueList[i];
+
+            nodeValue.childNodeList.Sort((a, b) =>
+            {
+                return (int)(a.position.x - b.position.x);
+            });
+        }
+    }
+
     private string saveFileName = string.Empty;
     private void DrawSave()
     {
         if (window != null)
         {
             Rect windowPos = window.position;
-            Vector2 bottomMiddle = new Vector2(window.position.width * 0.5f - 50, window.position.height - 45);
+            Vector2 topMiddle = new Vector2(window.position.width * 0.5f - 50, 0);
 
-            GUI.Label(new Rect(bottomMiddle.x - 180, bottomMiddle.y + 10, 100, 40), "SaveName");
+            GUI.Label(new Rect(topMiddle.x - 180, topMiddle.y + 10, 100, 40), "SaveName");
 
-            saveFileName = GUI.TextField(new Rect(bottomMiddle.x - 110, bottomMiddle.y + 10, 100, 20), saveFileName);
-            if (GUI.Button(new Rect(bottomMiddle.x, bottomMiddle.y, 100, 40), "Save"))
+            saveFileName = GUI.TextField(new Rect(topMiddle.x - 110, topMiddle.y + 10, 100, 20), saveFileName);
+            if (GUI.Button(new Rect(topMiddle.x, topMiddle.y, 100, 40), "Save"))
             {
                 Node.NodeValueToNodeAsset(rootNodeValue, saveFileName);
             }
+        }
+    }
+
+    private void ResetScrollPos()
+    {
+        if (nodeValueList.Count <= 0)
+        {
+            return;
+        }
+
+        NodeValue rightmostNode = null;
+        NodeValue bottomNode = null;
+        for (int i = 0; i < nodeValueList.Count; ++i)
+        {
+            NodeValue nodeValue = nodeValueList[i];
+            if (rightmostNode == null || (nodeValue.position.x > rightmostNode.position.x))
+            {
+                rightmostNode = nodeValue;
+            }
+            if (bottomNode == null || (nodeValue.position.y > bottomNode.position.y))
+            {
+                bottomNode = nodeValue;
+            }
+        }
+
+        if (rightmostNode.position.x > contentRect.width)
+        {
+            contentRect = new Rect(0, 0, rightmostNode.position.x + 200, contentRect.height);
+        }
+        if (bottomNode.position.y > contentRect.height)
+        {
+            contentRect = new Rect(0, 0, contentRect.width, bottomNode.position.y + 200);
         }
     }
 }
