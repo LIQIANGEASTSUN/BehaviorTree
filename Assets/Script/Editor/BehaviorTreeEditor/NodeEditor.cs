@@ -9,8 +9,8 @@ public class NodeEditor {
         EditorGUILayout.BeginVertical();
 
         EditorGUILayout.BeginHorizontal();
-        nodeValue.isRootNode = EditorGUILayout.Toggle( nodeValue.isRootNode, GUILayout.Width(50));
         EditorGUILayout.LabelField("根节点", GUILayout.Width(50));
+        nodeValue.isRootNode = EditorGUILayout.Toggle( nodeValue.isRootNode, GUILayout.Width(50));
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();

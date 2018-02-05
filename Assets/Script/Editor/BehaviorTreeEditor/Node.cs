@@ -8,17 +8,16 @@ public static class Node  {
 
     public static NodeValue nodeValue;
     public static List<NodeValue> nodeValueList = new List<NodeValue>();
+    public static string fileName = string.Empty;
 
-    public static void SetNodeAsset(NodeAsset _nodeAsset)
+    public static void SetNodeAsset(NodeAsset _nodeAsset, string _fileName)
     {
         nodeAsset = _nodeAsset;
+        fileName = _fileName;
     }
 
     public static NodeValue NodeAssetToNodeValue()
     {
-        //string path = "Assets/NodeAsset/NodeAsset.asset";
-        //NodeAsset nodeAsset = AssetDatabase.LoadAssetAtPath<NodeAsset>(path);
-
         if (nodeAsset == null || (nodeAsset.nodeValue == null))
         {
             return null;
@@ -26,8 +25,18 @@ public static class Node  {
 
         nodeValue = nodeAsset.nodeValue;
 
+        nodeValueList.Clear();
+
         IterationChild(nodeValue);
+
+        Clear();
         return nodeValue;
+    }
+
+    public static void Clear()
+    {
+        nodeAsset = null;
+        fileName = string.Empty;
     }
 
     public static void IterationChild(NodeValue nodeValue)
@@ -40,13 +49,13 @@ public static class Node  {
         }
     }
 
-    public static void NodeValueToNodeAsset(NodeValue nodeValue)
+    public static void NodeValueToNodeAsset(NodeValue nodeValue, string fileName)
     {
         if (nodeValue == null)
         {
             return;
         }
 
-        CreateNodeAsset.CreateAsset("New", nodeValue);
+        CreateNodeAsset.CreateAsset(nodeValue, fileName);
     }
 }

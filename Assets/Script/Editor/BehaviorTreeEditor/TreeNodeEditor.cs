@@ -5,7 +5,7 @@ using System;
 using BehaviorTree;
 
 public class TreeNodeEditor : EditorWindow {
-    private NodeValue nodeValue = null;
+    private NodeValue rootNodeValue = null;
     // 保存窗口中所有节点
     private List<NodeValue> nodeValueList = new List<NodeValue>();
     // 当前选择的节点
@@ -30,8 +30,9 @@ public class TreeNodeEditor : EditorWindow {
         if (!isInit)
         {
             isInit = true;
-            nodeValue = Node.NodeAssetToNodeValue();
+            rootNodeValue = Node.NodeAssetToNodeValue();
             nodeValueList = Node.nodeValueList;
+            saveFileName = Node.fileName;
         }
 
         Event _event = Event.current;
@@ -69,6 +70,17 @@ public class TreeNodeEditor : EditorWindow {
             DrawNodeCurve(selectNodeValue.position, mouseRect);
         }
 
+        DrawNodeWindows();
+
+        DrawSave();
+
+        Repaint();
+    }
+
+    // 绘制节点
+    private void DrawNodeWindows()
+    {
+        int rootNodeCount = 0;
         // 开始绘制节点 
         // 注意：必须在  BeginWindows(); 和 EndWindows(); 之间 调用 GUI.Window 才能显示
         BeginWindows();
@@ -78,19 +90,27 @@ public class TreeNodeEditor : EditorWindow {
             string name = Enum.GetName(typeof(NodeType), nodeValue.NodeType);
             nodeValue.position = GUI.Window(i, nodeValue.position, DrawNodeWindow, name);
             DrawToChildCurve(nodeValue);
+
+            if (nodeValue.isRootNode)
+            {
+                rootNodeValue = nodeValue;
+                ++rootNodeCount;
+            }
         }
         EndWindows();
 
-        if (window != null)
+        if (rootNodeCount > 1)
         {
-            Rect windowPos = window.position;
-            if (GUI.Button(new Rect(window.position.width * 0.5f - 50, window.position.height - 40, 100, 40), "Save"))
-            {
-                Node.NodeValueToNodeAsset(nodeValue);
-            }
+            ShowNotification(new GUIContent("只能有一个根节点"));
         }
-
-        Repaint();
+        else if (rootNodeCount == 1)
+        {
+            RemoveNotification();
+        }
+        else if (rootNodeCount == 0)
+        {
+            ShowNotification(new GUIContent("必须有一个根节点"));
+        }
     }
 
     void DrawNodeWindow(int id)
@@ -148,9 +168,10 @@ public class TreeNodeEditor : EditorWindow {
         newNodeValue.position = new Rect(mousePosition.x, mousePosition.y, 100, 100);
         nodeValueList.Add(newNodeValue);
 
-        if (nodeValue == null)
+        if (rootNodeValue == null)
         {
-            nodeValue = newNodeValue;
+            rootNodeValue = newNodeValue;
+            rootNodeValue.isRootNode = true;
         }
     }
 
@@ -164,7 +185,7 @@ public class TreeNodeEditor : EditorWindow {
     private void DeleteNode()
     {
         int selectIndex = 0;
-        selectNodeValue = GetMouseInNode(out selectIndex);
+        NodeValue selectNodeValue = GetMouseInNode(out selectIndex);
         if (selectNodeValue != null)
         {
             nodeValueList[selectIndex].Release();
@@ -194,5 +215,23 @@ public class TreeNodeEditor : EditorWindow {
         Vector3 startPos = new Vector3(start.x + start.width / 2, start.y + start.height, 0);
         Vector3 endPos = new Vector3(end.x + end.width / 2, end.y, 0);
         Handles.DrawLine(startPos, endPos);
+    }
+
+    private string saveFileName = string.Empty;
+    private void DrawSave()
+    {
+        if (window != null)
+        {
+            Rect windowPos = window.position;
+            Vector2 bottomMiddle = new Vector2(window.position.width * 0.5f - 50, window.position.height - 45);
+
+            GUI.Label(new Rect(bottomMiddle.x - 180, bottomMiddle.y + 10, 100, 40), "SaveName");
+
+            saveFileName = GUI.TextField(new Rect(bottomMiddle.x - 110, bottomMiddle.y + 10, 100, 20), saveFileName);
+            if (GUI.Button(new Rect(bottomMiddle.x, bottomMiddle.y, 100, 40), "Save"))
+            {
+                Node.NodeValueToNodeAsset(rootNodeValue, saveFileName);
+            }
+        }
     }
 }

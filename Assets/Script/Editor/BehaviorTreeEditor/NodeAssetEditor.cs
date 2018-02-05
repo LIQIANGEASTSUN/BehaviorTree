@@ -1,11 +1,22 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using System.IO;
 
 [CustomEditor(typeof(NodeAsset))]
 public class NodeAssetEditor : Editor
 {
+    private static bool isEnable = false;
+
+    private void OnEnable()
+    {
+        isEnable = true;
+    }
+
+    private void OnDisable()
+    {
+        isEnable = false;
+    }
 
     public override void OnInspectorGUI()
     {
@@ -25,6 +36,10 @@ public class NodeAssetEditor : Editor
     [OnOpenAsset(1)]
     public static bool OpenBehaviorFromUnityTool(int instanceID, int line)
     {
+        if (!isEnable)
+        {
+            return false;
+        }
         ShowEditor();
         return true;
     }
@@ -33,10 +48,9 @@ public class NodeAssetEditor : Editor
     {
         UnityEngine.Object obj = Selection.activeObject;
         string path = AssetDatabase.GetAssetPath(obj);
-        //string path = "Assets/NodeAsset/NodeAsset.asset";
 
         NodeAsset nodeAsset = AssetDatabase.LoadAssetAtPath<NodeAsset>(path);
-        Node.SetNodeAsset(nodeAsset);
+        Node.SetNodeAsset(nodeAsset, Path.GetFileNameWithoutExtension(path));
 
         TreeNodeEditor.ShowWindow();
     }
