@@ -22,6 +22,17 @@ public class BehaviorLoad : MonoBehaviour
             _rootNode.Execute();
         }
 
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            BehaviorParameter parameter = new BehaviorParameter();
+            parameter.parameterType = (int)BehaviorParameterType.Bool;
+            parameter.parameterName = "DD";
+            parameter.boolValue = false;
+            parameter.compare = (int)BehaviorCompare.NOT_EQUAL;
+
+            bool result = _conditionCheck.CompareParameter(parameter);
+            Debug.LogError(result);
+        }
     }
 
     private void Load()
@@ -29,9 +40,9 @@ public class BehaviorLoad : MonoBehaviour
         TextAsset textAsset = Resources.Load<TextAsset>("Data/AbilityGeneric");
 
         BehaviorAnalysis analysis = new BehaviorAnalysis();
-        _rootNode = analysis.Analysis(textAsset.text);
 
         _conditionCheck = new ConditionCheck();
+        _rootNode = analysis.Analysis(textAsset.text, ref _conditionCheck);
 
         int a = 0;
     }

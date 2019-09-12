@@ -55,10 +55,13 @@ namespace BehaviorTree
 
     public enum BehaviorCompare
     {
-        Greater = 0,
-        Less = 1,
-        Equals = 2,
-        NotEqual = 3,
+        INVALID = 0,
+        GREATER = 1 << 0,
+        LESS = 1 << 1,
+        EQUALS = 1 << 2,
+        NOT_EQUAL = 1 << 3,
+        GREATER_EQUALS = 1 << 4,
+        LESS_EQUAL = 1 << 5,
     }
 
     public class BehaviorParameter
@@ -85,6 +88,79 @@ namespace BehaviorTree
             parameter.floatValue = floatValue;
             parameter.boolValue = boolValue;
             parameter.compare = compare;
+        }
+
+        private BehaviorCompare Compare(int value)
+        {
+            BehaviorCompare behaviorCompare = Compare(intValue, value);
+            return behaviorCompare;
+        }
+
+        private BehaviorCompare Compare(float value)
+        {
+            BehaviorCompare behaviorCompare = Compare(floatValue, value);
+            return behaviorCompare;
+        }
+
+        private BehaviorCompare Compare(float a, float b)
+        {
+            BehaviorCompare behaviorCompare = BehaviorCompare.INVALID;
+            if (a > b)
+            {
+                behaviorCompare |= BehaviorCompare.GREATER;
+            }
+
+            if (a >= b)
+            {
+                behaviorCompare |= BehaviorCompare.GREATER_EQUALS;
+            }
+
+            if (a == b)
+            {
+                behaviorCompare |= BehaviorCompare.EQUALS;
+            }
+
+            if (a <= b)
+            {
+                behaviorCompare |= BehaviorCompare.LESS_EQUAL;
+            }
+
+            if (a < b)
+            {
+                behaviorCompare |= BehaviorCompare.LESS;
+            }
+
+            return behaviorCompare;
+        }
+
+        private BehaviorCompare Compare(bool value)
+        {
+            return (boolValue == value) ? BehaviorCompare.EQUALS : BehaviorCompare.NOT_EQUAL;
+        }
+
+        public bool Compare(BehaviorParameter parameter)
+        {
+            if (parameterType != parameter.parameterType)
+            {
+                Debug.LogError("parameter Type not Equal:" + parameter.parameterName + "    " + parameter.parameterType + "    " + parameterType);
+                return false;
+            }
+
+            BehaviorCompare behaviorCompare = BehaviorCompare.NOT_EQUAL;
+            if (parameterType == (int)BehaviorParameterType.Float)
+            {
+                behaviorCompare = (Compare(parameter.floatValue));
+            }
+            else if (parameterType == (int)BehaviorParameterType.Int)
+            {
+                behaviorCompare = (Compare(parameter.intValue));
+            }
+            else
+            {
+                behaviorCompare = (Compare(parameter.boolValue));
+            }
+
+            return (compare & (int)behaviorCompare) > 0;
         }
     }
     

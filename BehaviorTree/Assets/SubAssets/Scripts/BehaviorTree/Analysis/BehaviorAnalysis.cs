@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content)
+        public NodeBase Analysis(string content, ref ConditionCheck conditionCheck)
         {
             NodeBase rootNode = null;
 
@@ -38,6 +38,11 @@ namespace BehaviorTree
             {
                 NodeValue nodeValue = data.nodeList[i];
                 NodeBase nodeBase = AnalysisNode(nodeValue);
+
+                if (nodeValue.parameterList.Count > 0)
+                {
+                    conditionCheck.AddParameter(nodeValue.parameterList);
+                }
 
                 if (!IsLeafNode(nodeValue.NodeType))
                 {

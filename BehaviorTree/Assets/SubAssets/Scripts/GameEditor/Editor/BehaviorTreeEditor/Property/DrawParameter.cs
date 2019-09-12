@@ -71,15 +71,15 @@ namespace BehaviorTree
                 BehaviorCompare[] compareEnumArr = new BehaviorCompare[] { };
                 if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                 {
-                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.Greater, BehaviorCompare.Less, BehaviorCompare.Equals, BehaviorCompare.NotEqual };
+                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.GREATER, BehaviorCompare.GREATER_EQUALS, BehaviorCompare.LESS_EQUAL, BehaviorCompare.LESS, BehaviorCompare.EQUALS, BehaviorCompare.NOT_EQUAL };
                 }
                 if (behaviorParameter.parameterType == (int)BehaviorParameterType.Float)
                 {
-                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.Greater, BehaviorCompare.Less };
+                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.GREATER, BehaviorCompare.LESS };
                 }
                 if (behaviorParameter.parameterType == (int)BehaviorParameterType.Bool)
                 {
-                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.Equals, BehaviorCompare.NotEqual };
+                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.EQUALS, BehaviorCompare.NOT_EQUAL };
                 }
                 string[] compareArr = new string[compareEnumArr.Length];
                 int compare = behaviorParameter.compare;
