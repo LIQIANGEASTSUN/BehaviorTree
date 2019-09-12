@@ -8,6 +8,7 @@ namespace BehaviorTree
     public class BehaviorDrawPropertyController
     {
         private BehaviorFileHandleController _fileHandleController;
+        private BehaviorPlayController _playController;
         private BehaviorPropertyOption _propertyOption;
         private BehaviorNodeInspector _nodeInspector;
         private BehaviorGlobalParameter _globalParameterController;
@@ -15,6 +16,7 @@ namespace BehaviorTree
         public void Init()
         {
             _fileHandleController = new BehaviorFileHandleController();
+            _playController = new BehaviorPlayController();
             _propertyOption = new BehaviorPropertyOption();
             _nodeInspector = new BehaviorNodeInspector();
             _globalParameterController = new BehaviorGlobalParameter();
@@ -23,6 +25,7 @@ namespace BehaviorTree
         public void OnDestroy()
         {
             _fileHandleController.OnDestroy();
+            _playController.OnDestroy();
             _nodeInspector.OnDestroy();
             _globalParameterController.OnDestroy();
         }
@@ -30,6 +33,10 @@ namespace BehaviorTree
         public void OnGUI()
         {
             _fileHandleController.OnGUI();
+            GUILayout.Space(8);
+
+            _playController.OnGUI();
+            GUILayout.Space(8);
 
             int option = _propertyOption.OnGUI();
             if (option == 1)

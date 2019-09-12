@@ -148,8 +148,6 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-
-
             return treeData;
         }
 
