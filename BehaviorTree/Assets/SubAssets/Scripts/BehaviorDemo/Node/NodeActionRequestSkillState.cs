@@ -14,6 +14,7 @@ public class NodeActionRequestSkillState : NodeAction
 
     public override ResultType Execute()
     {
+        Debug.LogError("请求状态行为节点:" + NodeIndex);
         return ResultType.Fail;
     }
 

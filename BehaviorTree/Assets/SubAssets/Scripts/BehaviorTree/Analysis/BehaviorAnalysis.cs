@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content, ref ConditionCheck conditionCheck)
+        public NodeBase Analysis(string content, ref IConditionCheck iConditionCheck)
         {
             NodeBase rootNode = null;
 
@@ -37,11 +37,11 @@ namespace BehaviorTree
             for (int i = 0; i < data.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = data.nodeList[i];
-                NodeBase nodeBase = AnalysisNode(nodeValue);
+                NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
 
                 if (nodeValue.parameterList.Count > 0)
                 {
-                    conditionCheck.AddParameter(nodeValue.parameterList);
+                    iConditionCheck.AddParameter(nodeValue.parameterList);
                 }
 
                 if (!IsLeafNode(nodeValue.NodeType))
@@ -89,7 +89,7 @@ namespace BehaviorTree
             return (type == (int)NODE_TYPE.ACTION) || (type == (int)NODE_TYPE.CONDITION);
         }
 
-        private NodeBase AnalysisNode(NodeValue nodeValue)
+        private NodeBase AnalysisNode(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
             NodeBase node = null;
             if (nodeValue.NodeType == (int)NODE_TYPE.SELECT)  // 选择节点
@@ -144,7 +144,7 @@ namespace BehaviorTree
 
             if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)  // 条件节点
             {
-                return GetCondition(nodeValue);
+                return GetCondition(nodeValue, iConditionCheck);
             }
 
             if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)  // 行为节点
@@ -216,10 +216,11 @@ namespace BehaviorTree
             return untilSuccess;
         }
 
-        public NodeCondition GetCondition(NodeValue nodeValue)
+        public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
             NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identification);
             condition.SetParameters(nodeValue.parameterList);
+            condition.SetConditionCheck(iConditionCheck);
             return condition;
         }
 

@@ -14,7 +14,11 @@ public class NodeConditionSkillState : NodeCondition
 
     public override ResultType Execute()
     {
-        return ResultType.Fail;
+        bool result = _iconditionCheck.Condition(_parameterList);
+        ResultType resultType = result ? ResultType.Success : ResultType.Fail;
+
+        Debug.LogError("技能状态条件节点:" + NodeIndex + "   result:" + resultType);
+        return resultType;
     }
 
     public static CustomIdentification CustomIdentification()

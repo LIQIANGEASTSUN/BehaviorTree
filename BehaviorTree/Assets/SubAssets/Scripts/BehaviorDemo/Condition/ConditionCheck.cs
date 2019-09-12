@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class ConditionCheck
+public class ConditionCheck : IConditionCheck
 {
     // 保存当前世界状态中所有参数动态变化的值
     private Dictionary<string, BehaviorParameter> _parameterDic = new Dictionary<string, BehaviorParameter>();
@@ -105,6 +105,28 @@ public class ConditionCheck
         }
 
         return parameter.Compare(cacheParameter);
+    }
+
+    public bool Condition(BehaviorParameter parameter)
+    {
+        return CompareParameter(parameter);
+    }
+
+    public bool Condition(List<BehaviorParameter> parameterList)
+    {
+        bool result = true;
+        for (int i = 0; i < parameterList.Count; ++i)
+        {
+            BehaviorParameter parameter = parameterList[i];
+            bool value = CompareParameter(parameter);
+            if (!value)
+            {
+                result = value;
+                break;
+            }
+        }
+
+        return result;
     }
 
 }
