@@ -5,7 +5,12 @@ using UnityEditor;
 
 namespace BehaviorTree
 {
-
+    public enum BehaviorPlayType
+    {
+        PLAY = 0,
+        STOP = 1,
+        STEP = 2,
+    }
 
     public class BehaviorPlayController
     {
