@@ -16,9 +16,12 @@ namespace BehaviorTree
 
         public NodeBase Analysis(string content, ref IConditionCheck iConditionCheck)
         {
-            NodeBase rootNode = null;
+            return Analysis(content, ref iConditionCheck);
+        }
 
-            BehaviorTreeData data = JsonMapper.ToObject<BehaviorTreeData>(content);
+        public NodeBase Analysis(BehaviorTreeData data, ref IConditionCheck iConditionCheck)
+        {
+            NodeBase rootNode = null;
             if (null == data)
             {
                 Debug.LogError("数据无效");
@@ -62,7 +65,7 @@ namespace BehaviorTree
                 allNodeDic[nodeValue.id] = nodeBase;
             }
 
-            foreach(var kv in compositeDic)
+            foreach (var kv in compositeDic)
             {
                 int id = kv.Key;
                 NodeComposite composite = (NodeComposite)(kv.Value);

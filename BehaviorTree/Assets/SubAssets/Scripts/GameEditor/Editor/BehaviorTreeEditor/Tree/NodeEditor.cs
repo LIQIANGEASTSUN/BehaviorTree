@@ -5,8 +5,10 @@ using BehaviorTree;
 
 public class NodeEditor {
 
-    private static int height = 58;
-    public static void Draw(NodeValue nodeValue, int selectNodeId)
+    private static int height = 75;
+    private static float value = 0.5f;
+
+    public static void Draw(NodeValue nodeValue, int selectNodeId, float value = 0f)
     {
         EditorGUILayout.BeginVertical("box", GUILayout.Height(height));
         {
@@ -32,6 +34,8 @@ public class NodeEditor {
             }
 
             nodeValue.descript = EditorGUILayout.TextArea(nodeValue.descript);
+
+            GUILayout.HorizontalSlider(value, 0, 1);
         }
         EditorGUILayout.EndVertical();
 
@@ -41,7 +45,7 @@ public class NodeEditor {
     private static void SetHight(NodeValue nodeValue)
     {
         RectT rect = nodeValue.position;
-        rect.height = 80;
+        rect.height = 95;
         nodeValue.position = rect;
     }
 
