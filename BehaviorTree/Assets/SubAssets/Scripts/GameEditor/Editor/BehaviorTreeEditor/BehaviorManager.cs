@@ -21,7 +21,7 @@ public class BehaviorManager
     public delegate void BehaviorNodeParameter(int nodeId, BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorGlobalParameterChange(BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorNodeChangeParameter(int nodeId, string oldParameter, string newParameter);
-    public delegate void BehaviorRuntimePlay(int state);
+    public delegate void BehaviorRuntimePlay(BehaviorPlayType state, BehaviorPlayType step);
 
     private string _filePath = string.Empty;
     private string _fileName = string.Empty;
@@ -64,7 +64,6 @@ public class BehaviorManager
         behaviorNodeParameter += NodeParameterChange;
         globalParameterChange += GlobalParameterChange;
         behaviorNodeChangeParameter += NodeChangeParameter;
-        behaviorRuntimePlay += RuntimePlay;
     }
 
     public void OnDestroy()
@@ -80,7 +79,6 @@ public class BehaviorManager
         behaviorNodeParameter -= NodeParameterChange;
         globalParameterChange -= GlobalParameterChange;
         behaviorNodeChangeParameter -= NodeChangeParameter;
-        behaviorRuntimePlay -= RuntimePlay;
     }
 
     public void Update()
@@ -114,6 +112,11 @@ public class BehaviorManager
     public int CurrentSelectId
     {
         get { return _currentSelectId; }
+    }
+
+    public BehaviorTreeData BehaviorTreeData
+    {
+        get { return _behaviorTreeData; }
     }
 
     public NodeValue CurrentNode
@@ -339,11 +342,6 @@ public class BehaviorManager
                 break;
             }
         }
-    }
-
-    private void RuntimePlay(int state)
-    {
-        Debug.LogError("play:" + state);
     }
 
     private void GlobalParameterChange(BehaviorParameter parameter, bool isAdd)

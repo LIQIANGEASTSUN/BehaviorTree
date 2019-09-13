@@ -7,9 +7,11 @@ namespace BehaviorTree
 {
     public enum BehaviorPlayType
     {
-        PLAY = 0,
-        STOP = 1,
-        STEP = 2,
+        INVALID = -1,
+        PLAY    = 0,
+        PAUSE   = 1,
+        STOP    = 2,
+        STEP    = 3,
     }
 
     public class BehaviorPlayController
@@ -52,9 +54,9 @@ namespace BehaviorTree
 
     public class BehaviorPlayView
     {
-        private int option = 1;
-        private readonly string[] optionArr = new string[] { "Play", "Stop", "Step" };
-
+        private int option = 2;
+        private readonly string[] optionArr = new string[] { "Play", "Pause", "Stop"};
+        private BehaviorPlayType _step;
         public BehaviorPlayView()
         {
 
@@ -62,19 +64,28 @@ namespace BehaviorTree
 
         public void Draw()
         {
-            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.BeginHorizontal("box");
             {
                 int index = option;
                 option = GUILayout.Toolbar(option, optionArr, EditorStyles.toolbarButton);
-                if (index != option)
+
+                if (GUILayout.Button("Step"))
+                {
+                    _step = BehaviorPlayType.STEP;
+                }
+
+                if (index != option || _step == BehaviorPlayType.STEP)
                 {
                     if (null != BehaviorManager.behaviorRuntimePlay)
                     {
-                        BehaviorManager.behaviorRuntimePlay(option);
+                        BehaviorManager.behaviorRuntimePlay((BehaviorPlayType)option, _step);
                     }
+
+                    _step = BehaviorPlayType.INVALID;
                 }
+
             }
-            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
         }
     }
 

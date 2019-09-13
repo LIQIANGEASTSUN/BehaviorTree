@@ -16,7 +16,13 @@ namespace BehaviorTree
 
         public NodeBase Analysis(string content, ref IConditionCheck iConditionCheck)
         {
-            return Analysis(content, ref iConditionCheck);
+            BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
+            if (null == behaviorTreeData)
+            {
+                Debug.LogError("behaviorTreeData is null");
+                return null;
+            }
+            return Analysis(behaviorTreeData, ref iConditionCheck);
         }
 
         public NodeBase Analysis(BehaviorTreeData data, ref IConditionCheck iConditionCheck)
@@ -41,6 +47,7 @@ namespace BehaviorTree
             {
                 NodeValue nodeValue = data.nodeList[i];
                 NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
+                nodeBase.NodeId = nodeValue.id;
 
                 if (nodeValue.parameterList.Count > 0)
                 {

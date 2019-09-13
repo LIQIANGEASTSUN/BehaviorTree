@@ -17,7 +17,7 @@ public class NodeConditionGeneral : NodeCondition
         bool result = _iconditionCheck.Condition(_parameterList);
         ResultType resultType = result ? ResultType.Success : ResultType.Fail;
 
-        Debug.LogError("通用条件节点:" + NodeIndex + "   result:" + resultType);
+        Debug.LogError("通用条件节点:" + NodeId + "   result:" + resultType);
         return resultType;
     }
 

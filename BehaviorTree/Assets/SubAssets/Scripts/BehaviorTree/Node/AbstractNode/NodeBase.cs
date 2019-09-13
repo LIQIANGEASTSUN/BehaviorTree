@@ -14,6 +14,11 @@
         /// </summary>
         private int nodeIndex;
 
+        /// <summary>
+        /// 节点Id
+        /// </summary>
+        private int nodeId;
+
         public NodeBase(NODE_TYPE nodeType)
         {
             this.nodeType = nodeType;
@@ -30,5 +35,12 @@
             get { return nodeIndex; }
             set { nodeIndex = value; }
         }
+
+        public int NodeId
+        {
+            get { return nodeId; }
+            set { nodeId = value; }
+        }
+
     }
 }

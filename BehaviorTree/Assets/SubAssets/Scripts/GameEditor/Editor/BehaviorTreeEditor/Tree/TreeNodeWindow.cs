@@ -7,6 +7,7 @@ using BehaviorTree;
 public class TreeNodeWindow : EditorWindow {
     private BehaviorDrawPropertyController _behaviorDrawPropertyController;
     private BehaviorDrawController _behaviorDrawController;
+    private BehaviorRunTime _behaviorRunTime;
 
     public static TreeNodeWindow window;
     private static Rect windowsPosition = new Rect(10, 30, 1236, 864);
@@ -30,6 +31,8 @@ public class TreeNodeWindow : EditorWindow {
         _behaviorDrawController = new BehaviorDrawController();
         _behaviorDrawController.Init();
 
+        _behaviorRunTime = new BehaviorRunTime();
+
         EditorApplication.update += OnFrame;
     }
 
@@ -40,11 +43,14 @@ public class TreeNodeWindow : EditorWindow {
 
         _behaviorDrawController.OnDestroy();
         _behaviorDrawPropertyController.OnDestroy();
+
+        _behaviorRunTime.OnDestroy();
     }
 
     private void OnFrame()
     {
         BehaviorManager.Instance.Update();
+        _behaviorRunTime.Update();
     }
 
     private void OnGUI()
