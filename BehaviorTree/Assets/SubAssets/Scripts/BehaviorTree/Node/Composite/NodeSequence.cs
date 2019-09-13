@@ -1,4 +1,6 @@
-﻿namespace BehaviorTree
+﻿using UnityEngine;
+
+namespace BehaviorTree
 {
     /// <summary>
     /// 顺序节点(组合节点)
@@ -19,6 +21,8 @@
         /// <returns></returns>
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
             int index = 0;
             if (lastRunningNode != null)
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace BehaviorTree
 {
@@ -13,6 +14,8 @@ namespace BehaviorTree
 
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
             List<int> randomList = GetRandom(nodeChildList.Count);
 
             int index = -1;

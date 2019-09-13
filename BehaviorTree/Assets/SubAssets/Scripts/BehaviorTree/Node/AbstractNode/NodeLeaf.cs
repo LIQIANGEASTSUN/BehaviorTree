@@ -11,6 +11,9 @@ namespace BehaviorTree
         public NodeLeaf(NODE_TYPE nodeType):base(nodeType)
         { }
 
-
+        public override ResultType Execute()
+        {
+            return ResultType.Fail;
+        }
     }
 }

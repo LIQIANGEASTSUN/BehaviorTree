@@ -1,4 +1,6 @@
-﻿namespace BehaviorTree
+﻿using UnityEngine;
+
+namespace BehaviorTree
 {
     /// <summary>
     /// 节点超类

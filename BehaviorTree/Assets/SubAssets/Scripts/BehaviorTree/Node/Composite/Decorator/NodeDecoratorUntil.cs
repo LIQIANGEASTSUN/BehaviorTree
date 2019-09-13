@@ -15,6 +15,8 @@ namespace BehaviorTree
 
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
             NodeBase nodeRoot = nodeChildList[0];
             ResultType resultType = nodeRoot.Execute();
             if (resultType == _desiredResult)

@@ -1,4 +1,6 @@
-﻿namespace BehaviorTree
+﻿using UnityEngine;
+
+namespace BehaviorTree
 {
     /// <summary>
     /// 并行节点(组合节点)
@@ -16,6 +18,8 @@
         /// <returns></returns>
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
             ResultType resultType = ResultType.Fail;
 
             int successCount = 0;

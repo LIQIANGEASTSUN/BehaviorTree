@@ -15,16 +15,22 @@ namespace BehaviorTree
         
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
+            ResultType resultType = ResultType.Fail;
+
             NodeBase nodeRoot = nodeChildList[0];
-            ResultType resultType = nodeRoot.Execute();
-            if (resultType == ResultType.Fail)
+            ResultType type = nodeRoot.Execute();
+            if (type == ResultType.Fail)
             {
-                return ResultType.Success;
+                resultType = ResultType.Success;
             }
             else
             {
-                return ResultType.Fail;
+                resultType = ResultType.Fail;
             }
+
+            return resultType;
         }
     }
 }

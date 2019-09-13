@@ -14,7 +14,7 @@ public class NodeEditor {
         {
             if (nodeValue.id == selectNodeId)
             {
-                GUI.backgroundColor = new Color(0, 1, 0, 0.3f);
+                GUI.backgroundColor = new Color(0, 1, 0, 0.15f);
                 GUI.Box(new Rect(5, 20, nodeValue.position.width - 10, height), string.Empty);
                 GUI.backgroundColor = Color.white;
             }
@@ -35,7 +35,21 @@ public class NodeEditor {
 
             nodeValue.descript = EditorGUILayout.TextArea(nodeValue.descript);
 
-            GUILayout.HorizontalSlider(value, 0, 1);
+            {
+                float slider = NodeNotify.NodeDraw(nodeValue.id);
+
+                Rect runRect = new Rect(8, 80, nodeValue.position.width - 16, 8);
+                GUI.Box(runRect, string.Empty);
+                if (slider > 0)
+                {
+                    runRect.width = runRect.width * slider;
+                    GUI.backgroundColor = Color.green;
+                    GUI.Box(runRect, string.Empty);
+                    GUI.backgroundColor = Color.white;
+                }
+            }
+           
+            //GUILayout.HorizontalSlider(value, 0, 1);
         }
         EditorGUILayout.EndVertical();
 

@@ -14,7 +14,7 @@ public class NodeActionRequestSkillState : NodeAction
 
     public override ResultType Execute()
     {
-        Debug.LogError("请求状态行为节点:" + NodeId);
+        NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
         return ResultType.Fail;
     }
 

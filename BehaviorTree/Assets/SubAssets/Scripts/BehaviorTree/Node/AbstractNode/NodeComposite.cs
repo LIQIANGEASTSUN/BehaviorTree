@@ -24,5 +24,10 @@ namespace BehaviorTree
         {
             return nodeChildList;
         }
+
+        public override ResultType Execute()
+        {
+            return ResultType.Fail;
+        }
     }
 }

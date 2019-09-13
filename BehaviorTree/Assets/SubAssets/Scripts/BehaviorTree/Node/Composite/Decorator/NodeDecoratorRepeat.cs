@@ -16,6 +16,8 @@ namespace BehaviorTree
 
         public override ResultType Execute()
         {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+
             NodeBase nodeRoot = nodeChildList[0];
             ResultType resultType = nodeRoot.Execute();
 
@@ -23,10 +25,14 @@ namespace BehaviorTree
 
             if (_executeCount < _repeatCount)
             {
-                return ResultType.Running;
+                resultType = ResultType.Running;
+            }
+            else
+            {
+                resultType = ResultType.Fail;
             }
 
-            return ResultType.Fail;
+            return resultType;
         }
 
         public void ReStart()
