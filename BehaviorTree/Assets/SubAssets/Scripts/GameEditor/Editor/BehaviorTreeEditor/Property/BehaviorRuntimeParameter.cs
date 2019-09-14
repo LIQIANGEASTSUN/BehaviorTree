@@ -30,13 +30,21 @@ namespace BehaviorTree
 
         public void OnGUI()
         {
-            GlobalParameter globalParameter = _runtimeParameterModel.GlobalParameter;
-            _runtimeParameterView.Draw(globalParameter);
+            if (_runtimeParameterModel.ParameterList.Count <= 0)
+            {
+                List<BehaviorParameter> parameterList = BehaviorRunTime.Instance.ConditionCheck.GetAllParameter();
+                _runtimeParameterModel.AddParameter(parameterList);
+            }
+
+            _runtimeParameterView.Draw(_runtimeParameterModel.ParameterList);
         }
+
     }
 
     public class BehaviorRuntimeParameterModel
     {
+        private List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
+
         public BehaviorRuntimeParameterModel()
         {
         }
@@ -48,12 +56,26 @@ namespace BehaviorTree
                 return BehaviorManager.Instance.GlobalParameter;
             }
         }
+
+        public void AddParameter(List<BehaviorParameter> parameterList)
+        {
+            _parameterList = parameterList;
+        }
+
+        public List<BehaviorParameter> ParameterList
+        {
+            get
+            {
+                return _parameterList;
+            }
+        }
+
     }
 
     public class BehaviorRuntimeParameterView
     {
         private Vector2 scrollPos = Vector2.zero;
-        public void Draw(GlobalParameter globalParameter)
+        public void Draw(List<BehaviorParameter> parameterList)
         {
             EditorGUILayout.LabelField("运行时变量");
 
@@ -63,21 +85,12 @@ namespace BehaviorTree
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandHeight(true));
                 {
                     GUI.backgroundColor = new Color(0.85f, 0.85f, 0.85f, 1f);
-                    for (int i = 0; i < globalParameter.parameterList.Count; ++i)
+                    for (int i = 0; i < parameterList.Count; ++i)
                     {
-                        BehaviorParameter behaviorParameter = globalParameter.parameterList[i];
-
-                        Action DelCallBack = () =>
-                        {
-                            if (null != BehaviorManager.behaviorNodeParameter)
-                            {
-                                BehaviorManager.globalParameterChange(behaviorParameter, false);
-                            }
-                        };
-
+                        BehaviorParameter behaviorParameter = parameterList[i];
                         EditorGUILayout.BeginVertical("box");
                         {
-                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.RUNTIME_PARAMETER, DelCallBack);
+                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.RUNTIME_PARAMETER, null);
                         }
                         EditorGUILayout.EndVertical();
                     }

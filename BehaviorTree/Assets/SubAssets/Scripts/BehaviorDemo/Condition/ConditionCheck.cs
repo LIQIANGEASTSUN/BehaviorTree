@@ -72,6 +72,16 @@ public class ConditionCheck : IConditionCheck
 
             //Debug.LogError(parameter.parameterName + "     " + (BehaviorParameterType)(parameter.parameterType));
             _allParameterDic[parameter.parameterName] = parameter.Clone();
+
+            // 暂时这么处理，以后改成读取默认值
+            _allParameterDic[parameter.parameterName].intValue = 0;
+            _allParameterDic[parameter.parameterName].floatValue = 0;
+            _allParameterDic[parameter.parameterName].boolValue = false;
+        }
+
+        if (parameterList.Count > 0)
+        {
+            Debug.Log("暂时这么处理，以后改成读取默认值");
         }
     }
 
@@ -112,6 +122,17 @@ public class ConditionCheck : IConditionCheck
         }
 
         return result;
+    }
+
+    public List<BehaviorParameter> GetAllParameter()
+    {
+        List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
+        foreach(var kv in _allParameterDic)
+        {
+            parameterList.Add(kv.Value);
+        }
+
+        return parameterList;
     }
 
 }
