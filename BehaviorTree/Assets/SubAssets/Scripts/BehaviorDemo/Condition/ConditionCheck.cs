@@ -5,10 +5,7 @@ using BehaviorTree;
 
 public class ConditionCheck : IConditionCheck
 {
-    // 保存当前世界状态中所有参数动态变化的值
-    private Dictionary<string, BehaviorParameter> _parameterDic = new Dictionary<string, BehaviorParameter>();
-    
-    // 缓存当前行为树使用到的所有参数类型
+    // 缓存当前行为树使用到的所有参数类型,保存当前世界状态中所有参数动态变化的值
     private Dictionary<string, BehaviorParameter> _allParameterDic = new Dictionary<string, BehaviorParameter>();
 
     public ConditionCheck()
@@ -19,7 +16,7 @@ public class ConditionCheck : IConditionCheck
     public void SetParameter(string parameterName, object value)
     {
         BehaviorParameter parameter = null;
-        if (!EnableAdd(parameterName, ref parameter)) // 当前行为树不需要的参数值就不保存了
+        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
             return;
         }
@@ -60,19 +57,7 @@ public class ConditionCheck : IConditionCheck
         }
 
         Debug.LogError("SetParameter:" + parameterName + "    " + value);
-        _parameterDic[parameterName] = parameter;
-    }
-
-    private bool EnableAdd(string parameterName, ref BehaviorParameter parameter)
-    {
-        BehaviorParameter cacheParameter = null;
-        if (!_allParameterDic.TryGetValue(parameterName, out cacheParameter)) // 当前行为树不需要的参数值就不保存了
-        {
-            return false;
-        }
-
-        parameter = cacheParameter.Clone();
-        return true;
+        _allParameterDic[parameterName] = parameter;
     }
 
     public void AddParameter(List<BehaviorParameter> parameterList)
@@ -85,15 +70,15 @@ public class ConditionCheck : IConditionCheck
                 continue;
             }
 
-            Debug.LogError(parameter.parameterName + "     " + (BehaviorParameterType)(parameter.parameterType));
-            _allParameterDic[parameter.parameterName] = parameter;
+            //Debug.LogError(parameter.parameterName + "     " + (BehaviorParameterType)(parameter.parameterType));
+            _allParameterDic[parameter.parameterName] = parameter.Clone();
         }
     }
 
     public bool CompareParameter(BehaviorParameter parameter)
     {
         BehaviorParameter cacheParameter = null;
-        if (!_parameterDic.TryGetValue(parameter.parameterName, out cacheParameter))
+        if (!_allParameterDic.TryGetValue(parameter.parameterName, out cacheParameter))
         {
             return false;
         }
@@ -118,7 +103,7 @@ public class ConditionCheck : IConditionCheck
         for (int i = 0; i < parameterList.Count; ++i)
         {
             BehaviorParameter parameter = parameterList[i];
-            bool value = CompareParameter(parameter);
+            bool value = Condition(parameter);
             if (!value)
             {
                 result = value;

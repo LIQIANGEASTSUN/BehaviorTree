@@ -7,20 +7,20 @@ using System;
 namespace BehaviorTree
 {
 
-    public class BehaviorGlobalParameter
+    public class BehaviorRuntimeParameter
     {
-        private BehaviorGlobalParameterModel _globalParameterModel;
-        private BehaviorGlobalParameterView _globalParameterView;
+        private BehaviorRuntimeParameterModel _runtimeParameterModel;
+        private BehaviorRuntimeParameterView _runtimeParameterView;
 
-        public BehaviorGlobalParameter()
+        public BehaviorRuntimeParameter()
         {
             Init();
         }
 
         public void Init()
         {
-            _globalParameterModel = new BehaviorGlobalParameterModel();
-            _globalParameterView = new BehaviorGlobalParameterView();
+            _runtimeParameterModel = new BehaviorRuntimeParameterModel();
+            _runtimeParameterView = new BehaviorRuntimeParameterView();
         }
 
         public void OnDestroy()
@@ -30,15 +30,14 @@ namespace BehaviorTree
 
         public void OnGUI()
         {
-            GlobalParameter globalParameter = _globalParameterModel.GlobalParameter;
-            _globalParameterView.Draw(globalParameter);
+            GlobalParameter globalParameter = _runtimeParameterModel.GlobalParameter;
+            _runtimeParameterView.Draw(globalParameter);
         }
-
     }
 
-    public class BehaviorGlobalParameterModel
+    public class BehaviorRuntimeParameterModel
     {
-        public BehaviorGlobalParameterModel()
+        public BehaviorRuntimeParameterModel()
         {
         }
 
@@ -51,13 +50,12 @@ namespace BehaviorTree
         }
     }
 
-    public class BehaviorGlobalParameterView
+    public class BehaviorRuntimeParameterView
     {
-
         private Vector2 scrollPos = Vector2.zero;
         public void Draw(GlobalParameter globalParameter)
         {
-            EditorGUILayout.LabelField("全部变量");
+            EditorGUILayout.LabelField("运行时变量");
 
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             {
@@ -79,7 +77,7 @@ namespace BehaviorTree
 
                         EditorGUILayout.BeginVertical("box");
                         {
-                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.GLOBAL_PARAMETER, DelCallBack);
+                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.RUNTIME_PARAMETER, DelCallBack);
                         }
                         EditorGUILayout.EndVertical();
                     }
@@ -88,40 +86,13 @@ namespace BehaviorTree
                 EditorGUILayout.EndScrollView();
             }
             EditorGUILayout.EndVertical();
-
-            GUILayout.Space(10);
-            EditorGUILayout.BeginVertical("box");
-            {
-                DrawAddParameter();
-            }
-            EditorGUILayout.EndVertical();
-        }
-
-        private BehaviorParameter newAddParameter = new BehaviorParameter();
-        private void DrawAddParameter()
-        {
-            if (null == newAddParameter)
-            {
-                newAddParameter = new BehaviorParameter();
-            }
-
-            EditorGUILayout.BeginVertical("box");
-            {
-                newAddParameter = DrawParameter.Draw(newAddParameter, DrawParameterType.GLOBAL_PARAMETER_ADD, null);
-            }
-            EditorGUILayout.EndVertical();
-            GUILayout.Space(5);
-
-            if (GUILayout.Button("添加条件"))
-            {
-                if (null != BehaviorManager.behaviorNodeParameter)
-                {
-                    BehaviorManager.globalParameterChange(newAddParameter, true);
-                }
-            }
         }
 
     }
 
 }
+
+
+
+
 

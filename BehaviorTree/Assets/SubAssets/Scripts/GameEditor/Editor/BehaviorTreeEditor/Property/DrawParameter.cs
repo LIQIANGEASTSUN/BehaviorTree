@@ -11,6 +11,7 @@ namespace BehaviorTree
         NODE_PARAMETER = 0,
         GLOBAL_PARAMETER,
         GLOBAL_PARAMETER_ADD,
+        RUNTIME_PARAMETER,
     }
 
     public class DrawParameter
@@ -61,7 +62,8 @@ namespace BehaviorTree
                     }
                 }
                 else if (drawParameterType == DrawParameterType.GLOBAL_PARAMETER
-                    || (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD))
+                    || (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD)
+                    || drawParameterType == DrawParameterType.RUNTIME_PARAMETER)
                 {
                     GUI.enabled = (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD);
                     behaviorParameter.parameterName = EditorGUILayout.TextField(behaviorParameter.parameterName);
@@ -100,7 +102,7 @@ namespace BehaviorTree
                     compare = 0;
                 }
 
-                GUI.enabled = (drawParameterType != DrawParameterType.GLOBAL_PARAMETER);
+                GUI.enabled = (drawParameterType != DrawParameterType.GLOBAL_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER);
                 {
                     compare = EditorGUILayout.Popup(compare, compareArr, GUILayout.Width(65));
                     behaviorParameter.compare = (int)(compareEnumArr[compare]);
