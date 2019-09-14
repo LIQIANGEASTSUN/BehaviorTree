@@ -11,7 +11,6 @@ namespace BehaviorTree
         PLAY    = 0,
         PAUSE   = 1,
         STOP    = 2,
-        STEP    = 3,
     }
 
     public class BehaviorPlayController
@@ -56,7 +55,6 @@ namespace BehaviorTree
     {
         private int option = 2;
         private readonly string[] optionArr = new string[] { "Play", "Pause", "Stop"};
-        private BehaviorPlayType _step;
         public BehaviorPlayView()
         {
 
@@ -68,20 +66,12 @@ namespace BehaviorTree
             {
                 int index = option;
                 option = GUILayout.Toolbar(option, optionArr, EditorStyles.toolbarButton);
-
-                if (GUILayout.Button("Step"))
-                {
-                    _step = BehaviorPlayType.STEP;
-                }
-
-                if (index != option || _step == BehaviorPlayType.STEP)
+                if (index != option)
                 {
                     if (null != BehaviorManager.behaviorRuntimePlay)
                     {
-                        BehaviorManager.behaviorRuntimePlay((BehaviorPlayType)option, _step);
+                        BehaviorManager.behaviorRuntimePlay((BehaviorPlayType)option);
                     }
-
-                    _step = BehaviorPlayType.INVALID;
                 }
 
             }

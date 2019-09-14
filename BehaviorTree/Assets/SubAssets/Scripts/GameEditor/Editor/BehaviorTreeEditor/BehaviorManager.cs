@@ -21,12 +21,13 @@ public class BehaviorManager
     public delegate void BehaviorNodeParameter(int nodeId, BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorGlobalParameterChange(BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorNodeChangeParameter(int nodeId, string oldParameter, string newParameter);
-    public delegate void BehaviorRuntimePlay(BehaviorPlayType state, BehaviorPlayType step);
+    public delegate void BehaviorRuntimePlay(BehaviorPlayType state);
 
     private string _filePath = string.Empty;
     private string _fileName = string.Empty;
     private BehaviorTreeData _behaviorTreeData;
     private GlobalParameter _globalParameter;
+    private BehaviorPlayType _playState = BehaviorPlayType.STOP;
 
     // 当前选择的节点
     private int _currentSelectId = 0;
@@ -64,6 +65,7 @@ public class BehaviorManager
         behaviorNodeParameter += NodeParameterChange;
         globalParameterChange += GlobalParameterChange;
         behaviorNodeChangeParameter += NodeChangeParameter;
+        behaviorRuntimePlay += RuntimePlay;
     }
 
     public void OnDestroy()
@@ -79,6 +81,7 @@ public class BehaviorManager
         behaviorNodeParameter -= NodeParameterChange;
         globalParameterChange -= GlobalParameterChange;
         behaviorNodeChangeParameter -= NodeChangeParameter;
+        behaviorRuntimePlay -= RuntimePlay;
     }
 
     public void Update()
@@ -117,6 +120,11 @@ public class BehaviorManager
     public BehaviorTreeData BehaviorTreeData
     {
         get { return _behaviorTreeData; }
+    }
+
+    public BehaviorPlayType PlayType
+    {
+        get { return _playState; }
     }
 
     public NodeValue CurrentNode
@@ -342,6 +350,13 @@ public class BehaviorManager
                 break;
             }
         }
+    }
+
+    private void RuntimePlay(BehaviorPlayType state)
+    {
+        BehaviorRunTime.Instance.RuntimePlay(_playState, state);
+        NodeNotify.SetPlayState((int)state);
+        _playState = state;
     }
 
     private void GlobalParameterChange(BehaviorParameter parameter, bool isAdd)

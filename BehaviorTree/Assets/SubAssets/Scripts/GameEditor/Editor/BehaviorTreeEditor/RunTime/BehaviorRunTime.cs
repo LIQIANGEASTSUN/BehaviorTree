@@ -7,25 +7,23 @@ namespace BehaviorTree
 
     public class BehaviorRunTime
     {
+        public static readonly BehaviorRunTime Instance = new BehaviorRunTime();
+
         private NodeBase _rootNode = null;
         private IConditionCheck _iconditionCheck = null;
 
-        private BehaviorPlayType _playState = BehaviorPlayType.STOP;
         private RunTimeRotateGo _runtimeRotateGo;
-        public BehaviorRunTime()
+        private BehaviorRunTime()
         {
-            Init();
         }
 
-        private void Init()
+        public void Init()
         {
             _runtimeRotateGo = new RunTimeRotateGo();
-            BehaviorManager.behaviorRuntimePlay += RuntimePlay;
         }
 
         public void OnDestroy()
         {
-            BehaviorManager.behaviorRuntimePlay -= RuntimePlay;
             _runtimeRotateGo.OnDestroy();
         }
 
@@ -36,17 +34,16 @@ namespace BehaviorTree
             _rootNode = analysis.Analysis(behaviorTreeData, ref _iconditionCheck);
         }
 
-        private void RuntimePlay(BehaviorPlayType state, BehaviorPlayType step)
+        public void RuntimePlay(BehaviorPlayType oldState, BehaviorPlayType newState)
         {
-            if (_playState == BehaviorPlayType.STOP && state != BehaviorPlayType.STOP)
+            if (oldState == BehaviorPlayType.STOP && newState != BehaviorPlayType.STOP)
             {
                 Reset(BehaviorManager.Instance.BehaviorTreeData);
             }
-            _playState = state;
 
-            if (_playState != BehaviorPlayType.PLAY && step == BehaviorPlayType.STEP)
+            if (newState != BehaviorPlayType.PLAY)
             {
-                Execute(true);
+                Execute();
             }
         }
 
@@ -54,17 +51,17 @@ namespace BehaviorTree
         {
             _runtimeRotateGo.Update();
 
-            Execute(false);
+            Execute();
         }
 
-        public void Execute(bool step)
+        public void Execute()
         {
-            if (_playState == BehaviorPlayType.STOP)
+            if (BehaviorManager.Instance.PlayType == BehaviorPlayType.STOP)
             {
                 return;
             }
 
-            if (_playState == BehaviorPlayType.PAUSE && !step)
+            if (BehaviorManager.Instance.PlayType == BehaviorPlayType.PAUSE)
             {
                 return;
             }
