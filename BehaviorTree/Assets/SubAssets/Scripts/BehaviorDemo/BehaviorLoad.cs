@@ -17,26 +17,14 @@ public class BehaviorLoad : MonoBehaviour
     void Update()
     {
      
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            _rootNode.Execute();
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-
-        }
-
     }
 
     private void Load()
     {
         TextAsset textAsset = Resources.Load<TextAsset>("Data/AbilityGeneric");
-
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         iconditionCheck = new ConditionCheck();
         _rootNode = analysis.Analysis(textAsset.text, ref iconditionCheck);
-
         int a = 0;
     }
 

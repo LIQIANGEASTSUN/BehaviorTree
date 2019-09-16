@@ -106,6 +106,8 @@ namespace BehaviorTree
                 return nodeList;
             }
 
+
+            #region Skill
             // 条件节点
             {
                 CustomIdentification input = NodeConditionInput.CustomIdentification();
@@ -123,6 +125,27 @@ namespace BehaviorTree
                 CustomIdentification requestSkillState = NodeActionRequestSkillState.CustomIdentification();
                 nodeList.Add(requestSkillState);
             }
+            #endregion
+
+            #region Human
+            // 条件节点
+            {
+                CustomIdentification custom = NodeConditionCustom.CustomIdentification();
+                nodeList.Add(custom);
+            }
+
+            // 行为节点
+            {
+                CustomIdentification cooking = NodeActionCooking.CustomIdentification();
+                nodeList.Add(cooking);
+
+                CustomIdentification eat = NodeActionEat.CustomIdentification();
+                nodeList.Add(eat);
+
+                CustomIdentification move = NodeActionMove.CustomIdentification();
+                nodeList.Add(move);
+            }
+            #endregion
 
             HashSet<int> hash = new HashSet<int>();
             for (int i = 0; i < nodeList.Count; ++i)

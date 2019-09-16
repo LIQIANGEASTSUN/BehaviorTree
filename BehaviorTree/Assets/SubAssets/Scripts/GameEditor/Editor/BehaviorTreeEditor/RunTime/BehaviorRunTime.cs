@@ -32,8 +32,6 @@ namespace BehaviorTree
             BehaviorAnalysis analysis = new BehaviorAnalysis();
             _iconditionCheck = new ConditionCheck();
             _rootNode = analysis.Analysis(behaviorTreeData, ref _iconditionCheck);
-
-
         }
 
         public ConditionCheck ConditionCheck
