@@ -15,7 +15,30 @@ public class NodeActionMove : NodeAction
     public override ResultType Execute()
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
-        return ResultType.Fail;
+
+        Vector3 targetPos = Vector3.zero;
+        if (_parameterList.Count >= 0)
+        {
+            BehaviorParameter parameter = _parameterList[0];
+            if (parameter.parameterName.CompareTo("MoveTarget") == 0 && parameter.intValue == 0)
+            {
+                targetPos = HumanController.Instance.Human.KitchenPos();
+            }
+            else if (parameter.parameterName.CompareTo("MoveTarget") == 0 && parameter.intValue == 1)
+            {
+                targetPos = HumanController.Instance.Human.DiningTablePos();
+            }
+        }
+
+        HumanController.Instance.Human.Translate(targetPos);
+
+        ResultType resultType = ResultType.Running;
+        if (Vector3.Distance(HumanController.Instance.Human.Position(), targetPos) < 0.5f)
+        {
+            return ResultType.Success;
+        }
+
+        return resultType;
     }
 
     public static CustomIdentification CustomIdentification()

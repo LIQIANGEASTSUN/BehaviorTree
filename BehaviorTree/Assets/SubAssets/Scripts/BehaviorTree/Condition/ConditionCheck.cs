@@ -129,6 +129,7 @@ public class ConditionCheck : IConditionCheck
         List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
         foreach(var kv in _allParameterDic)
         {
+            Debug.LogError(kv.Value.parameterName);
             parameterList.Add(kv.Value);
         }
 

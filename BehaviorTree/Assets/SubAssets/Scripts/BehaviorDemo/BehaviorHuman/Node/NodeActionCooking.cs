@@ -15,7 +15,16 @@ public class NodeActionCooking : NodeAction
     public override ResultType Execute()
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
-        return ResultType.Fail;
+
+        HumanController.Instance.Human.AddFood(1);
+
+        ResultType resultType = ResultType.Running;
+        if (HumanController.Instance.Human.FoodEnougth())
+        {
+            resultType = ResultType.Success;
+        }
+
+        return resultType;
     }
 
     public static CustomIdentification CustomIdentification()

@@ -15,7 +15,10 @@ public class NodeActionEat : NodeAction
     public override ResultType Execute()
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
-        return ResultType.Fail;
+
+        HumanController.Instance.Human.Eat();
+
+        return ResultType.Running;
     }
 
     public static CustomIdentification CustomIdentification()
