@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class NodeActionCooking : NodeAction
+public class NodeActionWatchTV : NodeAction
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("行为-做饭", 11000, typeof(NodeActionCooking), NODE_TYPE.ACTION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("行为-看电视", 11003, typeof(NodeActionWatchTV), NODE_TYPE.ACTION);
 
-    public NodeActionCooking() : base()
+    public NodeActionWatchTV() : base()
     {
 
     }
@@ -15,8 +15,12 @@ public class NodeActionCooking : NodeAction
     public override ResultType Execute()
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+        if (null == HumanController.Instance || null == HumanController.Instance.Human)
+        {
+            return ResultType.Fail;
+        }
 
-        bool result = HumanController.Instance.Human.Cooking(0.3f);
+        bool result = HumanController.Instance.Human.IsHungry();
 
         ResultType resultType = result ? ResultType.Running : ResultType.Success;
         return resultType;

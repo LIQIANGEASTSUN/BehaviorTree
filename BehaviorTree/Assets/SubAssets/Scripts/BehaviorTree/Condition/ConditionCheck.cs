@@ -56,7 +56,6 @@ public class ConditionCheck : IConditionCheck
             parameter.boolValue = (bool)value;
         }
 
-        Debug.LogError("SetParameter:" + parameterName + "    " + value);
         _allParameterDic[parameterName] = parameter;
     }
 
