@@ -16,6 +16,11 @@ public class NodeActionMove : NodeAction
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
 
+        if (null == HumanController.Instance)
+        {
+            return ResultType.Fail;
+        }
+
         Vector3 targetPos = Vector3.zero;
         if (_parameterList.Count >= 0 && _parameterList[0].parameterName.CompareTo("MoveTarget") == 0)
         {
