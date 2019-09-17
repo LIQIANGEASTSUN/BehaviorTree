@@ -18,15 +18,17 @@ public class Human
 
     private float _food = 0;
     private float _foodMax = 100;
-    private float _eatSpeed = 20;
+    private float _eatSpeed = 0.3f;
 
     public Human(Transform target)
     {
         _target = target;
+        Init();
     }
 
     public void Init()
     {
+        Create();
     }
 
     public void OnDestroy()
@@ -76,26 +78,30 @@ public class Human
 
     private void HungryController()
     {
-        bool hungry = (_energy <= _energyHungry);
+        bool hungry = IsHungry();
         ConditionCheck.SetParameter("IsHungry", hungry);
     }
 
-    public void AddFood(float value)
+    public bool IsHungry()
+    {
+        return (_energy <= _energyHungry);
+    }
+
+    public bool Cooking(float value)
     {
         _food += value;
         _food = Mathf.Clamp(_food, 0, _foodMax);
+
+        return _food < _foodMax;
     }
 
-    public bool FoodEnougth()
-    {
-        return _food >= _foodMax;
-    }
-
-    public void Eat()
+    public bool Eat()
     {
         _food -= _eatSpeed;
         _energy += _eatSpeed * 2f;
         _energy = Mathf.Clamp(_energy, 0, _energyMax);
+
+        return _food > 0;
     }
 
     private void FoodController()
@@ -104,41 +110,70 @@ public class Human
         ConditionCheck.SetParameter("HasFood", hasFood);
     }
 
-    // 厨房
-    private GameObject kitchen;
     public Vector3 KitchenPos()
     {
-        if (null == kitchen)
-        {
-            kitchen = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            kitchen.name = "Kitchen";
-            kitchen.transform.position = new Vector3(0, 0, 5);
-        }
         return kitchen.transform.position;
     }
 
-    // 餐桌
-    private GameObject diningTable;
     public Vector3 DiningTablePos()
     {
-        if (null == diningTable)
-        {
-            diningTable = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            diningTable.name = "DiningTable";
-            diningTable.transform.position = new Vector3(5, 0, 0);
-        }
-
         return diningTable.transform.position;
+    }
+
+    public Vector3 TVPos()
+    {
+        return TV.transform.position;
     }
 
     public void Translate(Vector3 targetPos)
     {
         Vector3 dir = (targetPos - Position()).normalized;
-        _target.Translate(dir * Time.deltaTime, Space.World);
+        _target.Translate(dir * 3 * Time.deltaTime, Space.World);
     }
 
     public Vector3 Position()
     {
         return _target.position;
+    }
+
+
+    // 厨房
+    private GameObject kitchen;
+    // 餐桌
+    private GameObject diningTable;
+    // TV
+    private GameObject TV;
+    private void Create()
+    {
+        {
+            kitchen = new GameObject("Kitchen"); // 
+            kitchen.transform.rotation = Quaternion.Euler(90, 0, 0);
+            kitchen.transform.localScale = Vector3.one * 0.1f;
+            kitchen.transform.position = new Vector3(0, 0, 5);
+            TextMesh textMesh = kitchen.AddComponent<TextMesh>();
+            textMesh.fontSize = 100;
+            textMesh.text = "厨房";
+        }
+
+        {
+            diningTable = new GameObject("DiningTable");
+            diningTable.transform.rotation = Quaternion.Euler(90, 0, 0);
+            diningTable.transform.localScale = Vector3.one * 0.1f;
+            diningTable.transform.position = new Vector3(5, 0, 0);
+            TextMesh textMesh = diningTable.AddComponent<TextMesh>();
+            textMesh.fontSize = 100;
+            textMesh.text = "餐桌";
+        }
+
+        {
+            TV = new GameObject("TV");
+            TV.transform.rotation = Quaternion.Euler(90, 0, 0);
+            TV.transform.localScale = Vector3.one * 0.1f;
+            TV.transform.position = new Vector3(-5, 0, 0);
+            TextMesh textMesh = TV.AddComponent<TextMesh>();
+            textMesh.fontSize = 100;
+            textMesh.text = "TV";
+        }
+       
     }
 }

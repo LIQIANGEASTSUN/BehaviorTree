@@ -17,20 +17,22 @@ public class NodeActionMove : NodeAction
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
 
         Vector3 targetPos = Vector3.zero;
-        if (_parameterList.Count >= 0)
+        if (_parameterList.Count >= 0 && _parameterList[0].parameterName.CompareTo("MoveTarget") == 0)
         {
             BehaviorParameter parameter = _parameterList[0];
-            if (parameter.parameterName.CompareTo("MoveTarget") == 0 && parameter.intValue == 0)
+            if (parameter.intValue == 0)
             {
                 targetPos = HumanController.Instance.Human.KitchenPos();
             }
-            else if (parameter.parameterName.CompareTo("MoveTarget") == 0 && parameter.intValue == 1)
+            else if (parameter.intValue == 1)
             {
                 targetPos = HumanController.Instance.Human.DiningTablePos();
             }
+            else if (parameter.intValue == 2)
+            {
+                targetPos = HumanController.Instance.Human.TVPos();
+            }
         }
-
-        HumanController.Instance.Human.Translate(targetPos);
 
         ResultType resultType = ResultType.Running;
         if (Vector3.Distance(HumanController.Instance.Human.Position(), targetPos) < 0.5f)
@@ -38,6 +40,7 @@ public class NodeActionMove : NodeAction
             return ResultType.Success;
         }
 
+        HumanController.Instance.Human.Translate(targetPos);
         return resultType;
     }
 

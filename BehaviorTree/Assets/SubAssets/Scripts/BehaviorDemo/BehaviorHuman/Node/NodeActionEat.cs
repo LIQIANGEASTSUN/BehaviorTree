@@ -16,9 +16,10 @@ public class NodeActionEat : NodeAction
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
 
-        HumanController.Instance.Human.Eat();
+        bool result = HumanController.Instance.Human.Eat();
 
-        return ResultType.Running;
+        ResultType resultType = result ? ResultType.Running : ResultType.Success;
+        return resultType;
     }
 
     public static CustomIdentification CustomIdentification()
