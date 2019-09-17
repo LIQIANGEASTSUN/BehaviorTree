@@ -56,11 +56,34 @@ namespace BehaviorTree
     public enum BehaviorCompare
     {
         INVALID = 0,
+        /// <summary>
+        /// 大于
+        /// </summary>
         GREATER = 1 << 0,
+
+        /// <summary>
+        /// 小于
+        /// </summary>
         LESS = 1 << 1,
+
+        /// <summary>
+        /// 等于
+        /// </summary>
         EQUALS = 1 << 2,
+
+        /// <summary>
+        /// 不等于
+        /// </summary>
         NOT_EQUAL = 1 << 3,
+
+        /// <summary>
+        /// 大于等于
+        /// </summary>
         GREATER_EQUALS = 1 << 4,
+
+        /// <summary>
+        /// 小于等于
+        /// </summary>
         LESS_EQUAL = 1 << 5,
     }
 
