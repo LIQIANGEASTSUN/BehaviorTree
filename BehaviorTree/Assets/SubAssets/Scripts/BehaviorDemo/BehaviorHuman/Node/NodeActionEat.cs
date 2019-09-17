@@ -16,6 +16,11 @@ public class NodeActionEat : NodeAction
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
 
+        if (null == HumanController.Instance)
+        {
+            return ResultType.Fail;
+        }
+
         bool result = HumanController.Instance.Human.Eat();
 
         ResultType resultType = result ? ResultType.Running : ResultType.Success;
