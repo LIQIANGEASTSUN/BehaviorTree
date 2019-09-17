@@ -144,6 +144,9 @@ namespace BehaviorTree
 
                 CustomIdentification move = NodeActionMove.CustomIdentification();
                 nodeList.Add(move);
+
+                CustomIdentification watchTv = NodeActionWatchTV.CustomIdentification();
+                nodeList.Add(watchTv);
             }
             #endregion
 

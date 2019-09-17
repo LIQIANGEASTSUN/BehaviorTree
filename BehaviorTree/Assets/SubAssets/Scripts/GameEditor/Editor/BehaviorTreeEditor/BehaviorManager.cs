@@ -66,6 +66,8 @@ public class BehaviorManager
         globalParameterChange += GlobalParameterChange;
         behaviorNodeChangeParameter += NodeChangeParameter;
         behaviorRuntimePlay += RuntimePlay;
+
+        _playState = BehaviorPlayType.STOP;
     }
 
     public void OnDestroy()
@@ -82,6 +84,8 @@ public class BehaviorManager
         globalParameterChange -= GlobalParameterChange;
         behaviorNodeChangeParameter -= NodeChangeParameter;
         behaviorRuntimePlay -= RuntimePlay;
+
+        _playState = BehaviorPlayType.STOP;
     }
 
     public void Update()
@@ -161,6 +165,7 @@ public class BehaviorManager
             return;
         }
 
+        _playState = BehaviorPlayType.STOP;
         BehaviorReadWrite readWrite = new BehaviorReadWrite();
         BehaviorTreeData behaviorTreeData = readWrite.ReadJson(path);
         if (null == behaviorTreeData)
