@@ -69,18 +69,10 @@ public class ConditionCheck : IConditionCheck
                 continue;
             }
 
-            //Debug.LogError(parameter.parameterName + "     " + (BehaviorParameterType)(parameter.parameterType));
             _allParameterDic[parameter.parameterName] = parameter.Clone();
-
-            // 暂时这么处理，以后改成读取默认值
-            _allParameterDic[parameter.parameterName].intValue = 0;
-            _allParameterDic[parameter.parameterName].floatValue = 0;
-            _allParameterDic[parameter.parameterName].boolValue = false;
-        }
-
-        if (parameterList.Count > 0)
-        {
-            Debug.Log("暂时这么处理，以后改成读取默认值");
+            _allParameterDic[parameter.parameterName].intValue = parameter.intValue;
+            _allParameterDic[parameter.parameterName].floatValue = parameter.floatValue;
+            _allParameterDic[parameter.parameterName].boolValue = parameter.boolValue;
         }
     }
 
