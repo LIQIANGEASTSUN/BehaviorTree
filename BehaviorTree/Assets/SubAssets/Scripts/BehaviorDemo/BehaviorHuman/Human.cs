@@ -39,14 +39,14 @@ public class Human
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(behaviorTreeData, ref _iconditionCheck);
+        //_rootNode = analysis.Analysis(behaviorTreeData, ref _iconditionCheck);
     }
 
     public void SetData(string content)
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(content, ref _iconditionCheck);
+        //_rootNode = analysis.Analysis(content, ref _iconditionCheck);
     }
 
     public ConditionCheck ConditionCheck

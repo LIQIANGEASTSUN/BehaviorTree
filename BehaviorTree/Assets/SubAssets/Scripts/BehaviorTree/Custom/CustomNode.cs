@@ -139,37 +139,14 @@ namespace BehaviorTree
             #region Skill
             // 条件节点
             {
-                CustomIdentification skillState = NodeConditionSkillState.CustomIdentification();
-                nodeList.Add(skillState);
-            }
-
-            // 行为节点
-            {
-                CustomIdentification requestSkillState = NodeActionRequestSkillState.CustomIdentification();
-                nodeList.Add(requestSkillState);
-            }
-            #endregion
-
-            #region Human
-            // 条件节点
-            {
                 CustomIdentification custom = NodeConditionCustom.CustomIdentification();
                 nodeList.Add(custom);
             }
 
             // 行为节点
             {
-                CustomIdentification cooking = NodeActionCooking.CustomIdentification();
-                nodeList.Add(cooking);
-
-                CustomIdentification eat = NodeActionEat.CustomIdentification();
-                nodeList.Add(eat);
-
-                CustomIdentification move = NodeActionMove.CustomIdentification();
-                nodeList.Add(move);
-
-                CustomIdentification watchTv = NodeActionWatchTV.CustomIdentification();
-                nodeList.Add(watchTv);
+                CustomIdentification requestSkillState = NodeActionRequestSkillState.CustomIdentification();
+                nodeList.Add(requestSkillState);
             }
             #endregion
 
