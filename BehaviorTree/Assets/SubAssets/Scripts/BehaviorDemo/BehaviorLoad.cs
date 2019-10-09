@@ -21,7 +21,7 @@ public class BehaviorLoad : MonoBehaviour
 
     private void Load()
     {
-        TextAsset textAsset = Resources.Load<TextAsset>("Data/AbilityGeneric");
+        TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         iconditionCheck = new ConditionCheck();
         _rootNode = analysis.Analysis(textAsset.text, ref iconditionCheck);

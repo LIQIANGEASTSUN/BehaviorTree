@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeActionWatchTV : NodeAction
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("行为-看电视", 11003, typeof(NodeActionWatchTV), NODE_TYPE.ACTION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("行为-看电视", IDENTIFICATION.WATCH_TV, typeof(NodeActionWatchTV), NODE_TYPE.ACTION);
 
     public NodeActionWatchTV() : base()
     {

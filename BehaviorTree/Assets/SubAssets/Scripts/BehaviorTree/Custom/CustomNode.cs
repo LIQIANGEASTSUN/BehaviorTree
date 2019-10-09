@@ -6,10 +6,40 @@ using System;
 namespace BehaviorTree
 {
 
+    public enum IDENTIFICATION
+    {
+        #region Action    行为节点从 10000 开始
+        /// <summary>
+        /// 切换状态节点
+        /// </summary>
+        [EnumAttirbute("切换状态节点")]
+        SKILL_STATE_REQUEST = 10000,
+
+        /// <summary>
+        /// 技能状态节点
+        /// </summary>
+        [EnumAttirbute("技能状态节点")]
+        SKILL_STATE = 10001,
+
+        COOKING = 11000,
+        EAT = 11001,
+        MOVE = 11002,
+        WATCH_TV = 11003,
+        #endregion
+
+        #region Condition  条件节点从 20000 开始
+        /// <summary>
+        /// 通用条件节点
+        /// </summary>
+        [EnumAttirbute("通用条件节点")]
+        COMMON_CONDITION = 20002,
+        #endregion
+    }
+
     public struct CustomIdentification
     {
         private string name;
-        private int identification;
+        private IDENTIFICATION identification;
         private Type type;
         private NODE_TYPE nodeType;
         
@@ -18,7 +48,7 @@ namespace BehaviorTree
         /// </summary>
         /// <param name="name"></param>
         /// <param name="identification"></param>
-        public CustomIdentification(string name, int identification, Type t, NODE_TYPE nodeType)
+        public CustomIdentification(string name, IDENTIFICATION identification, Type t, NODE_TYPE nodeType)
         {
             this.name = name;
             this.identification = identification;
@@ -31,7 +61,7 @@ namespace BehaviorTree
             get { return name; }
         }
     
-        public int Identification
+        public IDENTIFICATION Identification
         {
             get { return identification; }
         }
@@ -72,7 +102,7 @@ namespace BehaviorTree
         {
         }
 
-        public object GetNode(int identification)
+        public object GetNode(IDENTIFICATION identification)
         {
             object obj = null;
             CustomIdentification info = GetIdentification(identification);
@@ -83,7 +113,7 @@ namespace BehaviorTree
             return obj;
         }
 
-        public CustomIdentification GetIdentification(int identification)
+        public CustomIdentification GetIdentification(IDENTIFICATION identification)
         {
             GetNodeList();
 
@@ -106,18 +136,11 @@ namespace BehaviorTree
                 return nodeList;
             }
 
-
             #region Skill
             // 条件节点
             {
-                CustomIdentification input = NodeConditionInput.CustomIdentification();
-                nodeList.Add(input);
-
                 CustomIdentification skillState = NodeConditionSkillState.CustomIdentification();
                 nodeList.Add(skillState);
-
-                CustomIdentification general = NodeConditionGeneral.CustomIdentification();
-                nodeList.Add(general);
             }
 
             // 行为节点
@@ -150,7 +173,7 @@ namespace BehaviorTree
             }
             #endregion
 
-            HashSet<int> hash = new HashSet<int>();
+            HashSet<IDENTIFICATION> hash = new HashSet<IDENTIFICATION>();
             for (int i = 0; i < nodeList.Count; ++i)
             {
                 CustomIdentification identificationi = nodeList[i];

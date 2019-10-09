@@ -151,11 +151,11 @@ public class BehaviorDrawModel
                 CustomIdentification customIdentification = nodeList[i];
                 if (customIdentification.NodeType == NODE_TYPE.CONDITION)
                 {
-                    conditionDrawInfo.AddNodeType(NODE_TYPE.CONDITION, customIdentification.Name, customIdentification.Identification);
+                    conditionDrawInfo.AddNodeType(NODE_TYPE.CONDITION, customIdentification.Name, (int)customIdentification.Identification);
                 }
                 else if (customIdentification.NodeType == NODE_TYPE.ACTION)
                 {
-                    actionDrawInfo.AddNodeType(NODE_TYPE.ACTION, customIdentification.Name, customIdentification.Identification);
+                    actionDrawInfo.AddNodeType(NODE_TYPE.ACTION, customIdentification.Name, (int)customIdentification.Identification);
                 }
             }
 

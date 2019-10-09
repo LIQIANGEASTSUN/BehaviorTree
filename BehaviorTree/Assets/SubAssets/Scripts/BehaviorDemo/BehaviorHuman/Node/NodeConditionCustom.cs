@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeConditionCustom : NodeCondition
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("通用条件节点", 11100, typeof(NodeConditionCustom), NODE_TYPE.CONDITION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("通用条件节点", IDENTIFICATION.COMMON_CONDITION, typeof(NodeConditionCustom), NODE_TYPE.CONDITION);
 
     public NodeConditionCustom()
     {

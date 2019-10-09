@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeActionMove : NodeAction
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("行为-移动到目标", 11002, typeof(NodeActionMove), NODE_TYPE.ACTION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("行为-移动到目标", IDENTIFICATION.MOVE, typeof(NodeActionMove), NODE_TYPE.ACTION);
 
     public NodeActionMove() : base()
     {

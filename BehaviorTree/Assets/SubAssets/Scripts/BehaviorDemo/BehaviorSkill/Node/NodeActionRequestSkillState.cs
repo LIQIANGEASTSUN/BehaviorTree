@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeActionRequestSkillState : NodeAction
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("切换状态节点", 10000, typeof(NodeActionRequestSkillState), NODE_TYPE.ACTION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("切换状态节点", IDENTIFICATION.SKILL_STATE_REQUEST, typeof(NodeActionRequestSkillState), NODE_TYPE.ACTION);
 
     public NodeActionRequestSkillState():base()
     {

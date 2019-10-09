@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeActionCooking : NodeAction
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("行为-做饭", 11000, typeof(NodeActionCooking), NODE_TYPE.ACTION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("行为-做饭", IDENTIFICATION.COOKING, typeof(NodeActionCooking), NODE_TYPE.ACTION);
 
     public NodeActionCooking() : base()
     {

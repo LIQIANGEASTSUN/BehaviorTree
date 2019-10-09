@@ -5,7 +5,7 @@ using BehaviorTree;
 
 public class NodeConditionSkillState : NodeCondition
 {
-    private static CustomIdentification _customIdentification = new CustomIdentification("技能状态节点", 20001, typeof(NodeConditionSkillState), NODE_TYPE.CONDITION);
+    private static CustomIdentification _customIdentification = new CustomIdentification("技能状态节点", IDENTIFICATION.SKILL_STATE, typeof(NodeConditionSkillState), NODE_TYPE.CONDITION);
 
     public NodeConditionSkillState()
     {
