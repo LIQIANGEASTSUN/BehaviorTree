@@ -24,7 +24,8 @@ public class BehaviorLoad : MonoBehaviour
         TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         iconditionCheck = new ConditionCheck();
-        //_rootNode = analysis.Analysis(textAsset.text, ref iconditionCheck);
+        List<NodeLeaf> nodeList = new List<NodeLeaf>();
+        _rootNode = analysis.Analysis(textAsset.text, ref iconditionCheck, ref nodeList);
         int a = 0;
     }
 

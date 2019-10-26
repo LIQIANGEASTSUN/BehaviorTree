@@ -18,13 +18,8 @@ namespace BehaviorTree
         /// <summary>
         /// 技能状态节点
         /// </summary>
-        [EnumAttirbute("技能状态节点")]
-        SKILL_STATE = 10001,
-
-        COOKING = 11000,
-        EAT = 11001,
-        MOVE = 11002,
-        WATCH_TV = 11003,
+        //[EnumAttirbute("技能状态节点")]
+        //SKILL_STATE = 10001,
         #endregion
 
         #region Condition  条件节点从 20000 开始
