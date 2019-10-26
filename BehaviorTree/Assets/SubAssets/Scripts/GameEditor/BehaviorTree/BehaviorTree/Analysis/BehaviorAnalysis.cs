@@ -22,6 +22,8 @@ namespace BehaviorTree
                 Debug.LogError("behaviorTreeData is null");
                 return null;
             }
+
+            iConditionCheck.AddParameter(behaviorTreeData.parameterList);
             return Analysis(behaviorTreeData, ref iConditionCheck, ref nodeLeafList);
         }
 
@@ -42,6 +44,8 @@ namespace BehaviorTree
                 return rootNode;
             }
 
+            iConditionCheck.AddParameter(data.parameterList);
+
             Dictionary<int, NodeBase> compositeDic = new Dictionary<int, NodeBase>();
             Dictionary<int, NodeBase> allNodeDic = new Dictionary<int, NodeBase>();
             Dictionary<int, List<int>> childDic = new Dictionary<int, List<int>>();
@@ -50,11 +54,6 @@ namespace BehaviorTree
                 NodeValue nodeValue = data.nodeList[i];
                 NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
                 nodeBase.NodeId = nodeValue.id;
-
-                if (nodeValue.parameterList.Count > 0)
-                {
-                    iConditionCheck.AddParameter(nodeValue.parameterList);
-                }
 
                 if (!IsLeafNode(nodeValue.NodeType))
                 {

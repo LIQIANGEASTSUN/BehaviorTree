@@ -79,7 +79,7 @@ namespace BehaviorTree
 
                         EditorGUILayout.BeginVertical("box");
                         {
-                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.GLOBAL_PARAMETER, DelCallBack);
+                            behaviorParameter = DrawParameter.Draw(behaviorParameter, DrawParameterType.BEHAVIOR_PARAMETER, DelCallBack);
                         }
                         EditorGUILayout.EndVertical();
                     }
@@ -107,7 +107,7 @@ namespace BehaviorTree
 
             EditorGUILayout.BeginVertical("box");
             {
-                newAddParameter = DrawParameter.Draw(newAddParameter, DrawParameterType.GLOBAL_PARAMETER_ADD, null);
+                newAddParameter = DrawParameter.Draw(newAddParameter, DrawParameterType.BEHAVIOR_PARAMETER_ADD, null);
             }
             EditorGUILayout.EndVertical();
             GUILayout.Space(5);

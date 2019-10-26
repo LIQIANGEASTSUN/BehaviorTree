@@ -9,8 +9,8 @@ namespace BehaviorTree
     public enum DrawParameterType
     {
         NODE_PARAMETER = 0,
-        GLOBAL_PARAMETER,
-        GLOBAL_PARAMETER_ADD,
+        BEHAVIOR_PARAMETER,
+        BEHAVIOR_PARAMETER_ADD,
         RUNTIME_PARAMETER,
     }
 
@@ -28,7 +28,7 @@ namespace BehaviorTree
                 int index = EnumNames.GetEnumIndex<BehaviorParameterType>((BehaviorParameterType)(behaviorParameter.parameterType));
                 BehaviorParameterType behaviorParameterType = EnumNames.GetEnum<BehaviorParameterType>(index);
 
-                bool enableChangeType = (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD);
+                bool enableChangeType = (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD);
                 GUI.enabled = enableChangeType;
                 {
                     index = EditorGUILayout.Popup(index, parameterNameArr);
@@ -61,11 +61,11 @@ namespace BehaviorTree
                         behaviorParameter.parameterName = parameterArr[result];
                     }
                 }
-                else if (drawParameterType == DrawParameterType.GLOBAL_PARAMETER
-                    || (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD)
+                else if (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER
+                    || (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD)
                     || drawParameterType == DrawParameterType.RUNTIME_PARAMETER)
                 {
-                    GUI.enabled = (drawParameterType == DrawParameterType.GLOBAL_PARAMETER_ADD);
+                    GUI.enabled = (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD);
                     behaviorParameter.parameterName = EditorGUILayout.TextField(behaviorParameter.parameterName);
                     GUI.enabled = true;
                 }
@@ -102,7 +102,7 @@ namespace BehaviorTree
                     compare = 0;
                 }
 
-                GUI.enabled = (drawParameterType != DrawParameterType.GLOBAL_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER);
+                GUI.enabled = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER);
                 {
                     compare = EditorGUILayout.Popup(compare, compareArr, GUILayout.Width(65));
                     behaviorParameter.compare = (int)(compareEnumArr[compare]);
@@ -114,7 +114,7 @@ namespace BehaviorTree
 
             EditorGUILayout.BeginHorizontal();
             {
-                GUI.enabled = (drawParameterType != DrawParameterType.GLOBAL_PARAMETER);
+                GUI.enabled = true;// (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER);
                 {
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                     {
@@ -133,7 +133,7 @@ namespace BehaviorTree
                 }
                 GUI.enabled = true;
 
-                if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.GLOBAL_PARAMETER)
+                if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER)
                 {
                     if (GUILayout.Button("Del"))
                     {
