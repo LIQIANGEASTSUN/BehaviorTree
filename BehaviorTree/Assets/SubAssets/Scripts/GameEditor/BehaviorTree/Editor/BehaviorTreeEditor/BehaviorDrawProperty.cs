@@ -11,7 +11,7 @@ namespace BehaviorTree
         private BehaviorPlayController _playController;
         private BehaviorPropertyOption _propertyOption;
         private BehaviorNodeInspector _nodeInspector;
-        private BehaviorGlobalParameter _globalParameterController;
+        private BehaviorParameterController _globalParameterController;
         private BehaviorRuntimeParameter _runtimeParameter;
 
         public void Init()
@@ -20,7 +20,7 @@ namespace BehaviorTree
             _playController = new BehaviorPlayController();
             _propertyOption = new BehaviorPropertyOption();
             _nodeInspector = new BehaviorNodeInspector();
-            _globalParameterController = new BehaviorGlobalParameter();
+            _globalParameterController = new BehaviorParameterController();
             _runtimeParameter = new BehaviorRuntimeParameter();
         }
 

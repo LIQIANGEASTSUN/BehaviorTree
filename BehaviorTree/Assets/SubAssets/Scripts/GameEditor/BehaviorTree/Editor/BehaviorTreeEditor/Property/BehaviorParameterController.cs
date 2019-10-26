@@ -7,20 +7,20 @@ using System;
 namespace BehaviorTree
 {
 
-    public class BehaviorGlobalParameter
+    public class BehaviorParameterController
     {
-        private BehaviorGlobalParameterModel _globalParameterModel;
-        private BehaviorGlobalParameterView _globalParameterView;
+        private BehaviorParameterModel _parameterModel;
+        private BehaviorParameterView _parameterView;
 
-        public BehaviorGlobalParameter()
+        public BehaviorParameterController()
         {
             Init();
         }
 
         public void Init()
         {
-            _globalParameterModel = new BehaviorGlobalParameterModel();
-            _globalParameterView = new BehaviorGlobalParameterView();
+            _parameterModel = new BehaviorParameterModel();
+            _parameterView = new BehaviorParameterView();
         }
 
         public void OnDestroy()
@@ -30,15 +30,15 @@ namespace BehaviorTree
 
         public void OnGUI()
         {
-            List<BehaviorParameter> parameterList = _globalParameterModel.ParameterList;
-            _globalParameterView.Draw(parameterList);
+            List<BehaviorParameter> parameterList = _parameterModel.ParameterList;
+            _parameterView.Draw(parameterList);
         }
 
     }
 
-    public class BehaviorGlobalParameterModel
+    public class BehaviorParameterModel
     {
-        public BehaviorGlobalParameterModel()
+        public BehaviorParameterModel()
         {
         }
 
@@ -51,7 +51,7 @@ namespace BehaviorTree
         }
     }
 
-    public class BehaviorGlobalParameterView
+    public class BehaviorParameterView
     {
 
         private Vector2 scrollPos = Vector2.zero;
