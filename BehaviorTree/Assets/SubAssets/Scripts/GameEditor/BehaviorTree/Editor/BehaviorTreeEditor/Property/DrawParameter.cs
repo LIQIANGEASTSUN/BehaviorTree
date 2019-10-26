@@ -118,17 +118,17 @@ namespace BehaviorTree
                 {
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                     {
-                        behaviorParameter.intValue = EditorGUILayout.IntField("DefaultIntValue", behaviorParameter.intValue);
+                        behaviorParameter.intValue = EditorGUILayout.IntField("IntValue", behaviorParameter.intValue);
                     }
 
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Float)
                     {
-                        behaviorParameter.floatValue = EditorGUILayout.FloatField("DefaultFloatValue", behaviorParameter.floatValue);
+                        behaviorParameter.floatValue = EditorGUILayout.FloatField("FloatValue", behaviorParameter.floatValue);
                     }
 
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Bool)
                     {
-                        behaviorParameter.boolValue = EditorGUILayout.Toggle("DefaultBoolValue", behaviorParameter.boolValue);
+                        behaviorParameter.boolValue = EditorGUILayout.Toggle("BoolValue", behaviorParameter.boolValue);
                     }
                 }
                 GUI.enabled = true;

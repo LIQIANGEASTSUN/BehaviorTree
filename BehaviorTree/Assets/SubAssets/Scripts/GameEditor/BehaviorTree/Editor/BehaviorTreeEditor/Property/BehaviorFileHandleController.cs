@@ -148,13 +148,6 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            //treeData.parameterList.Clear();
-            //for (int i = 0; i < BehaviorManager.Instance.GlobalParameter.parameterList.Count; ++i)
-            //{
-            //    BehaviorParameter parameter = BehaviorManager.Instance.GlobalParameter.parameterList[i];
-            //    treeData.parameterList.Add(parameter);
-            //}
-
             return treeData;
         }
 

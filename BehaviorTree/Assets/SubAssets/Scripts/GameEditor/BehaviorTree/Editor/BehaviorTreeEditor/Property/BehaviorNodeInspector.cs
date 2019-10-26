@@ -170,7 +170,7 @@ namespace BehaviorTree
 
                 if (BehaviorManager.Instance.BehaviorTreeData.parameterList.Count <= 0)
                 {
-                    string msg = "没有参数可添加，请先在 GlobalParameter 中添加参数";
+                    string msg = "没有参数可添加，请先添加参数";
 
                     if (TreeNodeWindow.window != null)
                     {

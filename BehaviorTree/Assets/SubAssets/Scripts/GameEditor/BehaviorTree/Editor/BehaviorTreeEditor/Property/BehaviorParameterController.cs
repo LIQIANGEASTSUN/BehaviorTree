@@ -73,7 +73,7 @@ namespace BehaviorTree
                         {
                             if (null != BehaviorManager.behaviorNodeParameter)
                             {
-                                BehaviorManager.globalParameterChange(behaviorParameter, false);
+                                BehaviorManager.parameterChange(behaviorParameter, false);
                             }
                         };
 
@@ -116,7 +116,7 @@ namespace BehaviorTree
             {
                 if (null != BehaviorManager.behaviorNodeParameter)
                 {
-                    BehaviorManager.globalParameterChange(newAddParameter, true);
+                    BehaviorManager.parameterChange(newAddParameter, true);
                 }
             }
         }

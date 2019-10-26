@@ -11,7 +11,7 @@ namespace BehaviorTree
         private BehaviorPlayController _playController;
         private BehaviorPropertyOption _propertyOption;
         private BehaviorNodeInspector _nodeInspector;
-        private BehaviorParameterController _globalParameterController;
+        private BehaviorParameterController _parameterController;
         private BehaviorRuntimeParameter _runtimeParameter;
 
         public void Init()
@@ -20,7 +20,7 @@ namespace BehaviorTree
             _playController = new BehaviorPlayController();
             _propertyOption = new BehaviorPropertyOption();
             _nodeInspector = new BehaviorNodeInspector();
-            _globalParameterController = new BehaviorParameterController();
+            _parameterController = new BehaviorParameterController();
             _runtimeParameter = new BehaviorRuntimeParameter();
         }
 
@@ -29,7 +29,7 @@ namespace BehaviorTree
             _fileHandleController.OnDestroy();
             _playController.OnDestroy();
             _nodeInspector.OnDestroy();
-            _globalParameterController.OnDestroy();
+            _parameterController.OnDestroy();
             _runtimeParameter.OnDestroy();
         }
 
@@ -55,7 +55,7 @@ namespace BehaviorTree
                 }
                 else
                 {
-                    _globalParameterController.OnGUI();
+                    _parameterController.OnGUI();
                 }
             }
         }

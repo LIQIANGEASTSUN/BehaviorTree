@@ -19,7 +19,7 @@ public class BehaviorManager
     public delegate void BehaviorDeleteFile(string fileName);
     public delegate void BehaviorNodeAddChild(int parentId, int childId);
     public delegate void BehaviorNodeParameter(int nodeId, BehaviorParameter parameter, bool isAdd);
-    public delegate void BehaviorGlobalParameterChange(BehaviorParameter parameter, bool isAdd);
+    public delegate void BehaviorParameterChange(BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorNodeChangeParameter(int nodeId, string oldParameter, string newParameter);
     public delegate void BehaviorRuntimePlay(BehaviorPlayType state);
 
@@ -40,7 +40,7 @@ public class BehaviorManager
     public static BehaviorDeleteFile behaviorDeleteFile;
     public static BehaviorNodeAddChild behaviorNodeAddChild;
     public static BehaviorNodeParameter behaviorNodeParameter;
-    public static BehaviorGlobalParameterChange globalParameterChange;
+    public static BehaviorParameterChange parameterChange;
     public static BehaviorNodeChangeParameter behaviorNodeChangeParameter;
     public static BehaviorRuntimePlay behaviorRuntimePlay;
 
@@ -59,7 +59,7 @@ public class BehaviorManager
         behaviorNodeAddChild += NodeAddChild;
         behaviorRemoveParentNode += RemoveParentNode;
         behaviorNodeParameter += NodeParameterChange;
-        globalParameterChange += GlobalParameterChange;
+        parameterChange += ParameterChange;
         behaviorNodeChangeParameter += NodeChangeParameter;
         behaviorRuntimePlay += RuntimePlay;
 
@@ -77,7 +77,7 @@ public class BehaviorManager
         behaviorNodeAddChild -= NodeAddChild;
         behaviorRemoveParentNode -= RemoveParentNode;
         behaviorNodeParameter -= NodeParameterChange;
-        globalParameterChange -= GlobalParameterChange;
+        parameterChange -= ParameterChange;
         behaviorNodeChangeParameter -= NodeChangeParameter;
         behaviorRuntimePlay -= RuntimePlay;
 
@@ -104,12 +104,6 @@ public class BehaviorManager
     {
         string path = string.Format("{0}{1}.bytes", FilePath, fileName);
         return path;
-    }
-
-    public string GetGlobalParameterPath()
-    {
-        string globalFilePath = "Assets/SubAssets/Scripts/GameEditor/Editor/BehaviorTreeEditor/GlobalParameter/globalParameter.txt";
-        return globalFilePath;
     }
 
     public int CurrentSelectId
@@ -352,7 +346,7 @@ public class BehaviorManager
         _playState = state;
     }
 
-    private void GlobalParameterChange(BehaviorParameter parameter, bool isAdd)
+    private void ParameterChange(BehaviorParameter parameter, bool isAdd)
     {
         if (isAdd)
         {
