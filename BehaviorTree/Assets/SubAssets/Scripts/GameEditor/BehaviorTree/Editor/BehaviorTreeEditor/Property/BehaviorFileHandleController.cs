@@ -148,21 +148,13 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            for (int i = 0; i < treeData.nodeList.Count; ++i)
-            {
-                NodeValue nodeValue = treeData.nodeList[i];
-                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)
-                {
-                    nodeValue.identification = (int)IDENTIFICATION.COMMON_CONDITION;
-                    nodeValue.nodeName = "通用条件节点";
-                    Debug.LogError("通用条件节点");
-                }
-                if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)
-                {
-                    nodeValue.identification = (int)IDENTIFICATION.SKILL_STATE_REQUEST;
-                    nodeValue.nodeName = "切换状态节点";
-                }
-            }
+            //treeData.parameterList.Clear();
+            //for (int i = 0; i < BehaviorManager.Instance.GlobalParameter.parameterList.Count; ++i)
+            //{
+            //    BehaviorParameter parameter = BehaviorManager.Instance.GlobalParameter.parameterList[i];
+            //    treeData.parameterList.Add(parameter);
+            //}
+
             return treeData;
         }
 

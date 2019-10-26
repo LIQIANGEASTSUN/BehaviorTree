@@ -30,8 +30,8 @@ namespace BehaviorTree
 
         public void OnGUI()
         {
-            GlobalParameter globalParameter = _globalParameterModel.GlobalParameter;
-            _globalParameterView.Draw(globalParameter);
+            List<BehaviorParameter> parameterList = _globalParameterModel.ParameterList;
+            _globalParameterView.Draw(parameterList);
         }
 
     }
@@ -42,11 +42,11 @@ namespace BehaviorTree
         {
         }
 
-        public GlobalParameter GlobalParameter
+        public List<BehaviorParameter> ParameterList
         {
             get
             {
-                return BehaviorManager.Instance.GlobalParameter;
+                return BehaviorManager.Instance.BehaviorTreeData.parameterList;
             }
         }
     }
@@ -55,7 +55,7 @@ namespace BehaviorTree
     {
 
         private Vector2 scrollPos = Vector2.zero;
-        public void Draw(GlobalParameter globalParameter)
+        public void Draw(List<BehaviorParameter> parameterList)
         {
             EditorGUILayout.LabelField("全部变量");
 
@@ -65,9 +65,9 @@ namespace BehaviorTree
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandHeight(true));
                 {
                     GUI.backgroundColor = new Color(0.85f, 0.85f, 0.85f, 1f);
-                    for (int i = 0; i < globalParameter.parameterList.Count; ++i)
+                    for (int i = 0; i < parameterList.Count; ++i)
                     {
-                        BehaviorParameter behaviorParameter = globalParameter.parameterList[i];
+                        BehaviorParameter behaviorParameter = parameterList[i];
 
                         Action DelCallBack = () =>
                         {

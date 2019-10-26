@@ -49,14 +49,6 @@ namespace BehaviorTree
         {
         }
 
-        public GlobalParameter GlobalParameter
-        {
-            get
-            {
-                return BehaviorManager.Instance.GlobalParameter;
-            }
-        }
-
         public void AddParameter(List<BehaviorParameter> parameterList)
         {
             _parameterList = parameterList;

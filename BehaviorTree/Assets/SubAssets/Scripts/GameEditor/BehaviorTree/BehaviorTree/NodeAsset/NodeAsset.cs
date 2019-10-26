@@ -5,15 +5,11 @@ using System.Collections.Generic;
 
 namespace BehaviorTree
 {
-    public class GlobalParameter
-    {
-        public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
-    }
-
     public class BehaviorTreeData
     {
         public int rootNodeId = -1;
         public List<NodeValue> nodeList = new List<NodeValue>();
+        public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
     }
 
     public class NodeValue

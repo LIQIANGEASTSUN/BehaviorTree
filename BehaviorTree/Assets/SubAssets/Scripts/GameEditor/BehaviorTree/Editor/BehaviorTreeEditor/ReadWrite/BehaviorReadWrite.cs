@@ -47,6 +47,12 @@ namespace BehaviorTree
                 behaviorData.nodeList = GetNodeList(nodeList);
             }
 
+            if (((IDictionary)jsonData).Contains("parameterList"))
+            {
+                JsonData parameterList = jsonData["parameterList"];
+                behaviorData.parameterList = GetParameterList(parameterList);
+            }
+
             return behaviorData;
         }
 
@@ -132,45 +138,6 @@ namespace BehaviorTree
             return dataList;
         }
         #endregion
-
-        #region GlobalParameter
-        public bool WriteGlobalParameter(GlobalParameter data, string filePath)
-        {
-            string content = LitJson.JsonMapper.ToJson(data);
-            bool value = FileReadWrite.Write(filePath, content);
-
-            if (value)
-            {
-                Debug.Log("Write Sucess:" + filePath);
-            }
-            else
-            {
-                Debug.LogError("Write Fail:" + filePath);
-            }
-
-            return value;
-        }
-
-        public GlobalParameter ReadGlobalParameter(string filePath)
-        {
-            GlobalParameter globalParameter = new GlobalParameter();
-            string content = FileReadWrite.Read(filePath);
-            if (string.IsNullOrEmpty(content))
-            {
-                return globalParameter;
-            }
-
-            JsonData jsonData = JsonMapper.ToObject(content);
-            if (((IDictionary)jsonData).Contains("parameterList"))
-            {
-                JsonData parameterList = jsonData["parameterList"];
-                globalParameter.parameterList = GetParameterList(parameterList);
-            }
-
-            return globalParameter;
-        }
-        #endregion
-
     }
 
 }

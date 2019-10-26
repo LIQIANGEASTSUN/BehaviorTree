@@ -26,7 +26,6 @@ public class BehaviorManager
     private string _filePath = string.Empty;
     private string _fileName = string.Empty;
     private BehaviorTreeData _behaviorTreeData;
-    private GlobalParameter _globalParameter;
     private BehaviorPlayType _playState = BehaviorPlayType.STOP;
 
     // 当前选择的节点
@@ -50,9 +49,6 @@ public class BehaviorManager
         _filePath = "Assets/Resources/Data/";
         _fileName = string.Empty;
         _behaviorTreeData = new BehaviorTreeData();
-
-        BehaviorReadWrite readWrite = new BehaviorReadWrite();
-        _globalParameter = readWrite.ReadGlobalParameter(GetGlobalParameterPath());
 
         behaviorChangeSelectId += ChangeSelectId;
         behaviorAddNode += AddNode;
@@ -144,14 +140,6 @@ public class BehaviorManager
         get
         {
             return _behaviorTreeData.nodeList;
-        }
-    }
-
-    public GlobalParameter GlobalParameter
-    {
-        get
-        {
-            return _globalParameter;
         }
     }
 
@@ -332,9 +320,9 @@ public class BehaviorManager
         }
 
         BehaviorParameter parameter = null;
-        for (int i = 0; i < _globalParameter.parameterList.Count; ++i)
+        for (int i = 0; i < _behaviorTreeData.parameterList.Count; ++i)
         {
-            BehaviorParameter temp = _globalParameter.parameterList[i];
+            BehaviorParameter temp = _behaviorTreeData.parameterList[i];
             if (temp.parameterName.CompareTo(newParameter) == 0)
             {
                 parameter = temp;
@@ -368,15 +356,12 @@ public class BehaviorManager
     {
         if (isAdd)
         {
-            AddParameter(_globalParameter.parameterList, parameter);
+            AddParameter(_behaviorTreeData.parameterList, parameter);
         }
         else
         {
-            DelParameter(_globalParameter.parameterList, parameter);
+            DelParameter(_behaviorTreeData.parameterList, parameter);
         }
-
-        BehaviorReadWrite readWrite = new BehaviorReadWrite();
-        readWrite.WriteGlobalParameter(_globalParameter, GetGlobalParameterPath());
     }
 
     private bool AddParameter(List<BehaviorParameter> parameterList, BehaviorParameter parameter, bool repeatAdd = false)

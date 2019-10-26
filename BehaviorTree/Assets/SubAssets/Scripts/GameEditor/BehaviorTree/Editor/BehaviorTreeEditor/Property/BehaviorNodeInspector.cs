@@ -168,7 +168,7 @@ namespace BehaviorTree
             if (GUILayout.Button("添加条件"))
             {
 
-                if (BehaviorManager.Instance.GlobalParameter.parameterList.Count <= 0)
+                if (BehaviorManager.Instance.BehaviorTreeData.parameterList.Count <= 0)
                 {
                     string msg = "没有参数可添加，请先在 GlobalParameter 中添加参数";
 
@@ -181,7 +181,7 @@ namespace BehaviorTree
                 {
                     if (null != BehaviorManager.behaviorNodeParameter)
                     {
-                        BehaviorParameter behaviorParameter = BehaviorManager.Instance.GlobalParameter.parameterList[0];
+                        BehaviorParameter behaviorParameter = BehaviorManager.Instance.BehaviorTreeData.parameterList[0];
                         BehaviorManager.behaviorNodeParameter(nodeValue.id, behaviorParameter, true);
                     }
                 }

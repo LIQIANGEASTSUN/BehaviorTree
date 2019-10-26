@@ -42,7 +42,7 @@ namespace BehaviorTree
             {
                 if (drawParameterType == DrawParameterType.NODE_PARAMETER)
                 {
-                    List<BehaviorParameter> parameterList = BehaviorManager.Instance.GlobalParameter.parameterList;
+                    List<BehaviorParameter> parameterList = BehaviorManager.Instance.BehaviorTreeData.parameterList;
                     string[] parameterArr = new string[parameterList.Count];
                     int index = -1;
                     for (int i = 0; i < parameterList.Count; ++i)
