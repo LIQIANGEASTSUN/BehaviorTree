@@ -7,10 +7,16 @@ namespace BehaviorTree
     /// </summary>
     public abstract class NodeAction : NodeLeaf
     {
+        protected IAction iAction;
         protected List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
 
         public NodeAction() : base(NODE_TYPE.ACTION)
         {
+        }
+
+        public void SetIAction(IAction iA)
+        {
+            iAction = iA;
         }
 
         public void SetParameters(List<BehaviorParameter> parameterList)
@@ -20,6 +26,8 @@ namespace BehaviorTree
                 _parameterList.AddRange(parameterList);
             }
         }
+
+
 
     }
 

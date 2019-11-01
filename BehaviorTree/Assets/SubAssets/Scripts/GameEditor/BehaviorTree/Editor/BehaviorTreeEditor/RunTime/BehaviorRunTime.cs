@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BehaviorTree
 {
 
-    public class BehaviorRunTime
+    public class BehaviorRunTime : IAction
     {
         public static readonly BehaviorRunTime Instance = new BehaviorRunTime();
 
@@ -32,7 +32,7 @@ namespace BehaviorTree
             BehaviorAnalysis analysis = new BehaviorAnalysis();
             _iconditionCheck = new ConditionCheck();
             List<NodeLeaf> nodeLeafList = new List<NodeLeaf>();
-            _rootNode = analysis.Analysis(behaviorTreeData, ref _iconditionCheck, ref nodeLeafList);
+            _rootNode = analysis.Analysis(behaviorTreeData, this, ref _iconditionCheck, ref nodeLeafList);
         }
 
         public ConditionCheck ConditionCheck

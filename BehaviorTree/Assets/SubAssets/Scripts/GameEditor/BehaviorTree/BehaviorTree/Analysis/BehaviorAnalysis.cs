@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
+        public NodeBase Analysis(string content, IAction iAction, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
         {
             BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
             if (null == behaviorTreeData)
@@ -24,10 +24,10 @@ namespace BehaviorTree
             }
 
             iConditionCheck.AddParameter(behaviorTreeData.parameterList);
-            return Analysis(behaviorTreeData, ref iConditionCheck, ref nodeLeafList);
+            return Analysis(behaviorTreeData, iAction, ref iConditionCheck, ref nodeLeafList);
         }
 
-        public NodeBase Analysis(BehaviorTreeData data, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
+        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
         {
             NodeBase rootNode = null;
             nodeLeafList = new List<NodeLeaf>();
@@ -52,7 +52,7 @@ namespace BehaviorTree
             for (int i = 0; i < data.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = data.nodeList[i];
-                NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
+                NodeBase nodeBase = AnalysisNode(nodeValue, iAction, iConditionCheck);
                 nodeBase.NodeId = nodeValue.id;
 
                 if (!IsLeafNode(nodeValue.NodeType))
@@ -106,7 +106,7 @@ namespace BehaviorTree
             return (type == (int)NODE_TYPE.ACTION) || (type == (int)NODE_TYPE.CONDITION);
         }
 
-        private NodeBase AnalysisNode(NodeValue nodeValue, IConditionCheck iConditionCheck)
+        private NodeBase AnalysisNode(NodeValue nodeValue, IAction iAction, IConditionCheck iConditionCheck)
         {
             NodeBase node = null;
             if (nodeValue.NodeType == (int)NODE_TYPE.SELECT)  // 选择节点
@@ -166,7 +166,7 @@ namespace BehaviorTree
 
             if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)  // 行为节点
             {
-                return GetAction(nodeValue);
+                return GetAction(nodeValue, iAction);
             }
 
             return node;
@@ -241,9 +241,10 @@ namespace BehaviorTree
             return condition;
         }
 
-        public NodeAction GetAction(NodeValue nodeValue)
+        public NodeAction GetAction(NodeValue nodeValue, IAction iAction)
         {
             NodeAction action = (NodeAction)CustomNode.Instance.GetNode((IDENTIFICATION)nodeValue.identification);
+            action.SetIAction(iAction);
             action.SetParameters(nodeValue.parameterList);
             return action;
         }
