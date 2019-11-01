@@ -94,7 +94,7 @@ namespace BehaviorTree
                     EditorGUILayout.LabelField(className);
                 }
 
-                nodeValue.descript = EditorGUILayout.TextField(nodeValue.descript);
+                nodeValue.descript = EditorGUILayout.TextArea(nodeValue.descript, GUILayout.Height(50));
             }
             EditorGUILayout.EndVertical();
 
