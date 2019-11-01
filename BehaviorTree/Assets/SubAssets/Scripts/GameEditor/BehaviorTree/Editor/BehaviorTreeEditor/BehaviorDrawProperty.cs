@@ -10,6 +10,7 @@ namespace BehaviorTree
         private BehaviorFileHandleController _fileHandleController;
         private BehaviorPlayController _playController;
         private BehaviorPropertyOption _propertyOption;
+        private BehaviorDescriptController _descriptController;
         private BehaviorNodeInspector _nodeInspector;
         private BehaviorParameterController _parameterController;
         private BehaviorRuntimeParameter _runtimeParameter;
@@ -19,6 +20,7 @@ namespace BehaviorTree
             _fileHandleController = new BehaviorFileHandleController();
             _playController = new BehaviorPlayController();
             _propertyOption = new BehaviorPropertyOption();
+            _descriptController = new BehaviorDescriptController();
             _nodeInspector = new BehaviorNodeInspector();
             _parameterController = new BehaviorParameterController();
             _runtimeParameter = new BehaviorRuntimeParameter();
@@ -42,7 +44,11 @@ namespace BehaviorTree
             GUILayout.Space(8);
 
             int option = _propertyOption.OnGUI();
-            if (option == 1)
+            if (option == 0)
+            {
+                _descriptController.OnGUI();
+            }
+            else if (option == 1)
             {
                 _nodeInspector.OnGUI();
             }

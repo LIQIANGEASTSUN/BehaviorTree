@@ -10,6 +10,7 @@ namespace BehaviorTree
         public int rootNodeId = -1;
         public List<NodeValue> nodeList = new List<NodeValue>();
         public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
+        public string descript = string.Empty;
     }
 
     public class NodeValue

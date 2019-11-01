@@ -93,6 +93,8 @@ namespace BehaviorTree
                     string className = customIdentification.Type.Name;
                     EditorGUILayout.LabelField(className);
                 }
+
+                nodeValue.descript = EditorGUILayout.TextField(nodeValue.descript);
             }
             EditorGUILayout.EndVertical();
 
