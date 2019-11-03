@@ -15,10 +15,8 @@ public class NodeActionRequestSkillState : NodeAction
     public override ResultType Execute()
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
-
-
-
-        return ResultType.Fail;
+        bool result = iAction.DoAction(_parameterList);
+        return result ? ResultType.Success : ResultType.Fail;
     }
 
     public static CustomIdentification CustomIdentification()

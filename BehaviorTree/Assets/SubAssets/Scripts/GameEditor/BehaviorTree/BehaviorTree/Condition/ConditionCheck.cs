@@ -59,6 +59,24 @@ public class ConditionCheck : IConditionCheck
         _allParameterDic[parameterName] = parameter;
     }
 
+    public void SetParameter(BehaviorParameter parameter)
+    {
+        BehaviorParameter cacheParameter = null;
+        if (!_allParameterDic.TryGetValue(parameter.parameterName, out cacheParameter)) // 当前行为树不需要的参数值就不保存了
+        {
+            return;
+        }
+
+        if (parameter.parameterType != cacheParameter.parameterType)
+        {
+            Debug.LogError("parameter type invalid:" + parameter.parameterName);
+            return;
+        }
+
+        cacheParameter.CloneFrom(parameter);
+        _allParameterDic[parameter.parameterName] = cacheParameter;
+    }
+
     public void AddParameter(List<BehaviorParameter> parameterList)
     {
         for (int i = 0; i < parameterList.Count; ++i)

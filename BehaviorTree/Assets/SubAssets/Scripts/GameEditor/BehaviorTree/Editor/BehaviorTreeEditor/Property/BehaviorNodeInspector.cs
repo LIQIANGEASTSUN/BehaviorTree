@@ -146,7 +146,7 @@ namespace BehaviorTree
                             }
                             else
                             {
-                                tempParameter.Clone(behaviorParameter);
+                                behaviorParameter.CloneFrom(tempParameter);
                             }
                         }
                         EditorGUILayout.EndVertical();

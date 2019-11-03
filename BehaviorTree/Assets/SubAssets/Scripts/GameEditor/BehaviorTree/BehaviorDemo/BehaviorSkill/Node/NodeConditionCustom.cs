@@ -19,7 +19,6 @@ public class NodeConditionCustom : NodeCondition
         bool result = _iconditionCheck.Condition(_parameterList);
         ResultType resultType = result ? ResultType.Success : ResultType.Fail;
 
-        Debug.LogError("nodeId:" + NodeId + "   nodeType:" + nodeType);
         return resultType;
     }
 

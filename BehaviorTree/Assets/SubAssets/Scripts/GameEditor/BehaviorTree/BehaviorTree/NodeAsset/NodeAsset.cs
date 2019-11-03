@@ -84,6 +84,8 @@ namespace BehaviorTree
         LESS_EQUAL = 1 << 5,
     }
 
+    [SerializeField]
+    [Serializable]
     public class BehaviorParameter
     {
         public int parameterType = 0;
@@ -96,18 +98,18 @@ namespace BehaviorTree
         public BehaviorParameter Clone()
         {
             BehaviorParameter newParameter = new BehaviorParameter();
-            Clone(newParameter);
+            newParameter.CloneFrom(this);
             return newParameter;
         }
 
-        public void Clone(BehaviorParameter parameter)
+        public void CloneFrom(BehaviorParameter parameter)
         {
-            parameter.parameterType = parameterType;
-            parameter.parameterName = parameterName;
-            parameter.intValue = intValue;
-            parameter.floatValue = floatValue;
-            parameter.boolValue = boolValue;
-            parameter.compare = compare;
+            parameterType = parameter.parameterType;
+            parameterName = parameter.parameterName;
+            intValue =  parameter.intValue;
+            floatValue = parameter.floatValue;
+            boolValue = parameter.boolValue;
+            compare = parameter.compare;
         }
 
         private BehaviorCompare Compare(int value)

@@ -78,6 +78,25 @@ namespace BehaviorTree
             }
         }
 
+        public bool DoAction(List<BehaviorParameter> parameterList)
+        {
+            bool result = true;
+            for (int i = 0; i < parameterList.Count; ++i)
+            {
+                bool value = DoAction(parameterList[i]);
+                if (!value)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        public bool DoAction(BehaviorParameter parameter)
+        {
+            return true;
+        }
     }
 
 }

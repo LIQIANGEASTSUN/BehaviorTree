@@ -1,8 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public interface IAction
+namespace BehaviorTree
 {
-    
+    public interface IAction
+    {
+        bool DoAction(List<BehaviorParameter> parameterList);
+
+        bool DoAction(BehaviorParameter parameter);
+    }
 }
+
+
