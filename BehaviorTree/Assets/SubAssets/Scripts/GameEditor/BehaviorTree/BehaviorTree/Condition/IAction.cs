@@ -5,9 +5,9 @@ namespace BehaviorTree
 {
     public interface IAction
     {
-        bool DoAction(List<BehaviorParameter> parameterList);
+        bool DoAction(int nodeId, List<BehaviorParameter> parameterList);
 
-        bool DoAction(BehaviorParameter parameter);
+        bool DoAction(int nodeId, BehaviorParameter parameter);
     }
 }
 

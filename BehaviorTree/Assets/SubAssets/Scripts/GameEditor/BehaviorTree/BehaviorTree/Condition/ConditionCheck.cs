@@ -13,7 +13,22 @@ public class ConditionCheck : IConditionCheck
 
     }
 
-    public void SetParameter(string parameterName, object value)
+    public void SetParameter(string parameterName, bool boolValue)
+    {
+        BehaviorParameter parameter = null;
+        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        {
+            return;
+        }
+
+        if (parameter.parameterType == (int)BehaviorParameterType.Bool)
+        {
+            parameter.boolValue = boolValue;
+            _allParameterDic[parameterName] = parameter;
+        }
+    }
+
+    public void SetParameter(string parameterName, float floatValue)
     {
         BehaviorParameter parameter = null;
         if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
@@ -23,40 +38,24 @@ public class ConditionCheck : IConditionCheck
 
         if (parameter.parameterType == (int)BehaviorParameterType.Float)
         {
-            if (value.GetType() != typeof(float)
-                && value.GetType() != typeof(int))
-            {
-                Debug.LogError("parameter type invalid:" + parameterName);
-                return;
-            }
+            parameter.floatValue = floatValue;
+            _allParameterDic[parameterName] = parameter;
+        }
+    }
 
-            parameter.floatValue = (float)value;
+    public void SetParameter(string parameterName, int intValue)
+    {
+        BehaviorParameter parameter = null;
+        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        {
+            return;
         }
 
         if (parameter.parameterType == (int)BehaviorParameterType.Int)
         {
-            if (value.GetType() != typeof(int)
-                && value.GetType() != typeof(float))
-            {
-                Debug.LogError("parameter type invalid:" + parameterName);
-                return;
-            }
-
-            parameter.intValue = (int)value;
+            parameter.intValue = intValue;
+            _allParameterDic[parameterName] = parameter;
         }
-
-        if (parameter.parameterType == (int)BehaviorParameterType.Bool)
-        {
-            if (value.GetType() != typeof(bool))
-            {
-                Debug.LogError("parameter type invalid:" + parameterName);
-                return;
-            }
-
-            parameter.boolValue = (bool)value;
-        }
-
-        _allParameterDic[parameterName] = parameter;
     }
 
     public void SetParameter(BehaviorParameter parameter)

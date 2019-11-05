@@ -31,26 +31,12 @@ namespace BehaviorTree
         {
             BehaviorAnalysis analysis = new BehaviorAnalysis();
             _iconditionCheck = new ConditionCheck();
-            List<NodeLeaf> nodeLeafList = new List<NodeLeaf>();
-            _rootNode = analysis.Analysis(behaviorTreeData, this, ref _iconditionCheck, ref nodeLeafList);
+            _rootNode = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
         }
 
         public ConditionCheck ConditionCheck
         {
             get { return (ConditionCheck)_iconditionCheck; }
-        }
-
-        public void RuntimePlay(BehaviorPlayType oldState, BehaviorPlayType newState)
-        {
-            if (oldState == BehaviorPlayType.STOP && newState != BehaviorPlayType.STOP)
-            {
-                Reset(BehaviorManager.Instance.BehaviorTreeData);
-            }
-
-            if (newState != BehaviorPlayType.PLAY)
-            {
-                Execute();
-            }
         }
 
         public void Update()
@@ -62,12 +48,8 @@ namespace BehaviorTree
 
         public void Execute()
         {
-            if (BehaviorManager.Instance.PlayType == BehaviorPlayType.STOP)
-            {
-                return;
-            }
-
-            if (BehaviorManager.Instance.PlayType == BehaviorPlayType.PAUSE)
+            if (BehaviorManager.Instance.PlayType == BehaviorPlayType.STOP
+                || (BehaviorManager.Instance.PlayType == BehaviorPlayType.PAUSE))
             {
                 return;
             }
@@ -78,12 +60,12 @@ namespace BehaviorTree
             }
         }
 
-        public bool DoAction(List<BehaviorParameter> parameterList)
+        public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
         {
             bool result = true;
             for (int i = 0; i < parameterList.Count; ++i)
             {
-                bool value = DoAction(parameterList[i]);
+                bool value = DoAction(nodeId, parameterList[i]);
                 if (!value)
                 {
                     result = false;
@@ -93,7 +75,7 @@ namespace BehaviorTree
             return result;
         }
 
-        public bool DoAction(BehaviorParameter parameter)
+        public bool DoAction(int nodeId, BehaviorParameter parameter)
         {
             return true;
         }

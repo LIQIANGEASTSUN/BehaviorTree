@@ -46,7 +46,7 @@ public class BehaviorManager
 
     public void Init()
     {
-        _filePath = "Assets/Resources/Data/";
+        _filePath = "Assets/SubAssets/GameData/BehaviorTree/";
         _fileName = string.Empty;
         _behaviorTreeData = new BehaviorTreeData();
 
@@ -82,6 +82,9 @@ public class BehaviorManager
         behaviorRuntimePlay -= RuntimePlay;
 
         _playState = BehaviorPlayType.STOP;
+
+        AssetDatabase.Refresh();
+        UnityEngine.Caching.ClearCache();
     }
 
     public void Update()
@@ -148,6 +151,8 @@ public class BehaviorManager
         }
 
         _playState = BehaviorPlayType.STOP;
+        NodeNotify.SetPlayState((int)_playState);
+
         BehaviorReadWrite readWrite = new BehaviorReadWrite();
         BehaviorTreeData behaviorTreeData = readWrite.ReadJson(path);
         if (null == behaviorTreeData)
@@ -158,6 +163,8 @@ public class BehaviorManager
 
         _fileName = fileName;
         _behaviorTreeData = behaviorTreeData;
+
+        BehaviorRunTime.Instance.Reset(behaviorTreeData);
     }
 
     private void SaveFile(string fileName)
@@ -341,7 +348,6 @@ public class BehaviorManager
 
     private void RuntimePlay(BehaviorPlayType state)
     {
-        BehaviorRunTime.Instance.RuntimePlay(_playState, state);
         NodeNotify.SetPlayState((int)state);
         _playState = state;
     }

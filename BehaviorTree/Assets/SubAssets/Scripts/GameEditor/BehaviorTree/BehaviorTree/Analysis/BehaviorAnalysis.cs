@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content, IAction iAction, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
+        public NodeBase Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
         {
             BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
             if (null == behaviorTreeData)
@@ -24,13 +24,12 @@ namespace BehaviorTree
             }
 
             iConditionCheck.AddParameter(behaviorTreeData.parameterList);
-            return Analysis(behaviorTreeData, iAction, ref iConditionCheck, ref nodeLeafList);
+            return Analysis(behaviorTreeData, iAction, iConditionCheck);
         }
 
-        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, ref IConditionCheck iConditionCheck, ref List<NodeLeaf> nodeLeafList)
+        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
         {
             NodeBase rootNode = null;
-            nodeLeafList = new List<NodeLeaf>();
 
             if (null == data)
             {
@@ -66,11 +65,11 @@ namespace BehaviorTree
                     }
                 }
 
-                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION     // 条件节点
-                    || (nodeValue.NodeType == (int)NODE_TYPE.ACTION))  // 行为节点
-                {
-                    nodeLeafList.Add((NodeLeaf)nodeBase);
-                }
+                //if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION     // 条件节点
+                //    || (nodeValue.NodeType == (int)NODE_TYPE.ACTION))  // 行为节点
+                //{
+                //    nodeLeafList.Add((NodeLeaf)nodeBase);
+                //}
 
                 if (null == nodeBase)
                 {

@@ -9,7 +9,11 @@ namespace BehaviorTree
     {
         void AddParameter(List<BehaviorParameter> parameterList);
 
-        void SetParameter(string parameterName, object value);
+        void SetParameter(string parameterName, bool boolValue);
+
+        void SetParameter(string parameterName, float floatValue);
+
+        void SetParameter(string parameterName, int intValue);
 
         void SetParameter(BehaviorParameter parameter);
 

@@ -6,13 +6,13 @@ using UnityEngine;
 public class RoleTest : MonoBehaviour
 {
     public static RoleTest Instance = null;
-    private Role _role;
+    private RolePlayer _role;
     public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
     void Start()
     {
         Instance = this;
 
-        _role = new Role();
+        _role = new RolePlayer();
         _role.Init();
 
         UpdateCondition();
@@ -41,16 +41,15 @@ public class RoleTest : MonoBehaviour
 }
 
 
-public class Role : IAction
+public class RolePlayer : IAction
 {
-    private BehaviorAnalysis analysis = new BehaviorAnalysis();
+    private BehaviorAnalysis analysis = null;
     private NodeBase _rootNode = null;
-    private List<NodeLeaf> _nodeLeafList = new List<NodeLeaf>();
     private IConditionCheck _iconditionCheck = null;
 
     public void Init()
     {
-        TextAsset textAsset = Resources.Load<TextAsset>("Data/Generic");
+        TextAsset textAsset = Resources.Load<TextAsset>("Generic");
         SetData(textAsset.text);
     }
 
@@ -72,22 +71,22 @@ public class Role : IAction
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(behaviorTreeData, this, ref _iconditionCheck, ref _nodeLeafList);
+        _rootNode = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
     }
 
     public void SetData(string content)
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(content, this, ref _iconditionCheck, ref _nodeLeafList);
+        _rootNode = analysis.Analysis(content, this, _iconditionCheck);
     }
 
-    public bool DoAction(List<BehaviorParameter> parameterList)
+    public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
     {
         bool result = true;
         for (int i = 0; i < parameterList.Count; ++i)
         {
-            bool value = DoAction(parameterList[i]);
+            bool value = DoAction(nodeId, parameterList[i]);
             if (!value)
             {
                 result = false;
@@ -97,7 +96,7 @@ public class Role : IAction
         return result;
     }
 
-    public bool DoAction(BehaviorParameter parameter)
+    public bool DoAction(int nodeId, BehaviorParameter parameter)
     {
         Debug.LogError("Execute:" + parameter.parameterName + "   bool:" + parameter.boolValue + "    float:" + parameter.floatValue + "    int:" + parameter.intValue);
 
