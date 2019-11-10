@@ -124,12 +124,12 @@ namespace BehaviorTree
             if (parameterType == (int)BehaviorParameterType.Float)
             {
                 BehaviorCompare = CompareFloat(parameter);
-                return (compare & (int)BehaviorCompare) > 0;
+                return (parameter.compare & (int)BehaviorCompare) > 0;
             }
             else if (parameterType == (int)BehaviorParameterType.Int)
             {
                 BehaviorCompare = CompareInt(parameter);
-                return (compare & (int)BehaviorCompare) > 0;
+                return (parameter.compare & (int)BehaviorCompare) > 0;
             }
             else
             {
