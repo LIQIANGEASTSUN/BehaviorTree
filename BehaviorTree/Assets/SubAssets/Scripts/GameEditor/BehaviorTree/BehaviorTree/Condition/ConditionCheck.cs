@@ -6,7 +6,7 @@ using BehaviorTree;
 public class ConditionCheck : IConditionCheck
 {
     // 缓存当前行为树使用到的所有参数类型,保存当前世界状态中所有参数动态变化的值
-    private Dictionary<string, BehaviorParameter> _allParameterDic = new Dictionary<string, BehaviorParameter>();
+    private Dictionary<string, BehaviorParameter> _environmentParameterDic = new Dictionary<string, BehaviorParameter>();
 
     public ConditionCheck()
     {
@@ -16,7 +16,7 @@ public class ConditionCheck : IConditionCheck
     public void SetParameter(string parameterName, bool boolValue)
     {
         BehaviorParameter parameter = null;
-        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
             return;
         }
@@ -24,14 +24,14 @@ public class ConditionCheck : IConditionCheck
         if (parameter.parameterType == (int)BehaviorParameterType.Bool)
         {
             parameter.boolValue = boolValue;
-            _allParameterDic[parameterName] = parameter;
+            _environmentParameterDic[parameterName] = parameter;
         }
     }
 
     public void SetParameter(string parameterName, float floatValue)
     {
         BehaviorParameter parameter = null;
-        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
             return;
         }
@@ -39,14 +39,14 @@ public class ConditionCheck : IConditionCheck
         if (parameter.parameterType == (int)BehaviorParameterType.Float)
         {
             parameter.floatValue = floatValue;
-            _allParameterDic[parameterName] = parameter;
+            _environmentParameterDic[parameterName] = parameter;
         }
     }
 
     public void SetParameter(string parameterName, int intValue)
     {
         BehaviorParameter parameter = null;
-        if (!_allParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
             return;
         }
@@ -54,26 +54,26 @@ public class ConditionCheck : IConditionCheck
         if (parameter.parameterType == (int)BehaviorParameterType.Int)
         {
             parameter.intValue = intValue;
-            _allParameterDic[parameterName] = parameter;
+            _environmentParameterDic[parameterName] = parameter;
         }
     }
 
     public void SetParameter(BehaviorParameter parameter)
     {
-        BehaviorParameter cacheParameter = null;
-        if (!_allParameterDic.TryGetValue(parameter.parameterName, out cacheParameter)) // 当前行为树不需要的参数值就不保存了
+        BehaviorParameter environmentParameter = null;
+        if (!_environmentParameterDic.TryGetValue(parameter.parameterName, out environmentParameter)) // 当前行为树不需要的参数值就不保存了
         {
             return;
         }
 
-        if (parameter.parameterType != cacheParameter.parameterType)
+        if (parameter.parameterType != environmentParameter.parameterType)
         {
             Debug.LogError("parameter type invalid:" + parameter.parameterName);
             return;
         }
 
-        cacheParameter.CloneFrom(parameter);
-        _allParameterDic[parameter.parameterName] = cacheParameter;
+        environmentParameter.CloneFrom(parameter);
+        _environmentParameterDic[parameter.parameterName] = environmentParameter;
     }
 
     public void AddParameter(List<BehaviorParameter> parameterList)
@@ -81,33 +81,35 @@ public class ConditionCheck : IConditionCheck
         for (int i = 0; i < parameterList.Count; ++i)
         {
             BehaviorParameter parameter = parameterList[i];
-            if (_allParameterDic.ContainsKey(parameter.parameterName))
+            if (_environmentParameterDic.ContainsKey(parameter.parameterName))
             {
                 continue;
             }
 
-            _allParameterDic[parameter.parameterName] = parameter.Clone();
-            _allParameterDic[parameter.parameterName].intValue = parameter.intValue;
-            _allParameterDic[parameter.parameterName].floatValue = parameter.floatValue;
-            _allParameterDic[parameter.parameterName].boolValue = parameter.boolValue;
+            _environmentParameterDic[parameter.parameterName] = parameter.Clone();
+            _environmentParameterDic[parameter.parameterName].intValue = parameter.intValue;
+            _environmentParameterDic[parameter.parameterName].floatValue = parameter.floatValue;
+            _environmentParameterDic[parameter.parameterName].boolValue = parameter.boolValue;
         }
     }
 
     public bool CompareParameter(BehaviorParameter parameter)
     {
-        BehaviorParameter cacheParameter = null;
-        if (!_allParameterDic.TryGetValue(parameter.parameterName, out cacheParameter))
+        BehaviorParameter environmentParameter = null;
+        if (!_environmentParameterDic.TryGetValue(parameter.parameterName, out environmentParameter))
         {
             return false;
         }
 
-        if (cacheParameter.parameterType != parameter.parameterType)
+        if (environmentParameter.parameterType != parameter.parameterType)
         {
-            Debug.LogError("parameter Type not Equal:" + cacheParameter.parameterName + "    " + cacheParameter.parameterType + "    " + parameter.parameterType);
+            Debug.LogError("parameter Type not Equal:" + environmentParameter.parameterName + "    " + environmentParameter.parameterType + "    " + parameter.parameterType);
             return false;
         }
 
-        return parameter.Compare(cacheParameter);
+        BehaviorCompare behaviorCompare = environmentParameter.Compare(parameter);
+        int value = (parameter.compare) & (int)behaviorCompare;
+        return value > 0;
     }
 
     public bool Condition(BehaviorParameter parameter)
@@ -135,7 +137,7 @@ public class ConditionCheck : IConditionCheck
     public List<BehaviorParameter> GetAllParameter()
     {
         List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
-        foreach(var kv in _allParameterDic)
+        foreach(var kv in _environmentParameterDic)
         {
             parameterList.Add(kv.Value);
         }
