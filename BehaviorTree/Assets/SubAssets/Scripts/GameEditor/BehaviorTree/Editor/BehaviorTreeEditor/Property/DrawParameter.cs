@@ -23,6 +23,7 @@ namespace BehaviorTree
                 return behaviorParameter;
             }
 
+            EditorGUILayout.BeginHorizontal();
             {
                 string[] parameterNameArr = EnumNames.GetEnumNames<BehaviorParameterType>();
                 int index = EnumNames.GetEnumIndex<BehaviorParameterType>((BehaviorParameterType)(behaviorParameter.parameterType));
@@ -36,7 +37,20 @@ namespace BehaviorTree
                     GUILayout.Space(5);
                 }
                 GUI.enabled = true;
+
+
+                if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER)
+                {
+                    if (GUILayout.Button("Del"))
+                    {
+                        if (null != DelCallBack)
+                        {
+                            DelCallBack();
+                        }
+                    }
+                }
             }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             {
@@ -103,48 +117,36 @@ namespace BehaviorTree
                 }
 
                 GUI.enabled = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER);
+                bool value = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER) && (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER_ADD);
+                bool boolType = (behaviorParameter.parameterType == (int)BehaviorParameterType.Bool);
+                if (value && !boolType)
                 {
                     compare = EditorGUILayout.Popup(compare, compareArr, GUILayout.Width(65));
                     behaviorParameter.compare = (int)(compareEnumArr[compare]);
                 }
                 GUI.enabled = true;
-            }
-            EditorGUILayout.EndHorizontal();
-            GUILayout.Space(5);
 
-            EditorGUILayout.BeginHorizontal();
-            {
                 GUI.enabled = true;// (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER);
                 {
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                     {
-                        behaviorParameter.intValue = EditorGUILayout.IntField("IntValue", behaviorParameter.intValue);
+                        behaviorParameter.intValue = EditorGUILayout.IntField(behaviorParameter.intValue, GUILayout.Width(60));
                     }
 
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Float)
                     {
-                        behaviorParameter.floatValue = EditorGUILayout.FloatField("FloatValue", behaviorParameter.floatValue);
+                        behaviorParameter.floatValue = EditorGUILayout.FloatField(behaviorParameter.floatValue, GUILayout.Width(60));
                     }
 
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Bool)
                     {
-                        behaviorParameter.boolValue = EditorGUILayout.Toggle("BoolValue", behaviorParameter.boolValue);
+                        behaviorParameter.boolValue = EditorGUILayout.Toggle(behaviorParameter.boolValue, GUILayout.Width(60));
                     }
                 }
                 GUI.enabled = true;
-
-                if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER)
-                {
-                    if (GUILayout.Button("Del"))
-                    {
-                        if (null != DelCallBack)
-                        {
-                            DelCallBack();
-                        }
-                    }
-                }
             }
             EditorGUILayout.EndHorizontal();
+            GUILayout.Space(5);
 
             return behaviorParameter;
         }

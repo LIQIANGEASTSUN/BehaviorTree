@@ -114,7 +114,7 @@ namespace BehaviorTree
             {
                 EditorGUILayout.LabelField(title);
 
-                int height = (nodeValue.parameterList.Count * 70) + 20;
+                int height = (nodeValue.parameterList.Count * 50);
                 height = height <= 300 ? height : 300;
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(height));
                 {
