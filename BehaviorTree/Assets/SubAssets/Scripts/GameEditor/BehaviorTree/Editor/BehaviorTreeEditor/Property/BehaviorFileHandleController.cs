@@ -148,6 +148,14 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
+            //for (int i = 0; i < treeData.parameterList.Count; ++i)
+            //{
+            //    BehaviorParameter parameter = treeData.parameterList[i];
+            //    if (parameter.parameterType == (int)BehaviorParameterType.Bool)
+            //    {
+            //        parameter.compare = (int)BehaviorCompare.EQUALS;
+            //    }
+            //}
             return treeData;
         }
 

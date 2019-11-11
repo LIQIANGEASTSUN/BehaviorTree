@@ -126,6 +126,11 @@ namespace BehaviorTree
                 }
                 GUI.enabled = true;
 
+                if (boolType)
+                {
+                    behaviorParameter.compare = (int)BehaviorCompare.EQUALS;
+                }
+
                 GUI.enabled = true;// (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER);
                 {
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
