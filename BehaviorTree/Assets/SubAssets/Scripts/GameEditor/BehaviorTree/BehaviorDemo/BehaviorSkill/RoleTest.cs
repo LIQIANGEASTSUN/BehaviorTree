@@ -49,7 +49,7 @@ public class RolePlayer : IAction
 
     public void Init()
     {
-        TextAsset textAsset = Resources.Load<TextAsset>("Generic");
+        TextAsset textAsset = Resources.Load<TextAsset>("Data/Generic");
         SetData(textAsset.text);
     }
 
