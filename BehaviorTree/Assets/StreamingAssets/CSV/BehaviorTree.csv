@@ -1,0 +1,4 @@
+﻿ID,EnName,CnName,Type,FloatValue,IntValue,BoolValue
+1,"A","测试变量A",0,0,0,0
+2,"B","测试变量B",2,0,0,0
+3,"C","测试变量C",5,0,0,0
