@@ -49,6 +49,8 @@ namespace BehaviorTree
     public class BehaviorNodeInspectorView
     {
 
+        private Color32[] colorArr = new Color32[] { new Color32(178, 226, 221, 255), new Color32(220, 226, 178, 255), new Color32(209, 178, 226, 255), new Color32(178, 185, 226, 255) };
+
         public void Draw(NodeValue nodeValue)
         {
             if (null == nodeValue)
@@ -110,6 +112,8 @@ namespace BehaviorTree
                 return;
             }
 
+            ConditionGroup conditionGroup = DrawConditionGroup(nodeValue);
+
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             {
                 EditorGUILayout.LabelField(title);
@@ -130,6 +134,18 @@ namespace BehaviorTree
                                 BehaviorManager.behaviorNodeParameter(nodeValue.id, behaviorParameter, false);
                             }
                         };
+
+                        Color color = Color.white;
+                        if (null != conditionGroup)
+                        {
+                            string name = conditionGroup.parameterList.Find(a => (a.CompareTo(behaviorParameter.parameterName) == 0));
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                color = colorArr[0];
+                            }
+                        }
+
+                        GUI.backgroundColor = color; // new Color(0.85f, 0.85f, 0.85f, 1f);
 
                         EditorGUILayout.BeginVertical("box");
                         {
@@ -163,6 +179,31 @@ namespace BehaviorTree
                 DrawAddParameter(nodeValue);
             }
             EditorGUILayout.EndVertical();
+        }
+
+        private ConditionGroup DrawConditionGroup(NodeValue nodeValue)
+        {
+            ConditionGroup conditionGroup = null;
+            if (nodeValue.NodeType != (int)NODE_TYPE.CONDITION)
+            {
+                return conditionGroup;
+            }
+
+            EditorGUILayout.BeginVertical("box");
+            {
+                conditionGroup = BehaviorConditionGroup.DrawTransitionGroup(nodeValue);
+
+                if (GUILayout.Button("添加组"))
+                {
+                    if (null != BehaviorManager.behaviorAddDelConditionGroup)
+                    {
+                        BehaviorManager.behaviorAddDelConditionGroup(nodeValue.id, -1, true);
+                    }
+                }
+            }
+            EditorGUILayout.EndVertical();
+
+            return conditionGroup;
         }
 
         private void DrawAddParameter(NodeValue nodeValue)

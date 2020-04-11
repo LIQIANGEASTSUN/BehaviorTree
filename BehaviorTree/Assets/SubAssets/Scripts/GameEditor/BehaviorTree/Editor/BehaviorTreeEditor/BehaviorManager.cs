@@ -22,6 +22,7 @@ public class BehaviorManager
     public delegate void BehaviorParameterChange(BehaviorParameter parameter, bool isAdd);
     public delegate void BehaviorNodeChangeParameter(int nodeId, string oldParameter, string newParameter);
     public delegate void BehaviorRuntimePlay(BehaviorPlayType state);
+    public delegate void BehaviorAddDelConditionGroup(int nodeId, int groupId, bool isAdd);
 
     private string _filePath = string.Empty;
     private string _fileName = string.Empty;
@@ -43,6 +44,7 @@ public class BehaviorManager
     public static BehaviorParameterChange parameterChange;
     public static BehaviorNodeChangeParameter behaviorNodeChangeParameter;
     public static BehaviorRuntimePlay behaviorRuntimePlay;
+    public static BehaviorAddDelConditionGroup behaviorAddDelConditionGroup;
 
     public void Init()
     {
@@ -62,6 +64,7 @@ public class BehaviorManager
         parameterChange += ParameterChange;
         behaviorNodeChangeParameter += NodeChangeParameter;
         behaviorRuntimePlay += RuntimePlay;
+        behaviorAddDelConditionGroup += NodeAddDelConditionGroup;
 
         _playState = BehaviorPlayType.STOP;
     }
@@ -80,6 +83,7 @@ public class BehaviorManager
         parameterChange -= ParameterChange;
         behaviorNodeChangeParameter -= NodeChangeParameter;
         behaviorRuntimePlay -= RuntimePlay;
+        behaviorAddDelConditionGroup -= NodeAddDelConditionGroup;
 
         _playState = BehaviorPlayType.STOP;
 
@@ -404,6 +408,47 @@ public class BehaviorManager
             {
                 parameterList.RemoveAt(i);
                 break;
+            }
+        }
+    }
+
+    private void NodeAddDelConditionGroup(int nodeId, int groupId, bool isAdd)
+    {
+        NodeValue nodeValue = GetNode(nodeId);
+        if (null == nodeValue)
+        {
+            return;
+        }
+
+        if (isAdd)
+        {
+            for (int i = 0; i < nodeValue.conditionGroupList.Count + 1; ++i)
+            {
+                ConditionGroup conditionGroup = nodeValue.conditionGroupList.Find(a => a.index == i);
+                if (null == conditionGroup)
+                {
+                    conditionGroup = new ConditionGroup();
+                    conditionGroup.index = i;
+                    nodeValue.conditionGroupList.Add(conditionGroup);
+                    break;
+                }
+            }
+
+            if (nodeValue.conditionGroupList.Count <= 0)
+            {
+                ConditionGroup conditionGroup = new ConditionGroup();
+                conditionGroup.index = 0;
+                nodeValue.conditionGroupList.Add(conditionGroup);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < nodeValue.conditionGroupList.Count; ++i)
+            {
+                if (nodeValue.conditionGroupList[i].index == groupId)
+                {
+                    nodeValue.conditionGroupList.RemoveAt(i);
+                }
             }
         }
     }

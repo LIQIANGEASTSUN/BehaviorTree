@@ -132,6 +132,10 @@ namespace BehaviorTree
                 BehaviorParameter parameter = new BehaviorParameter();
                 parameter.parameterType = int.Parse(item["parameterType"].ToString());
                 parameter.parameterName = item["parameterName"].ToString();
+                if (((IDictionary)item).Contains("CNName"))
+                {
+                    parameter.CNName = item["CNName"].ToString();
+                }
                 parameter.intValue = int.Parse(item["intValue"].ToString());
                 parameter.floatValue = float.Parse(item["floatValue"].ToString());
                 parameter.boolValue = bool.Parse(item["boolValue"].ToString());

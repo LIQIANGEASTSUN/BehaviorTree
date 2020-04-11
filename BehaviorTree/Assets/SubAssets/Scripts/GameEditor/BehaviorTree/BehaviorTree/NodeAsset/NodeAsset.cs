@@ -25,9 +25,16 @@ namespace BehaviorTree
         public string nodeName = string.Empty;
         public int identification = -1;
         public string descript = string.Empty;
+        public List<ConditionGroup> conditionGroupList = new List<ConditionGroup>();
 
         public RectT position = new RectT(0, 0, 100, 100); // 节点位置（编辑器显示使用）
     }
+
+    public class ConditionGroup
+    {
+        public int index;
+        public List<string> parameterList = new List<string>();
+    } 
 
     public enum BehaviorParameterType
     {
