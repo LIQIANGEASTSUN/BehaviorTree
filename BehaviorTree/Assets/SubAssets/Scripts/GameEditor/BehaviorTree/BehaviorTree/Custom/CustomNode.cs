@@ -12,13 +12,18 @@ namespace BehaviorTree
     {
         public readonly static CustomNode Instance = new CustomNode();
 
+        private ConfigBehaviorNode configBehaviorNode = null;
+        private HashSet<int> hash = new HashSet<int>();
         private List<CustomIdentification> nodeList = new List<CustomIdentification>();
 
         public CustomNode()
         {
+            configBehaviorNode = new ConfigBehaviorNode();
+            configBehaviorNode.AddEvent(AddIdentification);
+            configBehaviorNode.Init();
         }
 
-        public object GetNode(IDENTIFICATION identification)
+        public object GetNode(int identification)
         {
             object obj = null;
             CustomIdentification info = GetIdentification(identification);
@@ -29,14 +34,12 @@ namespace BehaviorTree
             return obj;
         }
 
-        public CustomIdentification GetIdentification(IDENTIFICATION identification)
+        public CustomIdentification GetIdentification(int identification)
         {
-            GetNodeList();
-
             for (int i = 0; i < nodeList.Count; ++i)
             {
                 CustomIdentification info = nodeList[i];
-                if (info.Identification == identification)
+                if (info.Identification == (int)identification)
                 {
                     return info;
                 }
@@ -45,39 +48,20 @@ namespace BehaviorTree
             return new CustomIdentification();
         }
 
+        private void AddIdentification(CustomIdentification customIdentification)
+        {
+            if (hash.Contains(customIdentification.Identification))
+            {
+                Debug.LogError("重复的 Identification:" + customIdentification.Identification);
+                return;
+            }
+            hash.Add(customIdentification.Identification);
+
+            nodeList.Add(customIdentification);
+        }
+
         public List<CustomIdentification> GetNodeList()
         {
-            if (nodeList.Count > 0)
-            {
-                return nodeList;
-            }
-
-            #region Skill
-            // 条件节点
-            {
-                CustomIdentification custom = NodeConditionCustom.CustomIdentification();
-                nodeList.Add(custom);
-            }
-
-            // 行为节点
-            {
-                CustomIdentification requestSkillState = NodeActionRequestSkillState.CustomIdentification();
-                nodeList.Add(requestSkillState);
-            }
-            #endregion
-
-            HashSet<IDENTIFICATION> hash = new HashSet<IDENTIFICATION>();
-            for (int i = 0; i < nodeList.Count; ++i)
-            {
-                CustomIdentification identificationi = nodeList[i];
-                if (hash.Contains(identificationi.Identification))
-                {
-                    Debug.LogError("重复的 Identification:" + identificationi.Identification);
-                    break;
-                }
-                hash.Add(identificationi.Identification);
-            }
-
             return nodeList;
         }
 

@@ -234,7 +234,7 @@ namespace BehaviorTree
 
         public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
-            NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode((IDENTIFICATION)nodeValue.identification);
+            NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identification);
             condition.SetParameters(nodeValue.parameterList);
             condition.SetConditionCheck(iConditionCheck);
             return condition;
@@ -242,7 +242,7 @@ namespace BehaviorTree
 
         public NodeAction GetAction(NodeValue nodeValue, IAction iAction)
         {
-            NodeAction action = (NodeAction)CustomNode.Instance.GetNode((IDENTIFICATION)nodeValue.identification);
+            NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identification);
             action.SetIAction(iAction);
             action.SetParameters(nodeValue.parameterList);
             return action;

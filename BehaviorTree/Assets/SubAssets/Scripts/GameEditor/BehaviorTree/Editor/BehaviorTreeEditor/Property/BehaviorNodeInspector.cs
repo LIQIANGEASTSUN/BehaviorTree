@@ -89,8 +89,8 @@ namespace BehaviorTree
                     string identificationName = string.Format("类标识_{0}", nodeValue.identification);
                     EditorGUILayout.LabelField(identificationName);
 
-                    CustomIdentification customIdentification = CustomNode.Instance.GetIdentification((IDENTIFICATION)nodeValue.identification);
-                    string className = customIdentification.Type.Name;
+                    CustomIdentification customIdentification = CustomNode.Instance.GetIdentification(nodeValue.identification);
+                    string className = customIdentification.ClassType.Name;
                     EditorGUILayout.LabelField(className);
                 }
 
