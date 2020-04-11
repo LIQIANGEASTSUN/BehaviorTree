@@ -72,28 +72,23 @@ namespace BehaviorTree
                 nodeValue.isRootNode = bool.Parse(item["isRootNode"].ToString());
                 nodeValue.NodeType = int.Parse(item["NodeType"].ToString());
                 nodeValue.parentNodeID = int.Parse(item["parentNodeID"].ToString());
+
+                JsonData childNodeList = item["childNodeList"];
+                nodeValue.childNodeList = GetChildIdList(childNodeList);
+
                 nodeValue.repeatTimes = int.Parse(item["repeatTimes"].ToString());
                 nodeValue.nodeName = item["nodeName"].ToString();
                 nodeValue.identification = int.Parse(item["identification"].ToString());
                 nodeValue.descript = item["descript"].ToString();
 
-                if (((IDictionary)item).Contains("childNodeList"))
-                {
-                    JsonData childNodeList = item["childNodeList"];
-                    nodeValue.childNodeList = GetChildIdList(childNodeList);
-                }
+                JsonData conditionGroupList = item["conditionGroupList"];
+                nodeValue.conditionGroupList = GetConditionGroupList(conditionGroupList);
 
-                if (((IDictionary)item).Contains("parameterList"))
-                {
-                    JsonData parameterList = item["parameterList"];
-                    nodeValue.parameterList = GetParameterList(parameterList);
-                }
+                JsonData parameterList = item["parameterList"];
+                nodeValue.parameterList = GetParameterList(parameterList);
 
-                if (((IDictionary)item).Contains("position"))
-                {
-                    JsonData position = item["position"];
-                    nodeValue.position = GetPosition(position);
-                }
+                JsonData position = item["position"];
+                nodeValue.position = GetPosition(position);
 
                 nodeList.Add(nodeValue);
             }
@@ -111,6 +106,25 @@ namespace BehaviorTree
             }
 
             return childIdList;
+        }
+
+        private List<ConditionGroup> GetConditionGroupList(JsonData jsonData)
+        {
+            List<ConditionGroup> conditionGroupList = new List<ConditionGroup>();
+            foreach (JsonData item in jsonData)
+            {
+                JsonData croupData = item["parameterList"];
+                ConditionGroup conditionGroup = new ConditionGroup();
+                for (int i = 0; i < croupData.Count; ++i)
+                {
+                    string parameterName = croupData[i].ToString();
+                    conditionGroup.parameterList.Add(parameterName);
+                }
+
+                conditionGroupList.Add(conditionGroup);
+            }
+
+            return conditionGroupList;
         }
 
         private RectT GetPosition(JsonData data)

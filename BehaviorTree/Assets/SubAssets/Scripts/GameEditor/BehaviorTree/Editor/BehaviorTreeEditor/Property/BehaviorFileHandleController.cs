@@ -148,14 +148,20 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            //for (int i = 0; i < treeData.parameterList.Count; ++i)
-            //{
-            //    BehaviorParameter parameter = treeData.parameterList[i];
-            //    if (parameter.parameterType == (int)BehaviorParameterType.Bool)
-            //    {
-            //        parameter.compare = (int)BehaviorCompare.EQUALS;
-            //    }
-            //}
+            
+            for (int i = 0; i < treeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = treeData.nodeList[i];
+                nodeValue.conditionGroupList.Clear();
+                ConditionGroup conditionGroup = new ConditionGroup();
+                nodeValue.conditionGroupList.Add(conditionGroup);
+                for (int j = 0; j < nodeValue.parameterList.Count; ++j)
+                {
+                    Debug.LogError(nodeValue.parameterList[j].parameterName);
+                    conditionGroup.parameterList.Add(nodeValue.parameterList[j].parameterName);
+                }
+            }
+
             return treeData;
         }
 
