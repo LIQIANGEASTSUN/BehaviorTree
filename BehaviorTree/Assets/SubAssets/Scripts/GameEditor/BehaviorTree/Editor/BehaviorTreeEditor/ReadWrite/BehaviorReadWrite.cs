@@ -53,7 +53,10 @@ namespace BehaviorTree
                 behaviorData.parameterList = GetParameterList(parameterList);
             }
 
-            behaviorData.descript = jsonData["descript"].ToString();
+            if (((IDictionary)jsonData).Contains("descript"))
+            {
+                behaviorData.descript = jsonData["descript"].ToString();
+            }
 
             return behaviorData;
         }
