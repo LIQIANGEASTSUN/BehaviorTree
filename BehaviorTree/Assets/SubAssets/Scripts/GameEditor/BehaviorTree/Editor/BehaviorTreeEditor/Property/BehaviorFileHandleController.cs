@@ -159,5 +159,107 @@ namespace BehaviorTree
             return treeData;
         }
 
+        public static void ImportParameter()
+        {
+            BehaviorTreeData behaviorData = BehaviorManager.Instance.BehaviorTreeData;
+            string fileName = "BehaviorTree";
+
+            behaviorData = ImportParameter(behaviorData, fileName);
+        }
+
+        private static BehaviorTreeData ImportParameter(BehaviorTreeData behaviorData, string fileName)
+        {
+            Debug.LogError(fileName);
+            TableRead.Instance.Init();
+            string csvPath =string.Format("{0}/StreamingAssets/CSV/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            TableRead.Instance.ReadCustomPath(csvPath);
+
+            // Debug.LogError(filePath + "   " + fileName);
+            List<int> keyList = TableRead.Instance.GetKeyList(fileName);
+
+            Dictionary<string, BehaviorParameter> parameterDic = new Dictionary<string, BehaviorParameter>();
+            for (int i = 0; i < behaviorData.parameterList.Count; ++i)
+            {
+                BehaviorParameter parameter = behaviorData.parameterList[i];
+                parameterDic[parameter.parameterName] = parameter;
+            }
+
+            for (int i = 0; i < keyList.Count; ++i)
+            {
+                int key = keyList[i];
+                string EnName = TableRead.Instance.GetData(fileName, key, "EnName");
+                string cnName = TableRead.Instance.GetData(fileName, key, "CnName");
+                string typeName = TableRead.Instance.GetData(fileName, key, "Type");
+                int type = int.Parse(typeName);
+
+                string floatContent = TableRead.Instance.GetData(fileName, key, "FloatValue");
+                float floatValue = float.Parse(floatContent);
+
+                string intContent = TableRead.Instance.GetData(fileName, key, "IntValue");
+                int intValue = int.Parse(intContent);
+
+                string boolContent = TableRead.Instance.GetData(fileName, key, "BoolValue");
+                bool boolValue = (int.Parse(boolContent) == 1);
+
+                if (parameterDic.ContainsKey(EnName))
+                {
+                    if (parameterDic[EnName].parameterType != type)
+                    {
+                        Debug.LogError("已经存在参数:" + EnName + "   type:" + (BehaviorParameterType)parameterDic[EnName].parameterType + "   newType:" + (BehaviorParameterType)type);
+                    }
+                    else
+                    {
+                        Debug.LogError("已经存在参数:" + EnName);
+                    }
+                    parameterDic.Remove(EnName);
+
+                    for (int j = 0; j < behaviorData.parameterList.Count; ++j)
+                    {
+                        BehaviorParameter cacheParameter = behaviorData.parameterList[j];
+                        if (cacheParameter.parameterName == EnName)
+                        {
+                            behaviorData.parameterList.RemoveAt(j);
+                            break;
+                        }
+                    }
+
+                    //continue;
+                }
+
+                //Debug.LogError(EnName + "    " +cnName + "    " + typeName);
+
+                BehaviorParameter parameter = new BehaviorParameter();
+                parameter.parameterName = EnName;
+                parameter.CNName = cnName;
+                parameter.compare = (int)BehaviorCompare.EQUALS;
+                parameter.parameterType = type;
+                parameter.boolValue = false;
+
+                if (type == (int)BehaviorParameterType.Float)
+                {
+                    parameter.floatValue = floatValue;
+                }
+
+                if (type == (int)BehaviorParameterType.Int)
+                {
+                    parameter.intValue = intValue;
+                }
+
+                if (type == (int)BehaviorParameterType.Float)
+                {
+                    parameter.boolValue = boolValue;
+                }
+
+                behaviorData.parameterList.Add(parameter);
+            }
+
+            foreach (var kv in parameterDic)
+            {
+                Debug.LogError("==========缺失的参数:" + kv.Key);
+            }
+
+            return behaviorData;
+        }
+
     }
 }

@@ -57,7 +57,15 @@ namespace BehaviorTree
         private Vector2 scrollPos = Vector2.zero;
         public void Draw(List<BehaviorParameter> parameterList)
         {
-            EditorGUILayout.LabelField("全部变量");
+            EditorGUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.LabelField("全部变量");
+                if (GUILayout.Button("导入变量"))
+                {
+                    BehaviorFileHandleView.ImportParameter();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             {
