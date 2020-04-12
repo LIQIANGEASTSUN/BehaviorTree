@@ -19,7 +19,7 @@ namespace BehaviorTree
 
         bool Condition(BehaviorParameter parameter);
 
-        bool Condition(List<BehaviorParameter> parameterList);
+        bool Condition(ConditionParameter conditionParameter);
 
         List<BehaviorParameter> GetAllParameter();
     }

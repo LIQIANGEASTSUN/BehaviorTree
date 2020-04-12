@@ -314,6 +314,11 @@ public class BehaviorManager
         {
             DelParameter(nodeValue.parameterList, parameter);
         }
+
+        for (int i = 0; i < nodeValue.parameterList.Count; ++i)
+        {
+            nodeValue.parameterList[i].index = i;
+        }
     }
 
     private void NodeChangeParameter(int nodeId, string oldParameter, string newParameter)
@@ -348,6 +353,11 @@ public class BehaviorManager
                 break;
             }
         }
+
+        for (int i = 0; i < nodeValue.parameterList.Count; ++i)
+        {
+            nodeValue.parameterList[i].index = i;
+        }
     }
 
     private void RuntimePlay(BehaviorPlayType state)
@@ -365,6 +375,11 @@ public class BehaviorManager
         else
         {
             DelParameter(_behaviorTreeData.parameterList, parameter);
+        }
+
+        for (int i = 0; i < _behaviorTreeData.parameterList.Count; ++i)
+        {
+            _behaviorTreeData.parameterList[i].index = i;
         }
     }
 

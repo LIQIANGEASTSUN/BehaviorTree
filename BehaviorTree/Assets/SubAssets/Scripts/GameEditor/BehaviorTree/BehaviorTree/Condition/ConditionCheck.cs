@@ -5,6 +5,8 @@ using BehaviorTree;
 
 public class ConditionCheck : IConditionCheck
 {
+    //存储所有能用到的参数，数据来源于配置，在Init时候存到_environmentParameterDic中去，如果除了初始化时没别的地方用到，可以省略
+    private List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
     // 缓存当前行为树使用到的所有参数类型,保存当前世界状态中所有参数动态变化的值
     private Dictionary<string, BehaviorParameter> _environmentParameterDic = new Dictionary<string, BehaviorParameter>();
 
@@ -76,21 +78,31 @@ public class ConditionCheck : IConditionCheck
         _environmentParameterDic[parameter.parameterName] = environmentParameter;
     }
 
-    public void AddParameter(List<BehaviorParameter> parameterList)
+
+    //将配置好的Parameter存到环境dic中
+    public void InitParmeter()
     {
-        for (int i = 0; i < parameterList.Count; ++i)
+        for (int i = 0; i < _parameterList.Count; ++i)
         {
-            BehaviorParameter parameter = parameterList[i];
-            if (_environmentParameterDic.ContainsKey(parameter.parameterName))
+            BehaviorParameter parameter = _parameterList[i];
+
+            BehaviorParameter cacheParaemter = null;
+            if (!_environmentParameterDic.TryGetValue(parameter.parameterName, out cacheParaemter))
             {
-                continue;
+                cacheParaemter = parameter.Clone();
+                _environmentParameterDic[parameter.parameterName] = cacheParaemter;
             }
 
-            _environmentParameterDic[parameter.parameterName] = parameter.Clone();
-            _environmentParameterDic[parameter.parameterName].intValue = parameter.intValue;
-            _environmentParameterDic[parameter.parameterName].floatValue = parameter.floatValue;
-            _environmentParameterDic[parameter.parameterName].boolValue = parameter.boolValue;
+            cacheParaemter.intValue = parameter.intValue;
+            cacheParaemter.floatValue = parameter.floatValue;
+            cacheParaemter.boolValue = parameter.boolValue;
         }
+    }
+
+    public void AddParameter(List<BehaviorParameter> parameterList)
+    {
+        _parameterList.AddRange(parameterList);
+        InitParmeter();
     }
 
     public bool CompareParameter(BehaviorParameter parameter)
@@ -117,16 +129,27 @@ public class ConditionCheck : IConditionCheck
         return CompareParameter(parameter);
     }
 
-    public bool Condition(List<BehaviorParameter> parameterList)
+    public bool Condition(ConditionParameter conditionParameter)
     {
         bool result = true;
-        for (int i = 0; i < parameterList.Count; ++i)
+        for (int i = 0; i < conditionParameter.groupList.Count; ++i)
         {
-            BehaviorParameter parameter = parameterList[i];
-            bool value = Condition(parameter);
-            if (!value)
+            ConditionGroupParameter groupParameter = conditionParameter.groupList[i];
+            result = true;
+
+            for (int j = 0; j < groupParameter.parameterList.Count; ++j)
             {
-                result = value;
+                BehaviorParameter parameter = groupParameter.parameterList[j];
+                bool value = Condition(parameter);
+                if (!value)
+                {
+                    result = false;
+                    break;
+                }
+            }
+
+            if (result)
+            {
                 break;
             }
         }

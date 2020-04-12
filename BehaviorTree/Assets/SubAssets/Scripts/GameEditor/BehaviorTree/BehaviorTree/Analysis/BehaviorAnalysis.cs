@@ -235,7 +235,7 @@ namespace BehaviorTree
         public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
             NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identification);
-            condition.SetParameters(nodeValue.parameterList);
+            condition.SetData(nodeValue.parameterList, nodeValue.conditionGroupList);
             condition.SetConditionCheck(iConditionCheck);
             return condition;
         }

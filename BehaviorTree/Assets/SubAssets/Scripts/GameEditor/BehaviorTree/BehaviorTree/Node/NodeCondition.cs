@@ -7,6 +7,7 @@ namespace BehaviorTree
     /// </summary>
     public class NodeCondition : NodeLeaf
     {
+        protected ConditionParameter conditionParameter = null;
         protected List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
         protected IConditionCheck _iconditionCheck = null;
 
@@ -24,12 +25,16 @@ namespace BehaviorTree
             _iconditionCheck = iConditionCheck;
         }
 
-        public void SetParameters(List<BehaviorParameter> parameterList)
+        public void SetData(List<BehaviorParameter> parameterList, List<ConditionGroup> conditionGroupList)
         {
             if (parameterList.Count > 0)
             {
                 _parameterList.AddRange(parameterList);
             }
+
+            conditionParameter = new ConditionParameter();
+            conditionParameter.SetGroup(conditionGroupList, _parameterList);
         }
+
     }
 }

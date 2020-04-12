@@ -98,6 +98,7 @@ namespace BehaviorTree
         public int parameterType = 0;
         public string parameterName = string.Empty;
         public string CNName = string.Empty;
+        public int index;
         public int intValue = 0;
         public float floatValue = 0;
         public bool boolValue = true;
@@ -114,6 +115,7 @@ namespace BehaviorTree
         {
             parameterType = parameter.parameterType;
             parameterName = parameter.parameterName;
+            CNName = parameter.CNName;
             intValue =  parameter.intValue;
             floatValue = parameter.floatValue;
             boolValue = parameter.boolValue;

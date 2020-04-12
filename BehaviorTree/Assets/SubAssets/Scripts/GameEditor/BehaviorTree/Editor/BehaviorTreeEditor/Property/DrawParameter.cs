@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Text.RegularExpressions;
 
 namespace BehaviorTree
 {
@@ -29,6 +30,16 @@ namespace BehaviorTree
                 int index = EnumNames.GetEnumIndex<BehaviorParameterType>((BehaviorParameterType)(behaviorParameter.parameterType));
                 BehaviorParameterType behaviorParameterType = EnumNames.GetEnum<BehaviorParameterType>(index);
 
+                GUI.enabled = false;
+                if (drawParameterType == DrawParameterType.NODE_PARAMETER)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        behaviorParameter.index = EditorGUILayout.IntField(behaviorParameter.index, GUILayout.Width(30));
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
+
                 bool enableChangeType = (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD);
                 GUI.enabled = enableChangeType;
                 {
@@ -38,6 +49,16 @@ namespace BehaviorTree
                 }
                 GUI.enabled = true;
 
+                if (drawParameterType == DrawParameterType.NODE_PARAMETER)
+                {
+                    GUI.enabled = false;
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        behaviorParameter.CNName = EditorGUILayout.TextField(behaviorParameter.CNName);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    GUI.enabled = true;
+                }
 
                 if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER)
                 {
@@ -62,7 +83,7 @@ namespace BehaviorTree
                     for (int i = 0; i < parameterList.Count; ++i)
                     {
                         BehaviorParameter p = parameterList[i];
-                        parameterArr[i] = p.parameterName;
+                        parameterArr[i] = p.CNName;
                         if (behaviorParameter.parameterName.CompareTo(p.parameterName) == 0)
                         {
                             index = i;
@@ -72,16 +93,37 @@ namespace BehaviorTree
                     int result = EditorGUILayout.Popup(index, parameterArr, GUILayout.ExpandWidth(true));
                     if (result != index)
                     {
-                        behaviorParameter.parameterName = parameterArr[result];
+                        behaviorParameter.parameterName = parameterList[result].parameterName;
                     }
                 }
                 else if (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER
-                    || (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD)
                     || drawParameterType == DrawParameterType.RUNTIME_PARAMETER)
                 {
                     GUI.enabled = (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD);
                     behaviorParameter.parameterName = EditorGUILayout.TextField(behaviorParameter.parameterName);
+                    behaviorParameter.CNName = EditorGUILayout.TextField(behaviorParameter.CNName);
                     GUI.enabled = true;
+                }
+                else if (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD)
+                {
+                    EditorGUILayout.BeginVertical();
+                    {
+                        string oldName = behaviorParameter.parameterName;
+                        behaviorParameter.parameterName = EditorGUILayout.TextField("英文:", behaviorParameter.parameterName);
+                        if (oldName.CompareTo(behaviorParameter.parameterName) != 0)
+                        {
+                            bool isNumOrAlp = IsNumOrAlp(behaviorParameter.parameterName);
+                            if (!isNumOrAlp)
+                            {
+                                string msg = string.Format("参数名只能包含:数字、字母、下划线，且数字不能放在第一个字符位置");
+                                TreeNodeWindow.window.ShowNotification(msg);
+                                behaviorParameter.parameterName = oldName;
+                            }
+                        }
+
+                        behaviorParameter.CNName = EditorGUILayout.TextField("中文", behaviorParameter.CNName);
+                    }
+                    EditorGUILayout.EndVertical();
                 }
 
                 BehaviorCompare[] compareEnumArr = new BehaviorCompare[] { };
@@ -156,7 +198,13 @@ namespace BehaviorTree
             return behaviorParameter;
         }
 
+        private static bool IsNumOrAlp(string str)
+        {
+            string pattern = @"^[a-zA-Z_][A-Za-z0-9_]*$";
+            Match match = Regex.Match(str, pattern);
+            return match.Success;
+        }
+
     }
+
 }
-
-

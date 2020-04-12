@@ -114,6 +114,11 @@ namespace BehaviorTree
 
             ConditionGroup conditionGroup = DrawConditionGroup(nodeValue);
 
+            for (int i = 0; i < nodeValue.parameterList.Count; ++i)
+            {
+                nodeValue.parameterList[i].index = i;
+            }
+
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             {
                 EditorGUILayout.LabelField(title);
