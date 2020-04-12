@@ -7,7 +7,7 @@ public class Human : IAction
 {
     private Transform _target;
 
-    private NodeBase _rootNode = null;
+    private BehaviorTreeEntity _behaviorTreeEntity = null;
     private IConditionCheck _iconditionCheck = null;
 
     private float _energy = 100;            // 能量
@@ -46,7 +46,7 @@ public class Human : IAction
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(content, this, _iconditionCheck);
+        _behaviorTreeEntity = analysis.Analysis(content, this, _iconditionCheck);
     }
 
     public ConditionCheck ConditionCheck
@@ -70,9 +70,9 @@ public class Human : IAction
 
     private void Execute()
     {
-        if (null != _rootNode)
+        if (null != _behaviorTreeEntity)
         {
-            _rootNode.Execute();
+            _behaviorTreeEntity.Execute();
         }
     }
 

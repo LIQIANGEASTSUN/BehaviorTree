@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
+        public BehaviorTreeEntity Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
         {
             BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
             if (null == behaviorTreeData)
@@ -27,20 +27,22 @@ namespace BehaviorTree
             return Analysis(behaviorTreeData, iAction, iConditionCheck);
         }
 
-        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
+        public BehaviorTreeEntity Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
         {
+            BehaviorTreeEntity behaviorTreeEntity = new BehaviorTreeEntity();
+
             NodeBase rootNode = null;
 
             if (null == data)
             {
                 Debug.LogError("数据无效");
-                return rootNode;
+                return behaviorTreeEntity;
             }
 
             if (data.rootNodeId < 0)
             {
                 Debug.LogError("没有跟节点");
-                return rootNode;
+                return behaviorTreeEntity;
             }
 
             iConditionCheck.AddParameter(data.parameterList);
@@ -64,12 +66,6 @@ namespace BehaviorTree
                         rootNode = nodeBase;
                     }
                 }
-
-                //if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION     // 条件节点
-                //    || (nodeValue.NodeType == (int)NODE_TYPE.ACTION))  // 行为节点
-                //{
-                //    nodeLeafList.Add((NodeLeaf)nodeBase);
-                //}
 
                 if (null == nodeBase)
                 {
@@ -97,7 +93,8 @@ namespace BehaviorTree
                 }
             }
 
-            return rootNode;
+            behaviorTreeEntity.SetRootNode(rootNode);
+            return behaviorTreeEntity;
         }
 
         private bool IsLeafNode(int type)

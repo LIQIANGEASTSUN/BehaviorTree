@@ -9,7 +9,7 @@ namespace BehaviorTree
     {
         public static readonly BehaviorRunTime Instance = new BehaviorRunTime();
 
-        private NodeBase _rootNode = null;
+        private BehaviorTreeEntity _behaviorTreeEntity = null;
         private IConditionCheck _iconditionCheck = null;
 
         private RunTimeRotateGo _runtimeRotateGo;
@@ -31,7 +31,7 @@ namespace BehaviorTree
         {
             BehaviorAnalysis analysis = new BehaviorAnalysis();
             _iconditionCheck = new ConditionCheck();
-            _rootNode = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
+            _behaviorTreeEntity = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
         }
 
         public ConditionCheck ConditionCheck
@@ -54,9 +54,9 @@ namespace BehaviorTree
                 return;
             }
 
-            if (null != _rootNode)
+            if (null != _behaviorTreeEntity)
             {
-                _rootNode.Execute();
+                _behaviorTreeEntity.Execute();
             }
         }
 

@@ -44,7 +44,7 @@ public class RoleTest : MonoBehaviour
 public class RolePlayer : IAction
 {
     private BehaviorAnalysis analysis = null;
-    private NodeBase _rootNode = null;
+    private BehaviorTreeEntity _behaviorTreeEntity = null;
     private IConditionCheck _iconditionCheck = null;
 
     public void Init()
@@ -56,9 +56,9 @@ public class RolePlayer : IAction
     // Update is called once per frame
     public void Update()
     {
-        if (null != _rootNode)
+        if (null != _behaviorTreeEntity)
         {
-            _rootNode.Execute();
+            _behaviorTreeEntity.Execute();
         }
     }
 
@@ -71,14 +71,14 @@ public class RolePlayer : IAction
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
+        _behaviorTreeEntity = analysis.Analysis(behaviorTreeData, this, _iconditionCheck);
     }
 
     public void SetData(string content)
     {
         BehaviorAnalysis analysis = new BehaviorAnalysis();
         _iconditionCheck = new ConditionCheck();
-        _rootNode = analysis.Analysis(content, this, _iconditionCheck);
+        _behaviorTreeEntity = analysis.Analysis(content, this, _iconditionCheck);
     }
 
     public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)

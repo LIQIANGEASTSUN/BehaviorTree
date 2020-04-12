@@ -7,7 +7,7 @@ using BehaviorTree;
 public class AbilityBehavior : IAbilityEnvironment, IAction
 {
     //private Skill _skill;
-    private NodeBase _rootNode = null;
+    private BehaviorTreeEntity _behaviorTreeEntity = null;
     private IConditionCheck _iconditionCheck = null;
     //private AbilityInputExtend _abilityInputExtend = null;
 
@@ -58,7 +58,7 @@ public class AbilityBehavior : IAbilityEnvironment, IAction
             return;
         }
         BehaviorAnalysis analysis = new BehaviorAnalysis();
-        _rootNode = analysis.Analysis(textAsset.text, this, _iconditionCheck);
+        _behaviorTreeEntity = analysis.Analysis(textAsset.text, this, _iconditionCheck);
 
         Clear();
     }
@@ -67,9 +67,9 @@ public class AbilityBehavior : IAbilityEnvironment, IAction
     {
         UpdateEnvironment();
 
-        if (null != _rootNode)
+        if (null != _behaviorTreeEntity)
         {
-            _rootNode.Execute();
+            _behaviorTreeEntity.Execute();
         }
     }
 
