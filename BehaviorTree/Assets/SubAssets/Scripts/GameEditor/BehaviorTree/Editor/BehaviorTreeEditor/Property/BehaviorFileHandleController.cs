@@ -148,19 +148,55 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            
+
             for (int i = 0; i < treeData.nodeList.Count; ++i)
             {
+                for (int j = 0; j < treeData.parameterList.Count; ++j)
+                {
+                    if (treeData.parameterList[j].parameterName.CompareTo("IsHungry") == 0)
+                    {
+                        treeData.parameterList[j].CNName = "饿了吗";
+                    }
+                    if (treeData.parameterList[j].parameterName.CompareTo("HasFood") == 0)
+                    {
+                        treeData.parameterList[j].CNName = "有食物吗";
+                    }
+                    if (treeData.parameterList[j].parameterName.CompareTo("MoveTarget") == 0)
+                    {
+                        treeData.parameterList[j].CNName = "移动到目标位置";
+                    }
+                }
+
                 NodeValue nodeValue = treeData.nodeList[i];
-                nodeValue.conditionGroupList.Clear();
-                ConditionGroup conditionGroup = new ConditionGroup();
-                nodeValue.conditionGroupList.Add(conditionGroup);
                 for (int j = 0; j < nodeValue.parameterList.Count; ++j)
                 {
-                    Debug.LogError(nodeValue.parameterList[j].parameterName);
-                    conditionGroup.parameterList.Add(nodeValue.parameterList[j].parameterName);
+                    if (nodeValue.parameterList[j].parameterName.CompareTo("IsHungry") == 0)
+                    {
+                        nodeValue.parameterList[j].CNName = "饿了吗";
+                    }
+                    if (nodeValue.parameterList[j].parameterName.CompareTo("HasFood") == 0)
+                    {
+                        nodeValue.parameterList[j].CNName = "有食物吗";
+                    }
+                    if (nodeValue.parameterList[j].parameterName.CompareTo("MoveTarget") == 0)
+                    {
+                        nodeValue.parameterList[j].CNName = "移动到目标位置";
+                    }
                 }
             }
+
+            //for (int i = 0; i < treeData.nodeList.Count; ++i)
+            //{
+            //    NodeValue nodeValue = treeData.nodeList[i];
+            //    nodeValue.conditionGroupList.Clear();
+            //    ConditionGroup conditionGroup = new ConditionGroup();
+            //    nodeValue.conditionGroupList.Add(conditionGroup);
+            //    for (int j = 0; j < nodeValue.parameterList.Count; ++j)
+            //    {
+            //        Debug.LogError(nodeValue.parameterList[j].parameterName);
+            //        conditionGroup.parameterList.Add(nodeValue.parameterList[j].parameterName);
+            //    }
+            //}
 
             return treeData;
         }

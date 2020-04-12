@@ -54,7 +54,7 @@ namespace BehaviorTree
                     GUI.enabled = false;
                     EditorGUILayout.BeginHorizontal();
                     {
-                        behaviorParameter.CNName = EditorGUILayout.TextField(behaviorParameter.CNName);
+                        behaviorParameter.parameterName = EditorGUILayout.TextField(behaviorParameter.parameterName);
                     }
                     EditorGUILayout.EndHorizontal();
                     GUI.enabled = true;
