@@ -18,7 +18,7 @@ public class Human : IAction
 
     private float _food = 0;
     private float _foodMax = 100;
-    private float _eatSpeed = 0.3f;
+    private float _eatSpeed = 0.8f;
 
     public Human(Transform target)
     {

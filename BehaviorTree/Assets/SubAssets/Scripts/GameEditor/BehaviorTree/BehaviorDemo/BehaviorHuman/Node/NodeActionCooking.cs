@@ -15,7 +15,7 @@ public class NodeActionCooking : NodeAction
     {
         NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
 
-        bool result = HumanController.Instance.Human.Cooking(0.3f);
+        bool result = HumanController.Instance.Human.Cooking(0.8f);
 
         ResultType resultType = result ? ResultType.Running : ResultType.Success;
         return resultType;
