@@ -7,6 +7,7 @@ namespace BehaviorTree
 {
     public class BehaviorTreeData
     {
+        public string fileName = string.Empty;
         public int rootNodeId = -1;
         public List<NodeValue> nodeList = new List<NodeValue>();
         public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
@@ -214,11 +215,6 @@ namespace BehaviorTree
         public float y;
         public float width;
         public float height;
-
-        public RectT()
-        {
-
-        }
 
         public RectT(float x, float y, float width, float height)
         {
