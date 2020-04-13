@@ -27,7 +27,7 @@ public class HumanController : MonoBehaviour
 
     private IEnumerator Delay()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.5f);
 
         GameObject target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         target.name = "Human";
