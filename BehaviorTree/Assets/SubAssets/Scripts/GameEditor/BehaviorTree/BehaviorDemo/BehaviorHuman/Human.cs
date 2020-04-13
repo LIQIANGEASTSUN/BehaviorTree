@@ -14,7 +14,6 @@ public class Human : IAction
     private GameObject TV;
 
     private BehaviorTreeEntity _behaviorTreeEntity = null;
-    private IConditionCheck _iconditionCheck = null;
 
     private float _energy = 100;            // 能量
     private float _energyConsumption = 10f;// 能耗
@@ -36,14 +35,7 @@ public class Human : IAction
 
     public void SetData(string content)
     {
-        BehaviorAnalysis analysis = new BehaviorAnalysis();
-        _iconditionCheck = new ConditionCheck();
-        _behaviorTreeEntity = analysis.Analysis(content, this, _iconditionCheck);
-    }
-
-    public ConditionCheck ConditionCheck
-    {
-        get { return (ConditionCheck)_iconditionCheck; }
+        _behaviorTreeEntity = new BehaviorTreeEntity(content);
     }
 
     public void Update()
@@ -70,10 +62,10 @@ public class Human : IAction
     public void UpdateEnvironment()
     {
         bool hungry = IsHungry();
-        ConditionCheck.SetParameter("IsHungry", hungry);
+        _behaviorTreeEntity.ConditionCheck.SetParameter("IsHungry", hungry);
 
         bool hasFood = (_food >= _foodMax);
-        ConditionCheck.SetParameter("HasFood", hasFood);
+        _behaviorTreeEntity.ConditionCheck.SetParameter("HasFood", hasFood);
     }
 
     public bool IsHungry()

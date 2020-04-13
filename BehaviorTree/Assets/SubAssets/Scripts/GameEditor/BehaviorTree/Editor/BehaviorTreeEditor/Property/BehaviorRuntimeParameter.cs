@@ -32,7 +32,7 @@ namespace BehaviorTree
         {
             if (_runtimeParameterModel.ParameterList.Count <= 0)
             {
-                List<BehaviorParameter> parameterList = BehaviorRunTime.Instance.ConditionCheck.GetAllParameter();
+                List<BehaviorParameter> parameterList = BehaviorRunTime.Instance.BehaviorTreeEntity.ConditionCheck.GetAllParameter();
                 _runtimeParameterModel.AddParameter(parameterList);
             }
 

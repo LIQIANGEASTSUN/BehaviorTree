@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public BehaviorTreeEntity Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
+        public NodeBase Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
         {
             BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
             if (null == behaviorTreeData)
@@ -27,22 +27,20 @@ namespace BehaviorTree
             return Analysis(behaviorTreeData, iAction, iConditionCheck);
         }
 
-        public BehaviorTreeEntity Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
+        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
         {
-            BehaviorTreeEntity behaviorTreeEntity = new BehaviorTreeEntity();
-
             NodeBase rootNode = null;
 
             if (null == data)
             {
                 Debug.LogError("数据无效");
-                return behaviorTreeEntity;
+                return rootNode;
             }
 
             if (data.rootNodeId < 0)
             {
                 Debug.LogError("没有跟节点");
-                return behaviorTreeEntity;
+                return rootNode;
             }
 
             iConditionCheck.AddParameter(data.parameterList);
@@ -93,8 +91,7 @@ namespace BehaviorTree
                 }
             }
 
-            behaviorTreeEntity.SetRootNode(rootNode);
-            return behaviorTreeEntity;
+            return rootNode;
         }
 
         private bool IsLeafNode(int type)

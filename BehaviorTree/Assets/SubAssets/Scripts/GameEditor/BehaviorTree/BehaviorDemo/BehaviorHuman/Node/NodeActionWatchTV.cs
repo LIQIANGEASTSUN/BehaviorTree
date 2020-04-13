@@ -22,8 +22,7 @@ public class NodeActionWatchTV : NodeAction
 
         bool result = HumanController.Instance.Human.IsHungry();
 
-        ResultType resultType = ResultType.Fail; //result ? ResultType.Running : ResultType.Success;
-        Debug.LogError(resultType);
+        ResultType resultType = result ? ResultType.Running : ResultType.Success;
         return resultType;
     }
 
