@@ -7,11 +7,11 @@ public class HumanController : MonoBehaviour
     public static HumanController Instance = null;
     private Human _human;
     // 厨房
-    public GameObject kitchen;
+    private Transform kitchen;
     // 餐桌
-    public GameObject diningTable;
+    private Transform diningTable;
     // TV
-    public GameObject TV;
+    private Transform TV;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +20,12 @@ public class HumanController : MonoBehaviour
         GameObject target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         target.name = "Human";
         target.transform.position = Vector3.zero;
-        _human = new Human(target.transform, kitchen, diningTable, TV);
+
+        kitchen = transform.Find("Kitchen");
+        diningTable = transform.Find("DiningTable");
+        TV = transform.Find("TV");
+
+        _human = new Human(target.transform, kitchen.gameObject, diningTable.gameObject, TV.gameObject);
         TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
         _human.SetData(textAsset.text);
     }
