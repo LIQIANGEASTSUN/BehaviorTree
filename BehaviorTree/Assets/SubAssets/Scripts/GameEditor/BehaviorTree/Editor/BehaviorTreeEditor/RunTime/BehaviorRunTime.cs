@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BehaviorTree
 {
 
-    public class BehaviorRunTime : IAction
+    public class BehaviorRunTime
     {
         public static readonly BehaviorRunTime Instance = new BehaviorRunTime();
 
@@ -60,25 +60,6 @@ namespace BehaviorTree
             }
         }
 
-        public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
-        {
-            bool result = true;
-            for (int i = 0; i < parameterList.Count; ++i)
-            {
-                bool value = DoAction(nodeId, parameterList[i]);
-                if (!value)
-                {
-                    result = false;
-                }
-            }
-
-            return result;
-        }
-
-        public bool DoAction(int nodeId, BehaviorParameter parameter)
-        {
-            return true;
-        }
     }
 
 }

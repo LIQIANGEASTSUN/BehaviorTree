@@ -6,7 +6,6 @@ using BehaviorTree;
 public class NodeEditor {
 
     private static int height = 75;
-    private static float value = 0.5f;
 
     public static void Draw(NodeValue nodeValue, int selectNodeId, float value = 0f)
     {

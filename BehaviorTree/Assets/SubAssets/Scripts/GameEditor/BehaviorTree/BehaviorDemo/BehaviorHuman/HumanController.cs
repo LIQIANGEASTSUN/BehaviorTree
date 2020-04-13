@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BehaviorTree;
 
 public class HumanController : MonoBehaviour
 {
-    public static HumanController Instance = null;
     private Human _human;
     // 厨房
     private Transform kitchen;
@@ -15,25 +15,36 @@ public class HumanController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Instance = this;
+        //Singleton<ConfigLoad>.Instance.Load(null);
+
+        StartCoroutine(Delay());
+    }
+
+    private IEnumerator Delay()
+    {
+        yield return new WaitForSeconds(2);
 
         GameObject target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         target.name = "Human";
         target.transform.position = Vector3.zero;
 
-        kitchen = transform.Find("Kitchen");
-        diningTable = transform.Find("DiningTable");
-        TV = transform.Find("TV");
+        kitchen = Create("厨房", new Vector3(0, 0, 0), new Vector3(90, 0, 0));
+        diningTable = Create("餐桌", new Vector3(5, 0, 0), new Vector3(90, 0, 0));
+        TV = Create("电视", new Vector3(0, 0, 5), new Vector3(90, 0, 0));
 
         _human = new Human(target.transform, kitchen.gameObject, diningTable.gameObject, TV.gameObject);
         TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
+        //BehaviorTreeData behaviorTreeData = Resources.Load("Data/Human"); //DataCenter.behaviorData.GetBehaviorInfo("Human");
         _human.SetData(textAsset.text);
     }
 
     // Update is called once per frame
     void Update()
     {
-        _human.Update();
+        if (null != Human)
+        {
+            Human.Update();
+        }
     }
 
     public Human Human
@@ -41,5 +52,21 @@ public class HumanController : MonoBehaviour
         get { return _human; }
     }
 
+    private Transform Create(string name, Vector3 pos, Vector3 rot)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.position = pos;
+        go.transform.rotation = Quaternion.Euler(rot);
+        go.transform.localScale = Vector3.one * 0.1f;
+
+        TextMesh textMesh = go.AddComponent<TextMesh>();
+        if (null != textMesh)
+        {
+            textMesh.text = name;
+            textMesh.fontSize = 100;
+        }
+
+        return go.transform;
+    }
 
 }

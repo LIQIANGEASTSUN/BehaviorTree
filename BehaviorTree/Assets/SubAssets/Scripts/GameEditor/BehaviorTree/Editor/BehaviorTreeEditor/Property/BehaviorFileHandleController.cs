@@ -205,7 +205,7 @@ namespace BehaviorTree
             }
 
             {
-                string mergeFilePath = string.Format("{0}/StreamingAssets/MergeFile/BehaviorTreeConfig.txt", Application.dataPath);
+                string mergeFilePath = string.Format("{0}/StreamingAssets/Bina/BehaviorTreeConfig.bytes", Application.dataPath);
 
                 if (System.IO.File.Exists(mergeFilePath))
                 {

@@ -92,7 +92,7 @@ namespace Bit
         // Converts an ushort into an array of bytes with
         // length two.
 
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static void GetBytes(ushort value, ref byte[] result)
         {
             Contract.Ensures(Contract.Result<byte[]>() != null);
@@ -100,10 +100,10 @@ namespace Bit
 
             GetBytes((short)value, ref result);
         }
-
+         
         // Converts an uint into an array of bytes with
         // length four.
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static void GetBytes(uint value, ref byte[] result)
         {
             Contract.Ensures(Contract.Result<byte[]>() != null);
@@ -114,7 +114,7 @@ namespace Bit
 
         // Converts an unsigned long into an array of bytes with
         // length eight.
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static void GetBytes(ulong value, ref byte[] result)
         {
             Contract.Ensures(Contract.Result<byte[]>() != null);
@@ -313,7 +313,7 @@ namespace Bit
 
         // Converts an array of bytes into an ushort.
         // 
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static ushort ToUInt16(byte[] value, int startIndex)
         {
             if (value == null)
@@ -335,7 +335,7 @@ namespace Bit
 
         // Converts an array of bytes into an uint.
         // 
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static uint ToUInt32(byte[] value, int startIndex)
         {
             if (value == null)
@@ -357,7 +357,7 @@ namespace Bit
 
         // Converts an array of bytes into an unsigned long.
         // 
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public static ulong ToUInt64(byte[] value, int startIndex)
         {
             if (value == null)

@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class NodeActionWatchTV : NodeAction
+public class NodeActionWatchTV : NodeAction, IHuman
 {
-
+    private Human human = null;
     public NodeActionWatchTV() : base()
     {
-
     }
 
-    public override ResultType Execute()
+    public override ResultType DoAction()
     {
-        base.Execute();
-
-        if (null == HumanController.Instance || null == HumanController.Instance.Human)
+        if (null == human)
         {
             return ResultType.Fail;
         }
 
-        bool result = HumanController.Instance.Human.IsHungry();
-
+        bool result = human.IsHungry();
         ResultType resultType = result ? ResultType.Running : ResultType.Success;
         return resultType;
+    }
+
+    public void SetHuman(Human human)
+    {
+        this.human = human;
     }
 
 }

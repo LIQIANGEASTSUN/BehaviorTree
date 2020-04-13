@@ -7,6 +7,8 @@ namespace BehaviorTree
 
     public interface IConditionCheck
     {
+        void InitParmeter();
+
         void AddParameter(List<BehaviorParameter> parameterList);
 
         void SetParameter(string parameterName, bool boolValue);

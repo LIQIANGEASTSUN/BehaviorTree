@@ -11,7 +11,7 @@ public class TreeNodeWindow : EditorWindow {
     public static TreeNodeWindow window;
     private static Rect windowsPosition = new Rect(10, 30, 1236, 864);
     
-    [MenuItem("Window/CreateTree")]
+    [MenuItem("Window/BehaviorTree")]
     public static void ShowWindow()
     {
         window = EditorWindow.GetWindow<TreeNodeWindow>();

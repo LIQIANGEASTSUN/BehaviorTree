@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class Human : IAction
+public interface IHuman
+{
+    void SetHuman(Human human);
+}
+
+public class Human
 {
     private Transform _target;
     // 厨房
@@ -36,6 +41,26 @@ public class Human : IAction
     public void SetData(string content)
     {
         _behaviorTreeEntity = new BehaviorTreeEntity(content);
+        SetIHuman();
+    }
+
+    public void SetData(BehaviorTreeData treeData)
+    {
+        _behaviorTreeEntity = new BehaviorTreeEntity(treeData);
+        SetIHuman();
+    }
+
+    private void SetIHuman()
+    {
+        for (int i = 0; i < _behaviorTreeEntity.ActionNodeList.Count; ++i)
+        {
+            NodeAction nodeAction = _behaviorTreeEntity.ActionNodeList[i];
+            if (typeof(IHuman).IsAssignableFrom(nodeAction.GetType()))
+            {
+                IHuman iHuman = nodeAction as IHuman;
+                iHuman.SetHuman(this);
+            }
+        }
     }
 
     public void Update()
@@ -88,16 +113,6 @@ public class Human : IAction
         _energy = Mathf.Clamp(_energy, 0, _energyMax);
 
         return _food > 0;
-    }
-
-    public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
-    {
-        return true;
-    }
-
-    public bool DoAction(int nodeId, BehaviorParameter parameter)
-    {
-        return true;
     }
 
     public Vector3 KitchenPos()

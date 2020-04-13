@@ -6,13 +6,14 @@ namespace BehaviorTree
     /// <summary>
     /// 行为节点(叶节点)
     /// </summary>
-    public abstract class NodeAction : NodeLeaf
+    public abstract class NodeAction : NodeLeaf, IAction
     {
         protected IAction iAction;
         protected List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
 
         public NodeAction() : base(NODE_TYPE.ACTION)
         {
+            SetIAction(this);
         }
 
         public void SetIAction(IAction iA)
@@ -23,7 +24,7 @@ namespace BehaviorTree
         public override ResultType Execute()
         {
             NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
-            return ResultType.Fail;
+            return iAction.DoAction();
         }
 
         public void SetParameters(List<BehaviorParameter> parameterList)
@@ -34,7 +35,7 @@ namespace BehaviorTree
             }
         }
 
-
+        public abstract ResultType DoAction();
 
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
-
+using System;
 
 namespace BehaviorTree
 {
@@ -14,7 +14,7 @@ namespace BehaviorTree
 
         }
 
-        public NodeBase Analysis(string content, IAction iAction, IConditionCheck iConditionCheck)
+        public NodeBase Analysis(string content, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack)
         {
             BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
             if (null == behaviorTreeData)
@@ -24,10 +24,10 @@ namespace BehaviorTree
             }
 
             iConditionCheck.AddParameter(behaviorTreeData.parameterList);
-            return Analysis(behaviorTreeData, iAction, iConditionCheck);
+            return Analysis(behaviorTreeData, iConditionCheck, ActionNodeCallBack);
         }
 
-        public NodeBase Analysis(BehaviorTreeData data, IAction iAction, IConditionCheck iConditionCheck)
+        public NodeBase Analysis(BehaviorTreeData data, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack)
         {
             NodeBase rootNode = null;
 
@@ -51,7 +51,7 @@ namespace BehaviorTree
             for (int i = 0; i < data.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = data.nodeList[i];
-                NodeBase nodeBase = AnalysisNode(nodeValue, iAction, iConditionCheck);
+                NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
                 nodeBase.NodeId = nodeValue.id;
 
                 if (!IsLeafNode(nodeValue.NodeType))
@@ -69,6 +69,12 @@ namespace BehaviorTree
                 {
                     Debug.LogError("AllNODE:" + nodeValue.id + "     " + (null != nodeBase));
                 }
+
+                if (nodeValue.NodeType == (int)NODE_TYPE.ACTION && null != ActionNodeCallBack)
+                {
+                    ActionNodeCallBack((NodeAction)nodeBase);
+                }
+
                 allNodeDic[nodeValue.id] = nodeBase;
             }
 
@@ -99,7 +105,7 @@ namespace BehaviorTree
             return (type == (int)NODE_TYPE.ACTION) || (type == (int)NODE_TYPE.CONDITION);
         }
 
-        private NodeBase AnalysisNode(NodeValue nodeValue, IAction iAction, IConditionCheck iConditionCheck)
+        private NodeBase AnalysisNode(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
             NodeBase node = null;
             if (nodeValue.NodeType == (int)NODE_TYPE.SELECT)  // 选择节点
@@ -159,7 +165,7 @@ namespace BehaviorTree
 
             if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)  // 行为节点
             {
-                return GetAction(nodeValue, iAction);
+                return GetAction(nodeValue);
             }
 
             return node;
@@ -234,10 +240,9 @@ namespace BehaviorTree
             return condition;
         }
 
-        public NodeAction GetAction(NodeValue nodeValue, IAction iAction)
+        public NodeAction GetAction(NodeValue nodeValue)
         {
             NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identification);
-            action.SetIAction(iAction);
             action.SetParameters(nodeValue.parameterList);
             return action;
         }

@@ -8,18 +8,20 @@ namespace BehaviorTree
     {
         private NodeBase _rootNode;
         private IConditionCheck _iconditionCheck = null;
+        private List<NodeAction> _actionNodeList = new List<NodeAction>();
 
         public BehaviorTreeEntity(string content)
         {
             _iconditionCheck = new ConditionCheck();
             BehaviorAnalysis analysis = new BehaviorAnalysis();
-            _rootNode = analysis.Analysis(content, null, _iconditionCheck);
+            _rootNode = analysis.Analysis(content, _iconditionCheck, AddActionNode);
         }
 
         public BehaviorTreeEntity(BehaviorTreeData data)
         {
+            _iconditionCheck = new ConditionCheck();
             BehaviorAnalysis analysis = new BehaviorAnalysis();
-            _rootNode = analysis.Analysis(data, null, _iconditionCheck);
+            _rootNode = analysis.Analysis(data, _iconditionCheck, AddActionNode);
         }
 
         public ConditionCheck ConditionCheck
@@ -27,9 +29,17 @@ namespace BehaviorTree
             get { return (ConditionCheck)_iconditionCheck; }
         }
 
-        public void SetRootNode(NodeBase rootNode)
+        public List<NodeAction> ActionNodeList
         {
-            _rootNode = rootNode;
+            get
+            {
+                return _actionNodeList;
+            }
+        }
+
+        private void AddActionNode(NodeAction nodeAction)
+        {
+            _actionNodeList.Add(nodeAction);
         }
 
         public void Execute()
@@ -38,6 +48,11 @@ namespace BehaviorTree
             {
                 _rootNode.Execute();
             }
+        }
+
+        public void Clear()
+        {
+            ConditionCheck.InitParmeter();
         }
     }
 
