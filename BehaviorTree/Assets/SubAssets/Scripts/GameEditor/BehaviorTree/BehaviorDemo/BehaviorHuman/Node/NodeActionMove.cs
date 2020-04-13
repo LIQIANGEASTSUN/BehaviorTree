@@ -13,11 +13,11 @@ public class NodeActionMove : NodeAction
 
     public override ResultType Execute()
     {
-        NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+        base.Execute();
 
         if (null == HumanController.Instance)
         {
-            return ResultType.Fail;
+            return ResultType.Success;
         }
 
         Vector3 targetPos = Vector3.zero;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace BehaviorTree
 {
@@ -17,6 +18,12 @@ namespace BehaviorTree
         public void SetIAction(IAction iA)
         {
             iAction = iA;
+        }
+
+        public override ResultType Execute()
+        {
+            NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+            return ResultType.Fail;
         }
 
         public void SetParameters(List<BehaviorParameter> parameterList)

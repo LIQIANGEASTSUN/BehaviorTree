@@ -13,7 +13,7 @@ public class NodeActionCooking : NodeAction
 
     public override ResultType Execute()
     {
-        NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+        base.Execute();
 
         bool result = HumanController.Instance.Human.Cooking(0.8f);
 

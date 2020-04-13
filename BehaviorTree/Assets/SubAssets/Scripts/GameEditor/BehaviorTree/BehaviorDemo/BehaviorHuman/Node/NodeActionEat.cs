@@ -13,7 +13,7 @@ public class NodeActionEat : NodeAction
 
     public override ResultType Execute()
     {
-        NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+        base.Execute();
 
         if (null == HumanController.Instance)
         {

@@ -13,7 +13,8 @@ public class NodeActionWatchTV : NodeAction
 
     public override ResultType Execute()
     {
-        NodeNotify.NotifyExecute(NodeId, Time.realtimeSinceStartup);
+        base.Execute();
+
         if (null == HumanController.Instance || null == HumanController.Instance.Human)
         {
             return ResultType.Fail;
@@ -21,7 +22,8 @@ public class NodeActionWatchTV : NodeAction
 
         bool result = HumanController.Instance.Human.IsHungry();
 
-        ResultType resultType = result ? ResultType.Running : ResultType.Success;
+        ResultType resultType = ResultType.Fail; //result ? ResultType.Running : ResultType.Success;
+        Debug.LogError(resultType);
         return resultType;
     }
 
