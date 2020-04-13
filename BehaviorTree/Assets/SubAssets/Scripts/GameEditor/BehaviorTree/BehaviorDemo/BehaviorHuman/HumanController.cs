@@ -12,10 +12,15 @@ public class HumanController : MonoBehaviour
     private Transform diningTable;
     // TV
     private Transform TV;
+
+    BehaviorData behaviorData = new BehaviorData();
+
     // Start is called before the first frame update
     void Start()
     {
         //Singleton<ConfigLoad>.Instance.Load(null);
+
+        StartCoroutine(behaviorData.LoadConfig());
 
         StartCoroutine(Delay());
     }
@@ -33,9 +38,8 @@ public class HumanController : MonoBehaviour
         TV = Create("电视", new Vector3(0, 0, 5), new Vector3(90, 0, 0));
 
         _human = new Human(target.transform, kitchen.gameObject, diningTable.gameObject, TV.gameObject);
-        TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
-        //BehaviorTreeData behaviorTreeData = Resources.Load("Data/Human"); //DataCenter.behaviorData.GetBehaviorInfo("Human");
-        _human.SetData(textAsset.text);
+        BehaviorTreeData behaviorTreeData = behaviorData.GetBehaviorInfo("Human");
+        _human.SetData(behaviorTreeData);
     }
 
     // Update is called once per frame
