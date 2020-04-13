@@ -6,6 +6,12 @@ using BehaviorTree;
 public class Human : IAction
 {
     private Transform _target;
+    // 厨房
+    private GameObject kitchen;
+    // 餐桌
+    private GameObject diningTable;
+    // TV
+    private GameObject TV;
 
     private BehaviorTreeEntity _behaviorTreeEntity = null;
     private IConditionCheck _iconditionCheck = null;
@@ -20,26 +26,12 @@ public class Human : IAction
     private float _foodMax = 100;
     private float _eatSpeed = 0.8f;
 
-    public Human(Transform target)
+    public Human(Transform target, GameObject kitchen, GameObject diningTable, GameObject TV)
     {
         _target = target;
-        Init();
-    }
-
-    public void Init()
-    {
-        Create();
-    }
-
-    public void OnDestroy()
-    {
-    }
-
-    public void SetData(BehaviorTreeData behaviorTreeData)
-    {
-        //BehaviorAnalysis analysis = new BehaviorAnalysis();
-        //_iconditionCheck = new ConditionCheck();
-        //_rootNode = analysis.Analysis(behaviorTreeData, this, ref _iconditionCheck);
+        this.kitchen = kitchen;
+        this.diningTable = diningTable;
+        this.TV = TV;
     }
 
     public void SetData(string content)
@@ -62,8 +54,7 @@ public class Human : IAction
             _energy = _energyMin;
         }
 
-        HungryController();
-        FoodController();
+        UpdateEnvironment();
 
         Execute();
     }
@@ -76,10 +67,13 @@ public class Human : IAction
         }
     }
 
-    private void HungryController()
+    public void UpdateEnvironment()
     {
         bool hungry = IsHungry();
         ConditionCheck.SetParameter("IsHungry", hungry);
+
+        bool hasFood = (_food >= _foodMax);
+        ConditionCheck.SetParameter("HasFood", hasFood);
     }
 
     public bool IsHungry()
@@ -104,10 +98,14 @@ public class Human : IAction
         return _food > 0;
     }
 
-    private void FoodController()
+    public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
     {
-        bool hasFood = (_food >= _foodMax);
-        ConditionCheck.SetParameter("HasFood", hasFood);
+        return true;
+    }
+
+    public bool DoAction(int nodeId, BehaviorParameter parameter)
+    {
+        return true;
     }
 
     public Vector3 KitchenPos()
@@ -136,54 +134,4 @@ public class Human : IAction
         return _target.position;
     }
 
-
-    // 厨房
-    private GameObject kitchen;
-    // 餐桌
-    private GameObject diningTable;
-    // TV
-    private GameObject TV;
-    private void Create()
-    {
-        {
-            kitchen = new GameObject("Kitchen"); // 
-            kitchen.transform.rotation = Quaternion.Euler(90, 0, 0);
-            kitchen.transform.localScale = Vector3.one * 0.1f;
-            kitchen.transform.position = new Vector3(0, 0, 5);
-            TextMesh textMesh = kitchen.AddComponent<TextMesh>();
-            textMesh.fontSize = 100;
-            textMesh.text = "厨房";
-        }
-
-        {
-            diningTable = new GameObject("DiningTable");
-            diningTable.transform.rotation = Quaternion.Euler(90, 0, 0);
-            diningTable.transform.localScale = Vector3.one * 0.1f;
-            diningTable.transform.position = new Vector3(5, 0, 0);
-            TextMesh textMesh = diningTable.AddComponent<TextMesh>();
-            textMesh.fontSize = 100;
-            textMesh.text = "餐桌";
-        }
-
-        {
-            TV = new GameObject("TV");
-            TV.transform.rotation = Quaternion.Euler(90, 0, 0);
-            TV.transform.localScale = Vector3.one * 0.1f;
-            TV.transform.position = new Vector3(-5, 0, 0);
-            TextMesh textMesh = TV.AddComponent<TextMesh>();
-            textMesh.fontSize = 100;
-            textMesh.text = "TV";
-        }
-       
-    }
-
-    public bool DoAction(int nodeId, List<BehaviorParameter> parameterList)
-    {
-        return true;
-    }
-
-    public bool DoAction(int nodeId, BehaviorParameter parameter)
-    {
-        return true;
-    }
 }

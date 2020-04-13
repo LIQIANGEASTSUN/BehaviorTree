@@ -216,6 +216,11 @@ namespace BehaviorTree
         public float width;
         public float height;
 
+        public RectT()
+        {
+
+        }
+
         public RectT(float x, float y, float width, float height)
         {
             this.x = x;

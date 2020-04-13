@@ -39,6 +39,8 @@ namespace BehaviorTree
 
             JsonData jsonData = JsonMapper.ToObject(content);
 
+            behaviorData.fileName = jsonData["fileName"].ToString();
+
             behaviorData.rootNodeId = int.Parse(jsonData["rootNodeId"].ToString());
 
             if (((IDictionary)jsonData).Contains("nodeList"))

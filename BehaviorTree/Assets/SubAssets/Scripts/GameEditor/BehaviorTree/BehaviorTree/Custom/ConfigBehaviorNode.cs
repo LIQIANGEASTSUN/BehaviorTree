@@ -10,8 +10,6 @@ namespace BehaviorTree
         public void Init()
         {
 
-            Config<NodeActionRequestSkillState>("切换状态节点", 10000);
-
 
             #region Human
             Config<NodeActionCooking>("行为-做饭", 11000);
@@ -19,7 +17,6 @@ namespace BehaviorTree
             Config<NodeActionMove>("行为-移动到目标", 11002);
             Config<NodeActionWatchTV>("行为-看电视", 11003);
             #endregion
-
 
 
             Config<NodeConditionCustom>("通用条件节点", 20002);

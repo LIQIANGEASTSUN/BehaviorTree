@@ -6,6 +6,12 @@ public class HumanController : MonoBehaviour
 {
     public static HumanController Instance = null;
     private Human _human;
+    // 厨房
+    public GameObject kitchen;
+    // 餐桌
+    public GameObject diningTable;
+    // TV
+    public GameObject TV;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,7 +20,7 @@ public class HumanController : MonoBehaviour
         GameObject target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         target.name = "Human";
         target.transform.position = Vector3.zero;
-        _human = new Human(target.transform);
+        _human = new Human(target.transform, kitchen, diningTable, TV);
         TextAsset textAsset = Resources.Load<TextAsset>("Data/Human");
         _human.SetData(textAsset.text);
     }
