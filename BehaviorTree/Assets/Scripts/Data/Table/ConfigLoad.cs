@@ -5,11 +5,18 @@ using UnityEngine;
 
 public class ConfigLoad : MonoBehaviour
 {
+
+    private void Start()
+    {
+        StartCoroutine(LoadConfig());
+    }
+
     private byte[] byteData = new byte[] { };
     private string textContent = string.Empty;
     private IEnumerator LoadConfig()
     {
-        yield return StartCoroutine(LoadData("Bina", "BehaviorTreeConfig.csv", 1));
+        yield return StartCoroutine(LoadData("Bina", "BehaviorTreeConfig.bytes", 1));
+
         DataCenter.behaviorData.LoadData(byteData);
     }
 

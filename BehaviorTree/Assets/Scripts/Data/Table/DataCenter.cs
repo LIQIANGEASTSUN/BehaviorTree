@@ -4,10 +4,7 @@ using UnityEngine;
 
 public static class DataCenter 
 {
-    public static BehaviorData behaviorData;
+    public static BehaviorData behaviorData = new BehaviorData();
 
-    public static void Init()
-    {
-        behaviorData = new BehaviorData();
-    }
+    
 }

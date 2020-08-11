@@ -69,25 +69,4 @@ public class BTConcrete : BTBase, IBTActionOwner
         base.Update();
     }
 
-    public void DoFunction(int functionType, DecisionReason reason)
-    {
-        //ProDebug.Logger.Log("+++++++++ DoFunction:" + _owner.SpriteID + "     functionType:" + functionType + "    " + reason);
-        UpdateParameter(BTCommonConstans.DoFunction, functionType);
-        UpdateParameter(BTCommonConstans.DoFunctionReason, (int)reason);
-    }
-
-    public int GetDoFunctionType()
-    {
-        int functionType = 0;
-        GetParameterValue(BTCommonConstans.DoFunction, ref functionType);
-        return functionType;
-    }
-
-    public DecisionReason GetDoFunctionReason()
-    {
-        int reason = 0;
-        GetParameterValue(BTCommonConstans.DoFunctionReason, ref reason);
-        return (DecisionReason)reason;
-    }
-
 }

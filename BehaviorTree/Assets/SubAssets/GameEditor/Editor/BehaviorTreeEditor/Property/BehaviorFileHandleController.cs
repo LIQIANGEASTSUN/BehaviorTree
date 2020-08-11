@@ -147,23 +147,17 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
+            HashSet<int> hash = new HashSet<int>();
             Debug.LogError("Begin=============:" + treeData.fileName);
-            for (int i = 0; i < treeData.nodeList.Count; ++i)
+            for (int i = treeData.nodeList.Count - 1; i >= 0; --i)
             {
                 NodeValue nodeValue = treeData.nodeList[i];
-                if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)  // 行为节点
+                if (hash.Contains(nodeValue.id))
                 {
-                    NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identificationName);
-                    nodeValue.identificationName = action.GetType().Name;
-                    Debug.LogError("ACTION:" + nodeValue.identificationName + "     " + action.GetType().Name);
+                    treeData.nodeList.RemoveAt(i);
                 }
 
-                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)
-                {
-                    NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identificationName);
-                    nodeValue.identificationName = condition.GetType().Name;
-                    Debug.LogError("CONDITION:" + nodeValue.identificationName + "     " + condition.GetType().Name);
-                }
+                hash.Add(nodeValue.id);
             }
             return treeData;
         }
