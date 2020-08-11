@@ -93,22 +93,12 @@ namespace BehaviorTree
 
         private static void SelectFile(string path)
         {
-            if (!System.IO.Directory.Exists(path))
+            if (null != BehaviorManager.behaviorSelectFile)
             {
-                System.IO.Directory.CreateDirectory(path);
-            }
-            GUILayout.Space(8);
-
-            string filePath = EditorUtility.OpenFilePanel("选择技能ID文件", path, "bytes");
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-                if (!string.IsNullOrEmpty(fileName))
+                string fileName = BehaviorManager.behaviorSelectFile();
+                if (null != BehaviorManager.behaviorLoadFile)
                 {
-                    if (null != BehaviorManager.behaviorLoadFile)
-                    {
-                        BehaviorManager.behaviorLoadFile(fileName);
-                    }
+                    BehaviorManager.behaviorLoadFile(fileName);
                 }
             }
         }
@@ -139,6 +129,11 @@ namespace BehaviorTree
                 BehaviorReadWrite readWrite = new BehaviorReadWrite();
                 BehaviorTreeData treeData = readWrite.ReadJson(fullName);
 
+                if (null != BehaviorManager.behaviorStandardID)
+                {
+                    treeData = BehaviorManager.behaviorStandardID(treeData);
+                }
+
                 treeData = UpdateData( treeData);
 
                 string jsonFilePath = System.IO.Path.GetDirectoryName(filePath) + "/Json/" + System.IO.Path.GetFileName(fullName);
@@ -152,106 +147,90 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            treeData = ChangeSubTree(treeData);
+            Debug.LogError("Begin=============:" + treeData.fileName);
+            for (int i = 0; i < treeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = treeData.nodeList[i];
+                if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)  // 行为节点
+                {
+                    NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identificationName);
+                    nodeValue.identificationName = action.GetType().Name;
+                    Debug.LogError("ACTION:" + nodeValue.identificationName + "     " + action.GetType().Name);
+                }
 
+                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)
+                {
+                    NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identificationName);
+                    nodeValue.identificationName = condition.GetType().Name;
+                    Debug.LogError("CONDITION:" + nodeValue.identificationName + "     " + condition.GetType().Name);
+                }
+            }
             return treeData;
         }
 
         private static BehaviorTreeData ChangeSubTree(BehaviorTreeData treeData)
         {
-            int a = 0;
-            if (a == 0)
-            {
-                return treeData;
-            }
-            if (treeData.fileName.CompareTo("Article") != 0)// 
-            {
-                return treeData;
-            }
+            //int a = 0;
+            //if (a == 0)
+            //{
+            //    return treeData;
+            //}
 
-            int subTreeId = 130;
-            int nodeId = 103;
-            List<NodeValue> nodeList = new List<NodeValue>();
-            NodeValue node = GetNode(treeData, nodeId);
-            if (null == node)
-            {
-                return treeData;
-            }
+            //if (treeData.fileName.CompareTo("Monster") != 0)// 
+            //{
+            //    return treeData;
+            //}
 
-            {
-                NodeValue parentNode = GetNode(treeData, node.parentNodeID);
-                if (null != parentNode)
-                {
-                    for (int i = 0; i < parentNode.childNodeList.Count; ++i)
-                    {
-                        if (parentNode.childNodeList[i] == nodeId)
-                        {
-                            parentNode.childNodeList.RemoveAt(i);
-                        }
-                    }
-                }
-            }
+            //int subTreeId = 95;
+            //int nodeId = 39;
+            //List<NodeValue> nodeList = new List<NodeValue>();
+            //NodeValue node = GetNode(treeData, nodeId);
+            //if (null == node)
+            //{
+            //    return treeData;
+            //}
 
-            NodeValue subTreeNode = GetNode(treeData, subTreeId);
-            if (null == subTreeNode)
-            {
-                return treeData;
-            }
+            //{
+            //    NodeValue parentNode = GetNode(treeData, node.parentNodeID);
+            //    if (null != parentNode)
+            //    {
+            //        for (int i = 0; i < parentNode.childNodeList.Count; ++i)
+            //        {
+            //            if (parentNode.childNodeList[i] == nodeId)
+            //            {
+            //                parentNode.childNodeList.RemoveAt(i);
+            //            }
+            //        }
+            //    }
+            //}
 
-            {
-                subTreeNode.childNodeList.Clear();
-                subTreeNode.childNodeList.Add(nodeId);
-            }
+            //NodeValue subTreeNode = GetNode(treeData, subTreeId);
+            //if (null == subTreeNode)
+            //{
+            //    return treeData;
+            //}
 
-            {
-                node.parentSubTreeNodeId = subTreeId;
-                node.subTreeEntry = true;
-            }
+            //{
+            //    subTreeNode.childNodeList.Clear();
+            //    subTreeNode.childNodeList.Add(nodeId);
+            //}
 
-            nodeList.Add(node);
+            //{
+            //    node.parentSubTreeNodeId = subTreeId;
+            //    node.subTreeEntry = true;
+            //}
 
-            FindChild(treeData, nodeId, ref nodeList);
-            for (int i = 0; i < nodeList.Count; ++i)
-            {
-                //ProDebug.Logger.LogError(nodeList[i].id);
+            //nodeList.Add(node);
 
-                nodeList[i].parentSubTreeNodeId = subTreeId;
-            }
+            //FindChild(treeData, nodeId, ref nodeList);
+            //for (int i = 0; i < nodeList.Count; ++i)
+            //{
+            //    //ProDebug.Logger.LogError(nodeList[i].id);
+
+            //    nodeList[i].parentSubTreeNodeId = subTreeId;
+            //}
 
             return treeData;
-        }
-
-        private static void FindChild(BehaviorTreeData treeData, int nodeId, ref List<NodeValue> nodeList)
-        {
-            NodeValue nodeValue = GetNode(treeData, nodeId);
-            if (null == nodeValue)
-            {
-                return;
-            }
-
-            for (int i = 0; i < nodeValue.childNodeList.Count; ++i)
-            {
-                int childId = nodeValue.childNodeList[i];
-                NodeValue childNode = GetNode(treeData, childId);
-                if (null != childNode)
-                {
-                    nodeList.Add(childNode);
-                }
-                FindChild(treeData, childNode.id, ref nodeList);
-            }
-        }
-
-        private static NodeValue GetNode(BehaviorTreeData treeData, int nodeId)
-        {
-            for (int i = 0; i < treeData.nodeList.Count; ++i)
-            {
-                NodeValue nodeValue = treeData.nodeList[i];
-                if (nodeValue.id == nodeId)
-                {
-                    return nodeValue;
-                }
-            }
-            return null;
         }
 
         private static void MergeFile(string filePath)

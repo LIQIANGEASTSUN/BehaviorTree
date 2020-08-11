@@ -6,28 +6,67 @@ using System;
 
 namespace BehaviorTree
 {
+    public delegate BehaviorTreeData LoadConfigInfoEvent(string fileName);
 
     public class BehaviorAnalysis
     {
+        private LoadConfigInfoEvent _loadConfigInfoEvent;
+        private Dictionary<string, BehaviorTreeData> _subTreeDataDic = new Dictionary<string, BehaviorTreeData>();
+
         public BehaviorAnalysis()
         {
 
         }
 
-        public NodeBase Analysis(string content, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack, Action<NodeCondition> ConditionNodeCallBack)
+        public void SetLoadConfigEvent(LoadConfigInfoEvent loadEvent)
         {
-            BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
-            if (null == behaviorTreeData)
-            {
-                //ProDebug.Logger.LogError("behaviorTreeData is null");
-                return null;
-            }
-
-            iConditionCheck.AddParameter(behaviorTreeData.parameterList);
-            return Analysis(behaviorTreeData, iConditionCheck, ActionNodeCallBack, ConditionNodeCallBack);
+            _loadConfigInfoEvent = loadEvent;
         }
 
         public NodeBase Analysis(BehaviorTreeData data, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack, Action<NodeCondition> ConditionNodeCallBack)
+        {
+            NodeBase rootNode = null;
+            if (null == data)
+            {
+                //ProDebug.Logger.LogError("数据无效");
+                return rootNode;
+            }
+
+            _subTreeDataDic.Clear();
+
+            List<BehaviorParameter> parameteList = new List<BehaviorParameter>();
+            parameteList.AddRange(data.parameterList);
+
+            for (int i = 0; i < data.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = data.nodeList[i];
+                if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+                {
+                    if (null != _loadConfigInfoEvent)
+                    {
+                        BehaviorTreeData subTreeData = _loadConfigInfoEvent(nodeValue.subTreeConfig);
+                        if (null == subTreeData)
+                        {
+                            //ProDebug.Logger.LogError("SubTreeData is null:" + nodeValue.subTreeConfig);
+                            continue;
+                        }
+                        _subTreeDataDic[nodeValue.subTreeConfig] = subTreeData;
+
+                        parameteList.AddRange(subTreeData.parameterList);
+                    }
+                }
+            }
+
+            iConditionCheck.AddParameter(parameteList);
+
+            int entityId = NewEntityId;
+            rootNode = Analysis(entityId, data, iConditionCheck, ActionNodeCallBack, ConditionNodeCallBack);
+
+            _subTreeDataDic.Clear();
+            return rootNode;
+        }
+
+        private NodeBase Analysis(int entityId, BehaviorTreeData data, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack, Action<NodeCondition> ConditionNodeCallBack)
         {
             NodeBase rootNode = null;
 
@@ -43,12 +82,9 @@ namespace BehaviorTree
                 return rootNode;
             }
 
-            iConditionCheck.AddParameter(data.parameterList);
-
             Dictionary<int, NodeBase> compositeDic = new Dictionary<int, NodeBase>();
             Dictionary<int, NodeBase> allNodeDic = new Dictionary<int, NodeBase>();
             Dictionary<int, List<int>> childDic = new Dictionary<int, List<int>>();
-            int entityId = NewEntityId;
             for (int i = 0; i < data.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = data.nodeList[i];
@@ -56,6 +92,17 @@ namespace BehaviorTree
                 nodeBase.NodeId = nodeValue.id;
                 nodeBase.EntityId = entityId;
                 nodeBase.Priority = nodeValue.priority;
+
+                if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+                {
+                    BehaviorTreeData subTreeData = null;
+                    if (_subTreeDataDic.TryGetValue(nodeValue.subTreeConfig, out subTreeData))
+                    {
+                        NodeBase subTreeNode = Analysis(entityId, subTreeData, iConditionCheck, ActionNodeCallBack, ConditionNodeCallBack);
+                        NodeComposite composite = (NodeComposite)(nodeBase);
+                        composite.AddNode(subTreeNode);
+                    }
+                }
 
                 if (!IsLeafNode(nodeValue.NodeType))
                 {
@@ -66,12 +113,6 @@ namespace BehaviorTree
                     {
                         rootNode = nodeBase;
                     }
-                }
-
-                if (null == nodeBase)
-                {
-                    //ProDebug.Logger.LogError("AllNODE:" + nodeValue.id + "     " + (null != nodeBase));
-                    continue;
                 }
 
                 if (nodeValue.NodeType == (int)NODE_TYPE.ACTION && null != ActionNodeCallBack)
@@ -155,6 +196,11 @@ namespace BehaviorTree
             if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL_ALL)   // 并行执行所有节点
             {
                 return GetParallelAll(nodeValue);
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.IF_JUDEG)       // 判断节点
+            {
+                return GetIfJudge(nodeValue);
             }
 
             if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_INVERTER)  // 修饰节点_取反
@@ -246,6 +292,13 @@ namespace BehaviorTree
             NodeParallelAll nodeParallelAll = new NodeParallelAll();
             return nodeParallelAll;
         }
+       
+        private NodeIfJudge GetIfJudge(NodeValue nodeValue)
+        {
+            NodeIfJudge ifJudge = new NodeIfJudge();
+            ifJudge.SetData(nodeValue.ifJudgeDataList.ToArray());
+            return ifJudge;
+        }
 
         public NodeRandomPriority GetRandomPriority(NodeValue nodeValue)
         {
@@ -292,7 +345,7 @@ namespace BehaviorTree
 
         public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
-            NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identification);
+            NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identificationName);
             condition.SetData(nodeValue.parameterList, nodeValue.conditionGroupList);
             condition.SetConditionCheck(iConditionCheck);
             return condition;
@@ -300,7 +353,7 @@ namespace BehaviorTree
 
         public NodeAction GetAction(NodeValue nodeValue)
         {
-            NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identification);
+            NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identificationName);
             if (null == action)
             {
                 Debug.LogError(nodeValue.id);

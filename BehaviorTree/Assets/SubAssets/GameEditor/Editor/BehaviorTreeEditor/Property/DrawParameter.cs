@@ -41,7 +41,7 @@ namespace BehaviorTree
                 }
 
                 bool enableChangeType = (drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER_ADD);
-                GUI.enabled = enableChangeType;
+                GUI.enabled = enableChangeType && !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                 {
                     index = EditorGUILayout.Popup(index, parameterNameArr);
                     behaviorParameter.parameterType = (int)EnumNames.GetEnum<BehaviorParameterType>(index);
@@ -62,6 +62,7 @@ namespace BehaviorTree
 
                 if (drawParameterType == DrawParameterType.NODE_PARAMETER || drawParameterType == DrawParameterType.BEHAVIOR_PARAMETER)
                 {
+                    GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                     if (GUILayout.Button("Del"))
                     {
                         if (null != DelCallBack)
@@ -69,6 +70,7 @@ namespace BehaviorTree
                             DelCallBack();
                         }
                     }
+                    GUI.enabled = true;
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -90,7 +92,9 @@ namespace BehaviorTree
                         }
                     }
 
+                    GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                     int result = EditorGUILayout.Popup(index, parameterArr, GUILayout.ExpandWidth(true));
+                    GUI.enabled = true;
                     if (result != index)
                     {
                         behaviorParameter.parameterName = parameterList[result].parameterName;
@@ -168,7 +172,7 @@ namespace BehaviorTree
                     compare = 0;
                 }
 
-                GUI.enabled = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER);
+                GUI.enabled = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER) && !BehaviorManager.Instance.CurrentOpenConfigSubTree(); ;
                 bool value = (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER) && (drawParameterType != DrawParameterType.RUNTIME_PARAMETER) && (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER_ADD);
                 bool boolType = (behaviorParameter.parameterType == (int)BehaviorParameterType.Bool);
                 if (value && !boolType)
@@ -183,7 +187,7 @@ namespace BehaviorTree
                     behaviorParameter.compare = (int)BehaviorCompare.EQUALS;
                 }
 
-                GUI.enabled = true;// (drawParameterType != DrawParameterType.BEHAVIOR_PARAMETER);
+                GUI.enabled = true && !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                 {
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                     {

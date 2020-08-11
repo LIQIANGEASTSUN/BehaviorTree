@@ -68,7 +68,7 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
-        if (parameter.parameterType == (int)BehaviorParameterType.Int)
+        if (parameter.parameterType == (int)BehaviorParameterType.String)
         {
             parameter.stringValue = stringValue;
             _environmentParameterDic[parameterName] = parameter;
@@ -106,7 +106,7 @@ public class ConditionCheck : IConditionCheck
     public bool GetParameterValue(string parameterName, ref int value)
     {
         BehaviorParameter environmentParameter = GetParameter(parameterName);
-        if (null == parameterName) // 当前行为树不需要的参数值就不保存了
+        if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
             return false;
         }
@@ -118,7 +118,7 @@ public class ConditionCheck : IConditionCheck
     public bool GetParameterValue(string parameterName, ref float value)
     {
         BehaviorParameter environmentParameter = GetParameter(parameterName);
-        if (null == parameterName) // 当前行为树不需要的参数值就不保存了
+        if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
             return false;
         }
@@ -130,7 +130,7 @@ public class ConditionCheck : IConditionCheck
     public bool GetParameterValue(string parameterName, ref bool value)
     {
         BehaviorParameter environmentParameter = GetParameter(parameterName);
-        if (null == parameterName) // 当前行为树不需要的参数值就不保存了
+        if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
             return false;
         }
@@ -142,7 +142,7 @@ public class ConditionCheck : IConditionCheck
     public bool GetParameterValue(string parameterName, ref string value)
     {
         BehaviorParameter environmentParameter = GetParameter(parameterName);
-        if (null == parameterName) // 当前行为树不需要的参数值就不保存了
+        if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
             return false;
         }

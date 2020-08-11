@@ -59,6 +59,8 @@ namespace BehaviorTree
                 return;
             }
 
+            GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
+
             EditorGUILayout.BeginVertical("box");
             {
                 if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION
@@ -75,46 +77,15 @@ namespace BehaviorTree
                 string msg = string.Format("{0}_{1}", nodeName, nodeValue.id);
                 EditorGUILayout.LabelField(msg);
 
-                if (nodeValue.NodeType != (int)NODE_TYPE.CONDITION
-                    && nodeValue.NodeType != (int)NODE_TYPE.ACTION)
+                if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
                 {
-                    EditorGUILayout.BeginHorizontal(/*"box"*/);
-                    {
-                        string[] nameArr = EnumNames.GetEnumNames<NODE_TYPE>();
-                        List<string> nameList = new List<string>(nameArr);
+                    SubTreeNode(nodeValue);
+                }
 
-                        NODE_TYPE[] removeTypeArr = new NODE_TYPE[2] { NODE_TYPE.ACTION, NODE_TYPE.CONDITION };
-                        for (int i = nameList.Count - 1; i >= 0; --i)
-                        {
-                            for (int j = 0; j < removeTypeArr.Length; ++j)
-                            {
-                                NODE_TYPE type = removeTypeArr[j];
-                                int value = EnumNames.GetEnumIndex<NODE_TYPE>(type);
-                                string name = EnumNames.GetEnumName<NODE_TYPE>(value);
-                                if (name.CompareTo(nameList[i]) == 0)
-                                {
-                                    nameList.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                        }
-                        nameArr = nameList.ToArray();
-                        int index = EnumNames.GetEnumIndex<NODE_TYPE>((NODE_TYPE)nodeValue.NodeType);
-                        if (index > nameArr.Length)
-                        {
-                            index -= 2;//把 条件节点、行为节点，两个节点减掉
-                        }
-                        int result = EditorGUILayout.Popup(new GUIContent("改变节点类型"), index, nameArr);
-                        if (result != index)
-                        {
-                            nodeValue.NodeType = (int)(EnumNames.GetEnum<NODE_TYPE>(result));
-                            nodeValue.nodeName = EnumNames.GetEnumName<NODE_TYPE>(result);
-                            nodeValue.function = NodeDescript.GetFunction((NODE_TYPE)nodeValue.NodeType); ;
-
-                            Debug.LogError(nodeValue.nodeName);
-                        }
-                    }
-                    EditorGUILayout.EndHorizontal();
+                if (nodeValue.NodeType != (int)NODE_TYPE.CONDITION
+                && nodeValue.NodeType != (int)NODE_TYPE.ACTION)
+                {
+                    CompositeNode(nodeValue);
                 }
 
                 EntryNode(nodeValue);
@@ -124,18 +95,13 @@ namespace BehaviorTree
                     nodeValue.repeatTimes = EditorGUILayout.IntField("重复执行次数", nodeValue.repeatTimes);
                 }
 
-                bool showChildNode = nodeValue.showChildNode;
+                if (nodeValue.NodeType == (int)NODE_TYPE.IF_JUDEG)
+                {
+                    IfJudge(nodeValue);
+                }
+
                 if (nodeValue.childNodeList.Count > 0)
                 {
-                    nodeValue.showChildNode = EditorGUILayout.Toggle(new GUIContent("显示子节点"), nodeValue.showChildNode);
-                    if (showChildNode != nodeValue.showChildNode)
-                    {
-                        if (null != BehaviorManager.behaviorShowChildNode)
-                        {
-                            BehaviorManager.behaviorShowChildNode(nodeValue.id, nodeValue.showChildNode);
-                        }
-                    }
-
                     if (nodeValue.NodeType != (int)NODE_TYPE.SUB_TREE)
                     {
                         nodeValue.moveWithChild = EditorGUILayout.Toggle(new GUIContent("同步移动子节点"), nodeValue.moveWithChild);
@@ -152,7 +118,7 @@ namespace BehaviorTree
                     EditorGUILayout.LabelField(parentName);
                 }
 
-                if (nodeValue.childNodeList.Count > 0)
+                if (nodeValue.childNodeList.Count > 0 && nodeValue.NodeType == (int)NODE_TYPE.RANDOM_PRIORITY)
                 {
                     EditorGUILayout.BeginVertical("box");
                     {
@@ -167,12 +133,12 @@ namespace BehaviorTree
                     EditorGUILayout.EndVertical();
                 }
 
-                if (nodeValue.identification > 0)
+                if (!string.IsNullOrEmpty(nodeValue.identificationName))
                 {
-                    string identificationName = string.Format("类标识_{0}", nodeValue.identification);
+                    string identificationName = string.Format("类标识_{0}", nodeValue.identificationName);
                     EditorGUILayout.LabelField(identificationName);
 
-                    CustomIdentification customIdentification = CustomNode.Instance.GetIdentification(nodeValue.identification);
+                    CustomIdentification customIdentification = CustomNode.Instance.GetIdentification(nodeValue.identificationName);
                     string className = customIdentification.ClassType.Name;
                     EditorGUILayout.LabelField(className);
                 }
@@ -189,7 +155,11 @@ namespace BehaviorTree
             }
             EditorGUILayout.EndVertical();
 
+            GUI.enabled = true;
             DrawNode(nodeValue, "参数");
+            GUI.enabled = true;
+
+            ParentInfo();
         }
 
         private void EntryNode(NodeValue nodeValue)
@@ -224,10 +194,205 @@ namespace BehaviorTree
                     {
                         BehaviorManager.behaviorChangeSubTreeEntryNode(nodeValue.parentSubTreeNodeId, nodeValue.id);
                     }
-                    //ProDebug.Logger.LogError("子树入口节点:" + nodeValue.parentSubTreeNodeId + "    " + nodeValue.subTreeEntry);
+                }
+            }
+        }
+
+        private void CompositeNode(NodeValue nodeValue)
+        {
+            if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION
+                || nodeValue.NodeType == (int)NODE_TYPE.ACTION)
+            {
+                return;
+            }
+
+            EditorGUILayout.BeginHorizontal(/*"box"*/);
+            {
+                string[] nameArr = EnumNames.GetEnumNames<NODE_TYPE>();
+                List<string> nameList = new List<string>(nameArr);
+
+                NODE_TYPE[] removeTypeArr = new NODE_TYPE[2] { NODE_TYPE.ACTION, NODE_TYPE.CONDITION };
+                for (int i = nameList.Count - 1; i >= 0; --i)
+                {
+                    for (int j = 0; j < removeTypeArr.Length; ++j)
+                    {
+                        NODE_TYPE type = removeTypeArr[j];
+                        int value = EnumNames.GetEnumIndex<NODE_TYPE>(type);
+                        string name = EnumNames.GetEnumName<NODE_TYPE>(value);
+                        if (name.CompareTo(nameList[i]) == 0)
+                        {
+                            nameList.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
+                nameArr = nameList.ToArray();
+                int index = EnumNames.GetEnumIndex<NODE_TYPE>((NODE_TYPE)nodeValue.NodeType);
+                if (index > nameArr.Length)
+                {
+                    index -= 2;//把 条件节点、行为节点，两个节点减掉
+                }
+
+                if ((NODE_TYPE)nodeValue.NodeType != NODE_TYPE.SUB_TREE)
+                {
+                    int result = EditorGUILayout.Popup(new GUIContent("改变节点类型"), index, nameArr);
+                    if (result != index)
+                    {
+                        nodeValue.NodeType = (int)(EnumNames.GetEnum<NODE_TYPE>(result));
+                        nodeValue.nodeName = EnumNames.GetEnumName<NODE_TYPE>(result);
+                        nodeValue.function = NodeDescript.GetFunction((NODE_TYPE)nodeValue.NodeType); ;
+
+                        Debug.LogError(nodeValue.nodeName);
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void IfJudge(NodeValue nodeValue)
+        {
+            HashSet<int> childHash = new HashSet<int>();
+            if (nodeValue.childNodeList.Count > 3)
+            {
+                if (null != TreeNodeWindow.window)
+                {
+                    string msg = string.Format("判断节点 {0} 最多只能有三个节点", nodeValue.id);
+                    TreeNodeWindow.window.ShowNotification(msg);
+                }
+
+                while(nodeValue.childNodeList.Count > 3)
+                {
+                    nodeValue.childNodeList.RemoveAt(nodeValue.childNodeList.Count - 1);
+                }
+
+                while (nodeValue.ifJudgeDataList.Count > 3)
+                {
+                    nodeValue.ifJudgeDataList.RemoveAt(nodeValue.ifJudgeDataList.Count - 1);
                 }
             }
 
+            EditorGUILayout.BeginVertical("box");
+            {
+                for (int i = 0; i < nodeValue.childNodeList.Count; ++i)
+                {
+                    int childId = nodeValue.childNodeList[i];
+                    childHash.Add(childId);
+                    IfJudgeData judgeData = nodeValue.ifJudgeDataList.Find((a) => { return a.nodeId == childId; });
+                    if (null == judgeData)
+                    {
+                        judgeData = new IfJudgeData();
+                        judgeData.nodeId = childId;
+                        nodeValue.ifJudgeDataList.Add(judgeData);
+                        judgeData.ifJudegType = ((i == 0) ? (int)NodeIfJudgeEnum.IF : (int)NodeIfJudgeEnum.ACTION);
+
+                        if (i == 2)
+                        {
+                            IfJudgeData data = nodeValue.ifJudgeDataList[1];
+                            JudgeNodeChangeChildCondition(nodeValue, data.nodeId, (ResultType)data.ifResult);
+                        }
+
+                        nodeValue.ifJudgeDataList.Add(judgeData);
+                    }
+                    judgeData.ifJudegType = ((i == 0) ? (int)NodeIfJudgeEnum.IF : (int)NodeIfJudgeEnum.ACTION);
+
+                    EditorGUILayout.BeginVertical("box");
+                    {
+                        GUI.enabled = false;
+                        EditorGUILayout.IntField("nodeId:", judgeData.nodeId);
+                        {
+                            string[] nameArr = EnumNames.GetEnumNames<NodeIfJudgeEnum>();
+                            int index = EnumNames.GetEnumIndex<NodeIfJudgeEnum>((NodeIfJudgeEnum)judgeData.ifJudegType);
+                            int result = EditorGUILayout.Popup(new GUIContent("节点类型"), index, nameArr);
+                            judgeData.ifJudegType = (int)(EnumNames.GetEnum<NodeIfJudgeEnum>(result));
+                        }
+                        GUI.enabled = true;
+
+                        if (judgeData.ifJudegType == (int)NodeIfJudgeEnum.ACTION)
+                        {
+                            string[] nameArr = new string[] { "Fail", "Success"};
+                            int result = EditorGUILayout.Popup(new GUIContent("执行条件"), judgeData.ifResult, nameArr);
+                            JudgeNodeChangeChildCondition(nodeValue, judgeData.nodeId, (ResultType)result);
+                        }
+
+                    }
+                    EditorGUILayout.EndVertical();
+                }
+            }
+            EditorGUILayout.EndVertical();
+
+            for(int i = nodeValue.ifJudgeDataList.Count - 1; i >= 0; --i)
+            {
+                IfJudgeData data = nodeValue.ifJudgeDataList[i];
+                if (!childHash.Contains(data.nodeId))
+                {
+                    nodeValue.ifJudgeDataList.RemoveAt(i);
+                }
+            }
+
+            nodeValue.ifJudgeDataList.Sort((a, b) =>
+            {
+                return a.ifJudegType - b.ifJudegType;
+            });
+        }
+
+        private void JudgeNodeChangeChildCondition(NodeValue nodeValue, int childId, ResultType resultType)
+        {
+            for (int i = 0; i < nodeValue.ifJudgeDataList.Count; ++i)
+            {
+                IfJudgeData judgeData = nodeValue.ifJudgeDataList[i];
+                if (judgeData.ifJudegType == (int)NodeIfJudgeEnum.IF)
+                {
+                    continue;
+                }
+               
+                if (judgeData.nodeId == childId)
+                {
+                    judgeData.ifResult = (int)resultType;
+                }
+                else
+                {
+                    int result = (int)resultType - (int)ResultType.Success;
+                    judgeData.ifResult = Mathf.Abs(result);
+                }
+            }
+        }
+
+        private void SubTreeNode(NodeValue nodeValue)
+        {
+            string[] nameArr = EnumNames.GetEnumNames<SUB_TREE_TYPE>();
+            int index = EnumNames.GetEnumIndex<SUB_TREE_TYPE>((SUB_TREE_TYPE)nodeValue.subTreeType);
+            int result = EditorGUILayout.Popup(new GUIContent("子树类型"), index, nameArr);
+            nodeValue.subTreeType = (int)(EnumNames.GetEnum<SUB_TREE_TYPE>(result));
+
+            GUILayout.Space(8);
+            nodeValue.subTreeConfig = EditorGUILayout.TextField(new GUIContent("配置文件"), nodeValue.subTreeConfig);
+            GUILayout.Space(5);
+
+            if (nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+            {
+                if (null != BehaviorManager.behaviorDeleteSubTreeChild)
+                {
+                    BehaviorManager.behaviorDeleteSubTreeChild(nodeValue.id);
+                }
+
+                if (GUILayout.Button("选择子树配置文件"))
+                {
+                    if (null != BehaviorManager.behaviorSelectFile)
+                    {
+                        nodeValue.subTreeConfig = BehaviorManager.behaviorSelectFile();
+                    }
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("将子树存储为配置文件"))
+                {
+                    if (null != BehaviorManager.behaviorSaveSubTree)
+                    {
+                        BehaviorManager.behaviorSaveSubTree(nodeValue.subTreeConfig, nodeValue.id);
+                    }
+                }
+            }
         }
 
         private Vector2 scrollPos = Vector2.zero;
@@ -246,6 +411,7 @@ namespace BehaviorTree
                 nodeValue.parameterList[i].index = i;
             }
 
+            GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             {
                 EditorGUILayout.LabelField(title);
@@ -304,6 +470,7 @@ namespace BehaviorTree
                 EditorGUILayout.EndScrollView();
             }
             EditorGUILayout.EndVertical();
+            GUI.enabled = true;
 
             GUILayout.Space(10);
             EditorGUILayout.BeginVertical("box");
@@ -325,6 +492,7 @@ namespace BehaviorTree
             {
                 conditionGroup = BehaviorConditionGroup.DrawTransitionGroup(nodeValue);
 
+                GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                 if (GUILayout.Button("添加组"))
                 {
                     if (null != BehaviorManager.behaviorAddDelConditionGroup)
@@ -332,6 +500,8 @@ namespace BehaviorTree
                         BehaviorManager.behaviorAddDelConditionGroup(nodeValue.id, -1, true);
                     }
                 }
+
+                GUI.enabled = true;
             }
             EditorGUILayout.EndVertical();
 
@@ -340,9 +510,9 @@ namespace BehaviorTree
 
         private void DrawAddParameter(NodeValue nodeValue)
         {
+            GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
             if (GUILayout.Button("添加条件"))
             {
-
                 if (BehaviorManager.Instance.BehaviorTreeData.parameterList.Count <= 0)
                 {
                     string msg = "没有参数可添加，请先添加参数";
@@ -359,6 +529,21 @@ namespace BehaviorTree
                         BehaviorParameter behaviorParameter = BehaviorManager.Instance.BehaviorTreeData.parameterList[0];
                         BehaviorManager.behaviorNodeParameter(nodeValue.id, behaviorParameter, true);
                     }
+                }
+            }
+            GUI.enabled = true;
+        }
+
+        private int _nodeID = -1;
+        private void ParentInfo()
+        {
+            GUILayout.Space(20);
+            _nodeID = EditorGUILayout.IntField("节点ID", _nodeID);
+            if (GUILayout.Button("打印节点所有父节点路径"))
+            {
+                if (null != BehaviorManager.behaviorDebugNodeParentInfo)
+                {
+                    BehaviorManager.behaviorDebugNodeParentInfo(_nodeID);
                 }
             }
         }

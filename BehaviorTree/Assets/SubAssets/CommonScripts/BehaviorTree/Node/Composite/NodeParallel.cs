@@ -26,7 +26,6 @@ namespace BehaviorTree
         public override void OnExit()
         {
             base.OnExit();
-
             for (int i = 0; i < nodeChildList.Count; ++i)
             {
                 int value = (1 << i);

@@ -35,6 +35,7 @@ namespace BehaviorTree
             Rect area = GUILayoutUtility.GetRect(0f, 1, GUILayout.ExpandWidth(true));
             bool select = (selectIndex == group.index);
 
+            GUI.enabled = true;
             EditorGUILayout.BeginHorizontal("box", GUILayout.ExpandWidth(true));
             {
                 if (selectIndex < 0 || nodeId < 0 || nodeId != nodeValue.id)
@@ -63,7 +64,8 @@ namespace BehaviorTree
                     }
                 }
 
-                GUI.enabled = select;
+                GUI.enabled = select && !BehaviorManager.Instance.CurrentOpenConfigSubTree();
+          
                 for (int i = 0; i < nodeValue.parameterList.Count; ++i)
                 {
                     BehaviorParameter parameter = nodeValue.parameterList[i];
@@ -96,6 +98,7 @@ namespace BehaviorTree
                 }
                 GUI.enabled = true;
 
+                GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
                 if (GUILayout.Button("删除"))
                 {
                     if (null != BehaviorManager.behaviorAddDelConditionGroup)
@@ -103,6 +106,7 @@ namespace BehaviorTree
                         BehaviorManager.behaviorAddDelConditionGroup(nodeValue.id, group.index, false);
                     }
                 }
+                GUI.enabled = true;
             }
             EditorGUILayout.EndHorizontal();
 

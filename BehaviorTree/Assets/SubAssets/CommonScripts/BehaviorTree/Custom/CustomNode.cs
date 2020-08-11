@@ -15,7 +15,7 @@ namespace BehaviorTree
         public readonly static CustomNode Instance = new CustomNode();
 
         private ConfigBehaviorNode configBehaviorNode = null;
-        private HashSet<int> hash = new HashSet<int>();
+        //private HashSet<string> hash = new HashSet<string>();
         private List<CustomIdentification> nodeList = new List<CustomIdentification>();
 
         public CustomNode()
@@ -25,10 +25,10 @@ namespace BehaviorTree
             configBehaviorNode.Init();
         }
 
-        public object GetNode(int identification)
+        public object GetNode(string identificationName)
         {
             object obj = null;
-            CustomIdentification info = GetIdentification(identification);
+            CustomIdentification info = GetIdentification(identificationName);
             if (info.Valid())
             {
                 obj = info.Create();
@@ -36,12 +36,12 @@ namespace BehaviorTree
             return obj;
         }
 
-        public CustomIdentification GetIdentification(int identification)
+        public CustomIdentification GetIdentification(string identificationName)
         {
             for (int i = 0; i < nodeList.Count; ++i)
             {
                 CustomIdentification info = nodeList[i];
-                if (info.Identification == (int)identification)
+                if (info.IdentificationName.CompareTo(identificationName) == 0)
                 {
                     return info;
                 }
@@ -52,12 +52,12 @@ namespace BehaviorTree
 
         private void AddIdentification(CustomIdentification customIdentification)
         {
-            if (hash.Contains(customIdentification.Identification))
-            {
-                //ProDebug.Logger.LogError("重复的 Identification:" + customIdentification.Identification);
-                return;
-            }
-            hash.Add(customIdentification.Identification);
+            //if (hash.Contains(customIdentification.IdentificationName))
+            //{
+            //    ProDebug.Logger.LogError("重复的 Identification:" + customIdentification.IdentificationName);
+            //    return;
+            //}
+            //hash.Add(customIdentification.IdentificationName);
 
             nodeList.Add(customIdentification);
         }

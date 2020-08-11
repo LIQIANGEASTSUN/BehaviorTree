@@ -18,16 +18,29 @@ public class NodeEditor {
             GUI.Box(backRect, string.Empty);
             GUI.backgroundColor = Color.white;
 
-            nodeValue.descript = EditorGUILayout.TextField(nodeValue.descript);
-
-            if (!nodeValue.showChildNode)
-            {
-                EditorGUILayout.LabelField("子节点已隐藏");
-            }
+            string idMsg = string.Empty;
             if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
             {
-                EditorGUILayout.LabelField("子树");
+                idMsg = string.Format("子树ID:{0}", nodeValue.id);
             }
+            else
+            {
+                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)
+                {
+                    idMsg = string.Format("条件ID:{0}", nodeValue.id);
+                }
+                else if (nodeValue.NodeType == (int)NODE_TYPE.ACTION)
+                {
+                    idMsg = string.Format("行为ID:{0}", nodeValue.id);
+                }
+                else
+                {
+                    idMsg = string.Format("ID:{0}", nodeValue.id);
+                }
+            }
+            EditorGUILayout.LabelField(idMsg);
+
+            nodeValue.descript = EditorGUILayout.TextField(nodeValue.descript);
 
             ResultType resultType = ResultType.Fail;
             float slider = NodeNotify.NodeDraw(nodeValue.id, ref resultType);
@@ -48,6 +61,20 @@ public class NodeEditor {
     private static Color GetColor(NodeValue nodeValue, int selectNodeId)
     {
         Color color = Color.white;
+
+        if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
+        {
+            if (nodeValue.id == selectNodeId)
+            {
+                color = new Color(0, 1, 0, 0.35f);
+            }
+            else
+            {
+                color = new Color(0, 0, 1, 0.35f);
+            }
+            return color;
+        }
+
         if (nodeValue.isRootNode || nodeValue.subTreeEntry)
         {
             color = Color.green;
@@ -91,8 +118,9 @@ public class NodeEditor {
 
     private static int GetHight(NodeValue nodeValue)
     {
-        int height = 60;
-        if (!nodeValue.showChildNode || nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
+        //int height = 60;
+        int height = 80;
+        if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
         {
             height = 80;
         }

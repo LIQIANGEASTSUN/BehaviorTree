@@ -61,6 +61,7 @@ namespace BehaviorTree
             foreach (JsonData item in data)
             {
                 NodeValue nodeValue = new NodeValue();
+                nodeValue.identificationName = item["identificationName"].ToString();
                 nodeValue.id = int.Parse(item["id"].ToString());
                 nodeValue.isRootNode = bool.Parse(item["isRootNode"].ToString());
                 nodeValue.NodeType = int.Parse(item["NodeType"].ToString());
@@ -72,12 +73,14 @@ namespace BehaviorTree
 
                 nodeValue.repeatTimes = int.Parse(item["repeatTimes"].ToString());
                 nodeValue.nodeName = item["nodeName"].ToString();
-                nodeValue.identification = int.Parse(item["identification"].ToString());
                 nodeValue.descript = item["descript"].ToString();
                 nodeValue.function = item["function"].ToString();
 
                 JsonData conditionGroupList = item["conditionGroupList"];
                 nodeValue.conditionGroupList = GetConditionGroupList(conditionGroupList);
+
+                JsonData ifJudgeDataList = item["ifJudgeDataList"];
+                nodeValue.ifJudgeDataList = GetIfJudgeDataList(ifJudgeDataList);
 
                 JsonData parameterList = item["parameterList"];
                 nodeValue.parameterList = GetParameterList(parameterList);
@@ -85,11 +88,10 @@ namespace BehaviorTree
                 JsonData position = item["position"];
                 nodeValue.position = GetPosition(position);
 
-                nodeValue.showChildNode = bool.Parse(item["showChildNode"].ToString());
-                nodeValue.show = bool.Parse(item["show"].ToString());
-
                 nodeValue.parentSubTreeNodeId = int.Parse(item["parentSubTreeNodeId"].ToString());
                 nodeValue.subTreeEntry = bool.Parse(item["subTreeEntry"].ToString());
+                nodeValue.subTreeType = int.Parse(item["subTreeType"].ToString());
+                nodeValue.subTreeConfig = item["subTreeConfig"].ToString();
 
                 nodeList.Add(nodeValue);
             }
@@ -114,8 +116,9 @@ namespace BehaviorTree
             List<ConditionGroup> conditionGroupList = new List<ConditionGroup>();
             foreach (JsonData item in jsonData)
             {
-                JsonData croupData = item["parameterList"];
                 ConditionGroup conditionGroup = new ConditionGroup();
+                conditionGroup.index = int.Parse(item["index"].ToString()); 
+                JsonData croupData = item["parameterList"];
                 for (int i = 0; i < croupData.Count; ++i)
                 {
                     string parameterName = croupData[i].ToString();
@@ -127,6 +130,22 @@ namespace BehaviorTree
 
             return conditionGroupList;
         }
+
+        private List<IfJudgeData> GetIfJudgeDataList (JsonData jsonData)
+        {
+            List<IfJudgeData> ifJudgeDataList = new List<IfJudgeData>();
+            foreach(JsonData item in jsonData)
+            {
+                IfJudgeData judgeData = new IfJudgeData();
+                judgeData.nodeId = int.Parse(item["nodeId"].ToString());
+                judgeData.ifJudegType = int.Parse(item["ifJudegType"].ToString());
+                judgeData.ifResult = int.Parse(item["ifResult"].ToString());
+
+                ifJudgeDataList.Add(judgeData);
+            }
+            return ifJudgeDataList;
+        }
+
 
         private RectT GetPosition(JsonData data)
         {

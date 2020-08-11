@@ -32,7 +32,7 @@ namespace BehaviorTree
 
         public void Reset(BehaviorTreeData behaviorTreeData)
         {
-            _behaviorTreeEntity = new BehaviorTreeEntity(behaviorTreeData);
+            _behaviorTreeEntity = new BehaviorTreeEntity(behaviorTreeData, LoadConfig);
             BehaviorTreeEntity.CurrentDebugEntityId = _behaviorTreeEntity.EntityId;
             NodeNotify.Clear();
         }
@@ -45,6 +45,15 @@ namespace BehaviorTree
 
             BehaviorManager.behaviorRuntimePlay(BehaviorPlayType.PLAY);
             NodeNotify.Clear();
+        }
+
+        private BehaviorTreeData LoadConfig(string fileName)
+        {
+            if (null != BehaviorManager.behaviorReadFile)
+            {
+                return BehaviorManager.behaviorReadFile(fileName, false);
+            }
+            return null;
         }
 
         public void Update()

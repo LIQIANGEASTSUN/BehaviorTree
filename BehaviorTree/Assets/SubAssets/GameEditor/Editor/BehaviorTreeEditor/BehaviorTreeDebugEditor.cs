@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 [CustomEditor(typeof(BehaviorTreeDebug))]
 public class BehaviorTreeDebugEditor : Editor

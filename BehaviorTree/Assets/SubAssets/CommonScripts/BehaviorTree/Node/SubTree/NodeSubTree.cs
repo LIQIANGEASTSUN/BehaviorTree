@@ -23,7 +23,6 @@ namespace BehaviorTree
         public override void OnExit()
         {
             base.OnExit();
-
             if (null != lastRunningNode)
             {
                 lastRunningNode.Postposition(ResultType.Fail);
@@ -43,6 +42,10 @@ namespace BehaviorTree
             nodeBase.Preposition();
             resultType = nodeBase.Execute();
             nodeBase.Postposition(resultType);
+            if (resultType == ResultType.Running)
+            {
+                lastRunningNode = nodeBase;
+            }
 
             NodeNotify.NotifyExecute(EntityId, NodeId, resultType, Time.realtimeSinceStartup);
             return resultType;

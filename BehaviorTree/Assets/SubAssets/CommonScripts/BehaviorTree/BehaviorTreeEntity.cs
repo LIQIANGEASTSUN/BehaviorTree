@@ -13,17 +13,11 @@ namespace BehaviorTree
         private int _entityId;
         private static int _currentDebugEntityId;
 
-        public BehaviorTreeEntity(string content)
+        public BehaviorTreeEntity(BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
         {
             _iconditionCheck = new ConditionCheck();
             BehaviorAnalysis analysis = new BehaviorAnalysis();
-            _rootNode = analysis.Analysis(content, _iconditionCheck, AddActionNode, AddConditionNode);
-        }
-
-        public BehaviorTreeEntity(BehaviorTreeData data)
-        {
-            _iconditionCheck = new ConditionCheck();
-            BehaviorAnalysis analysis = new BehaviorAnalysis();
+            analysis.SetLoadConfigEvent(loadEvent);
             _rootNode = analysis.Analysis(data, _iconditionCheck, AddActionNode, AddConditionNode);
             if (null != _rootNode)
             {

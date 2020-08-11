@@ -65,11 +65,11 @@ public class Node_Draw_Info
         _nodeArr.Add(kv);
     }
 
-    public void AddNodeType(NODE_TYPE nodeType, string nodeName, int identification)
+    public void AddNodeType(NODE_TYPE nodeType, string nodeName, string identificationName)
     {
         Node_Draw_Info_Item item = new Node_Draw_Info_Item(nodeType);
         item.SetName(nodeName);
-        item.SetIdentification(identification);
+        item.SetIdentification(identificationName);
         string name = string.Format("{0}/{1}", _nodeTypeName, nodeName);
         KeyValuePair<string, Node_Draw_Info_Item> kv = new KeyValuePair<string, Node_Draw_Info_Item>(name, item);
         _nodeArr.Add(kv);
@@ -81,7 +81,7 @@ public class Node_Draw_Info_Item
 {
     public string _nodeName = string.Empty;
     public NODE_TYPE _nodeType;
-    public int _identification = -1;
+    public string _identificationName = string.Empty;
 
     public Node_Draw_Info_Item(NODE_TYPE nodeType)
     {
@@ -99,9 +99,9 @@ public class Node_Draw_Info_Item
         _nodeName = name;
     }
 
-    public void SetIdentification(int identification)
+    public void SetIdentification(string identificationName)
     {
-        _identification = identification;
+        _identificationName = identificationName;
     }
 
 }
@@ -146,13 +146,35 @@ public class BehaviorDrawModel
     public List<NodeValue> GetSubTreeNode(int currentOpenSubTreeId)
     {
         List<NodeValue> nodeList = new List<NodeValue>();
-        List<NodeValue> allNodeList = GetNodeList();
-        for (int i = 0; i < allNodeList.Count; ++i)
+
+        NodeValue subTreeNode = BehaviorManager.Instance.GetNode(currentOpenSubTreeId);
+        if (null == subTreeNode)
         {
-            NodeValue nodeValue = allNodeList[i];
-            if (currentOpenSubTreeId >= 0 && nodeValue.parentSubTreeNodeId == currentOpenSubTreeId)
+            return nodeList;
+        }
+
+        if (subTreeNode.subTreeType == (int)SUB_TREE_TYPE.NORMAL)
+        {
+            List<NodeValue> allNodeList = GetNodeList();
+            for (int i = 0; i < allNodeList.Count; ++i)
             {
-                nodeList.Add(nodeValue);
+                NodeValue nodeValue = allNodeList[i];
+                if (currentOpenSubTreeId >= 0 && nodeValue.parentSubTreeNodeId == currentOpenSubTreeId)
+                {
+                    nodeList.Add(nodeValue);
+                }
+            }
+        }
+        else if (subTreeNode.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+        {
+            BehaviorTreeData data = null;
+            if (null != BehaviorManager.behaviorReadFile)
+            {
+                data = BehaviorManager.behaviorReadFile(subTreeNode.subTreeConfig, false);
+            }
+            if (null != data)
+            {
+                nodeList.AddRange(data.nodeList);
             }
         }
 
@@ -160,7 +182,7 @@ public class BehaviorDrawModel
     }
 
     private List<NODE_TYPE[]> nodeList = new List<NODE_TYPE[]>() {
-        new NODE_TYPE[] { NODE_TYPE.SELECT, NODE_TYPE.PARALLEL_ALL },  // 组合节点
+        new NODE_TYPE[] { NODE_TYPE.SELECT, NODE_TYPE.IF_JUDEG },  // 组合节点
         new NODE_TYPE[]{ NODE_TYPE.DECORATOR_INVERTER, NODE_TYPE.DECORATOR_UNTIL_SUCCESS}, // 修饰节点
     };
     private string[] typeNameArr = { "组合节点", "修饰节点" };
@@ -196,11 +218,11 @@ public class BehaviorDrawModel
                 CustomIdentification customIdentification = nodeList[i];
                 if (customIdentification.NodeType == NODE_TYPE.CONDITION)
                 {
-                    conditionDrawInfo.AddNodeType(NODE_TYPE.CONDITION, customIdentification.Name, (int)customIdentification.Identification);
+                    conditionDrawInfo.AddNodeType(NODE_TYPE.CONDITION, customIdentification.Name, customIdentification.IdentificationName);
                 }
                 else if (customIdentification.NodeType == NODE_TYPE.ACTION)
                 {
-                    actionDrawInfo.AddNodeType(NODE_TYPE.ACTION, customIdentification.Name, (int)customIdentification.Identification);
+                    actionDrawInfo.AddNodeType(NODE_TYPE.ACTION, customIdentification.Name, customIdentification.IdentificationName);
                 }
             }
         }
@@ -296,7 +318,12 @@ public class BehaviorDrawView
     {
         _nodeList = nodeList;
 
+        int currentOpenSubTreeId = BehaviorManager.Instance.CurrentOpenSubTreeId;
         DrawTielt();
+        if (currentOpenSubTreeId != BehaviorManager.Instance.CurrentOpenSubTreeId)
+        {
+            return;
+        }
 
         Rect rect = GUILayoutUtility.GetRect(0f, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         scrollRect = rect;
@@ -310,6 +337,19 @@ public class BehaviorDrawView
             NodeMakeTransition(currentNode, nodeList);
 
             DrawNodeWindows(nodeList);
+
+            for (int i = 0; i < nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = nodeList[i];
+
+                nodeValue.childNodeList.Sort((a, b) =>
+                {
+                    NodeValue nodeA = BehaviorManager.Instance.GetNode(a);
+                    NodeValue nodeB = BehaviorManager.Instance.GetNode(b);
+                    return (int)(nodeA.position.x - nodeB.position.x);
+                });
+            }
+
             SortChild(nodeList);
 
             ResetScrollPos(nodeList);
@@ -393,15 +433,29 @@ public class BehaviorDrawView
             for (int i = 0; i < nodeList.Count; i++)
             {
                 NodeValue nodeValue = nodeList[i];
-                if (!nodeValue.show)
+                int xConst = 330;
+                int yConst = 0;
+                if (nodeValue.position.x < xConst || nodeValue.position.y < yConst)
                 {
-                    continue;
+                    float x = (nodeValue.position.x < xConst ? (xConst - nodeValue.position.x + 30): 0);
+                    float y = (nodeValue.position.y < yConst ? (yConst - nodeValue.position.y + 30): 0);
+
+                    Vector2 offset = new Vector2(x, y);
+                    nodeValue.position.x += offset.x;
+                    nodeValue.position.y += offset.y;
+
+                    SyncChildNodePosition(nodeValue, offset);
                 }
 
-                string name = string.Format("{0}{1}", nodeValue.id, nodeValue.nodeName);
+                GUI.enabled = !BehaviorManager.Instance.CurrentOpenConfigSubTree();
+                string name = string.Format("{0}", nodeValue.nodeName);
                 GUIContent nameGui = new GUIContent(name, name);
                 Rect rect = GUI.Window(i, RectTool.RectTToRect(nodeValue.position), DrawNodeWindow, nameGui);
-                ResetNodePosition(nodeValue, rect);
+                if (!BehaviorManager.Instance.CurrentOpenConfigSubTree())
+                {
+                    ResetNodePosition(nodeValue, rect);
+                }
+                GUI.enabled = true;
 
                 if (nodeValue.NodeType != (int)NODE_TYPE.SUB_TREE)
                 {
@@ -415,6 +469,10 @@ public class BehaviorDrawView
 
     void DrawNodeWindow(int id)
     {
+        if (id >= _nodeList.Count)
+        {
+            return;
+        }
         NodeValue nodeValue = _nodeList[id];
         NodeEditor.Draw(nodeValue, BehaviorManager.Instance.CurrentSelectId);
         GUI.DragWindow();
@@ -525,7 +583,7 @@ public class BehaviorDrawView
                     KeyValuePair<string, Node_Draw_Info_Item> kv = draw_Info._nodeArr[j];
                     //string itemName = string.Format("Add Node/{0}", kv.Key);
                     string itemName = string.Format("{0}", kv.Key);
-                    menu.AddItem(new GUIContent(itemName), false, CallBack, kv.Value);
+                    GenericMenuAddItem(menu, new GUIContent(itemName), CallBack, kv.Value);
                 }
             }
         }
@@ -534,20 +592,44 @@ public class BehaviorDrawView
             if (null != currentNode && nodeValue.id == currentNode.id && (NODE_TYPE)nodeValue.NodeType < NODE_TYPE.CONDITION)
             {
                 // 连线子节点
-                menu.AddItem(new GUIContent("Make Transition"), false, MakeTransition);
+                GenericMenuAddItem(menu, new GUIContent("Make Transition"), MakeTransition);
                 menu.AddSeparator("");
             }
             // 删除节点
-            menu.AddItem(new GUIContent("Delete Node"), false, DeleteNode);
+            GenericMenuAddItem(menu, new GUIContent("Delete Node"), DeleteNode);
 
             if (nodeValue.parentNodeID >= 0)
             {
-                menu.AddItem(new GUIContent("Remove Parent"), false, RemoveParentNode);
+                GenericMenuAddItem(menu, new GUIContent("Remove Parent"), RemoveParentNode);
             }
         }
 
         menu.ShowAsContext();
         Event.current.Use();
+    }
+
+    private void GenericMenuAddItem(GenericMenu menu, GUIContent content, GenericMenu.MenuFunction func)
+    {
+        if (!BehaviorManager.Instance.CurrentOpenConfigSubTree())
+        {
+            menu.AddItem(content, false, func);
+        }
+        else
+        {
+            menu.AddDisabledItem(content);
+        }
+    }
+
+    private void GenericMenuAddItem(GenericMenu menu, GUIContent content, GenericMenu.MenuFunction2 func, object userData)
+    {
+        if (!BehaviorManager.Instance.CurrentOpenConfigSubTree())
+        {
+            menu.AddItem(content, false, func, userData);
+        }
+        else
+        {
+            menu.AddDisabledItem(content);
+        }
     }
 
     // 连线子节点
@@ -594,12 +676,11 @@ public class BehaviorDrawView
         {
             int childId = nodeValue.childNodeList[i];
             NodeValue childNode = BehaviorManager.Instance.GetNode(childId);
-            if (!childNode.show)
+            if (null == nodeValue || null == childNode)
             {
                 continue;
             }
             DrawNodeCurve(nodeValue.position, childNode.position);
-
             DrawLabel(i.ToString(), nodeValue.position, childNode.position);
         }
     }

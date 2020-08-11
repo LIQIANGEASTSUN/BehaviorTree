@@ -54,6 +54,12 @@
         PARALLEL_ALL = 7,
 
         /// <summary>
+        /// IF 判断节点
+        /// </summary>
+        [EnumAttirbute("IF 判断节点")]
+        IF_JUDEG = 8,
+
+        /// <summary>
         /// 修饰节点_取反
         /// </summary>
         [EnumAttirbute("修饰节点_取反")]
@@ -68,25 +74,25 @@
         /// <summary>
         /// 修饰节点_返回Fail
         /// </summary>
-        [EnumAttirbute("修饰节点_返回Fail")]
+        [EnumAttirbute("修饰_返回Fail")]
         DECORATOR_RETURN_FAIL = 102,
 
         /// <summary>
         /// 修饰节点_返回Success
         /// </summary>
-        [EnumAttirbute("修饰节点_返回Success")]
+        [EnumAttirbute("修饰_返回Success")]
         DECORATOR_RETURN_SUCCESS = 103,
 
         /// <summary>
         /// 修饰节点_直到Fail
         /// </summary>
-        [EnumAttirbute("修饰节点_直到Fail")]
+        [EnumAttirbute("修饰_直到Fail")]
         DECORATOR_UNTIL_FAIL = 104,
 
         /// <summary>
         /// 修饰节点_直到Success
         /// </summary>
-        [EnumAttirbute("修饰节点_直到Success")]
+        [EnumAttirbute("修饰_直到Success")]
         DECORATOR_UNTIL_SUCCESS = 105,
 
         /// <summary>
@@ -123,4 +129,40 @@ public enum NODE_STATUS
     /// 运行状态
     /// </summary>
     RUNNING = 1,
+}
+
+/// <summary>
+/// 子树类型
+/// </summary>
+public enum SUB_TREE_TYPE
+{
+    /// <summary>
+    /// 普通：可编辑子节点
+    /// </summary>
+    [EnumAttirbute("普通：可编辑子节点")]
+    NORMAL = 0,
+
+    /// <summary>
+    /// 配置：单独的树配置，不可编辑子节点
+    /// </summary>
+    [EnumAttirbute("配置：读取配置文件")]
+    CONFIG = 1,
+}
+
+/// <summary>
+/// 判断节点类型
+/// </summary>
+public enum NodeIfJudgeEnum
+{
+    /// <summary>
+    /// if 判断节点
+    /// </summary>
+    [EnumAttirbute("if 判断节点")]
+    IF = 0,
+
+    /// <summary>
+    /// 执行节点
+    /// </summary>
+    [EnumAttirbute("执行节点")]
+    ACTION = 1,
 }

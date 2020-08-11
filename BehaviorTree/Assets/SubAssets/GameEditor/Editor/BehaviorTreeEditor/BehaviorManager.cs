@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using BehaviorTree;
 using System.IO;
+using System.Text;
 
 public class BehaviorManager
 {
@@ -23,14 +24,20 @@ public class BehaviorManager
     public delegate void BehaviorNodeChangeParameter(int nodeId, string oldParameter, string newParameter);
     public delegate void BehaviorRuntimePlay(BehaviorPlayType state);
     public delegate void BehaviorAddDelConditionGroup(int nodeId, int groupId, bool isAdd);
-    public delegate void BehaviorShowChildNode(int nodeId, bool show);
     public delegate void BehaviorOpenSubTree(int nodeId);
     public delegate void BehaviorChangeSubTreeEntryNode(int subTreeNodeId, int nodeId);
+    public delegate void BehaviorDeleteSubTreeChild(int subTreeNodeId);
+    public delegate BehaviorTreeData BehaviorReadFile(string fileName, bool warningWhenExist);
+    public delegate BehaviorTreeData BehaviorStandardID(BehaviorTreeData data);
+    public delegate string BehaviorSelectFile();
+    public delegate void BehaviorSaveSubTree(string subConfigName, int subTreeNodeId);
+    public delegate void BehaviorDebugNodeParentInfo(int nodeId);
 
     private string _filePath = string.Empty;
     private string _fileName = string.Empty;
     private BehaviorTreeData _behaviorTreeData;
     private BehaviorPlayType _playState = BehaviorPlayType.STOP;
+    private Dictionary<string, BehaviorTreeData> _configDataDic = new Dictionary<string, BehaviorTreeData>();
 
     // 当前选择的节点
     private int _currentSelectId = 0;
@@ -51,9 +58,14 @@ public class BehaviorManager
     public static BehaviorNodeChangeParameter behaviorNodeChangeParameter;
     public static BehaviorRuntimePlay behaviorRuntimePlay;
     public static BehaviorAddDelConditionGroup behaviorAddDelConditionGroup;
-    public static BehaviorShowChildNode behaviorShowChildNode;
     public static BehaviorOpenSubTree behaviorOpenSubTree;
     public static BehaviorChangeSubTreeEntryNode behaviorChangeSubTreeEntryNode;
+    public static BehaviorDeleteSubTreeChild behaviorDeleteSubTreeChild;
+    public static BehaviorReadFile behaviorReadFile;
+    public static BehaviorStandardID behaviorStandardID;
+    public static BehaviorSelectFile behaviorSelectFile;
+    public static BehaviorSaveSubTree behaviorSaveSubTree;
+    public static BehaviorDebugNodeParentInfo behaviorDebugNodeParentInfo;
 
     public void Init()
     {
@@ -75,9 +87,14 @@ public class BehaviorManager
         behaviorNodeChangeParameter += NodeChangeParameter;
         behaviorRuntimePlay += RuntimePlay;
         behaviorAddDelConditionGroup += NodeAddDelConditionGroup;
-        behaviorShowChildNode += ShowChildNode;
         behaviorOpenSubTree += OpenSubTree;
         behaviorChangeSubTreeEntryNode += ChangeSubTreeEntryNode;
+        behaviorDeleteSubTreeChild += DeleteSubTreeChild;
+        behaviorReadFile += ReadFile;
+        behaviorStandardID += StandardID;
+        behaviorSelectFile += SelectFile;
+        behaviorSaveSubTree += SaveSubTree;
+        behaviorDebugNodeParentInfo += DebugNodeParentInfo;
 
         _currentSelectId = -1;
         _currentOpenSubTreeId = -1;
@@ -101,9 +118,14 @@ public class BehaviorManager
         behaviorNodeChangeParameter -= NodeChangeParameter;
         behaviorRuntimePlay -= RuntimePlay;
         behaviorAddDelConditionGroup -= NodeAddDelConditionGroup;
-        behaviorShowChildNode -= ShowChildNode;
         behaviorOpenSubTree -= OpenSubTree;
         behaviorChangeSubTreeEntryNode -= ChangeSubTreeEntryNode;
+        behaviorDeleteSubTreeChild -= DeleteSubTreeChild;
+        behaviorReadFile -= ReadFile;
+        behaviorStandardID -= StandardID;
+        behaviorSelectFile -= SelectFile;
+        behaviorSaveSubTree -= SaveSubTree;
+        behaviorDebugNodeParentInfo -= DebugNodeParentInfo;
 
         _playState = BehaviorPlayType.STOP;
 
@@ -175,45 +197,84 @@ public class BehaviorManager
 
     private void LoadFile(string fileName)
     {
-        string path = GetFilePath(fileName);
-        if (!File.Exists(path))
+        if (string.IsNullOrEmpty(fileName))
         {
-            if (!EditorUtility.DisplayDialog("提示", "文件不存在", "yes"))
-            { }
             return;
         }
 
-        _playState = BehaviorPlayType.STOP;
-        NodeNotify.SetPlayState((int)_playState);
+        _configDataDic.Clear();
 
         BehaviorReadWrite readWrite = new BehaviorReadWrite();
-        BehaviorTreeData behaviorTreeData = readWrite.ReadJson(path);
+        BehaviorTreeData behaviorTreeData = ReadFile(fileName, true);
         if (null == behaviorTreeData)
         {
             //ProDebug.Logger.LogError("file is null:" + fileName);
             return;
         }
 
+        _playState = BehaviorPlayType.STOP;
+        NodeNotify.SetPlayState((int)_playState);
+
         _fileName = fileName;
         _behaviorTreeData = behaviorTreeData;
         _currentSelectId = -1;
         _currentOpenSubTreeId = -1;
 
-        for (int i = 0; i < _behaviorTreeData.nodeList.Count; ++i)
+        BehaviorRunTime.Instance.Reset(behaviorTreeData);
+    }
+
+    private BehaviorTreeData ReadFile(string fileName, bool warningWhenExist)
+    {
+        BehaviorTreeData behaviorTreeData = null;
+        if (_configDataDic.TryGetValue(fileName, out behaviorTreeData))
         {
-            _behaviorTreeData.nodeList[i].showChildNode = true;
-            _behaviorTreeData.nodeList[i].show = true;
+            return behaviorTreeData;
         }
 
-        BehaviorRunTime.Instance.Reset(behaviorTreeData);
+        string path = GetFilePath(fileName);
+        if (warningWhenExist && !File.Exists(path))
+        {
+            if (!EditorUtility.DisplayDialog("提示", "文件不存在", "yes"))
+            { }
+            return null;
+        }
+
+        BehaviorReadWrite readWrite = new BehaviorReadWrite();
+        behaviorTreeData = readWrite.ReadJson(path);
+        _configDataDic[fileName] = behaviorTreeData;
+
+        LoadAllSubConfig(behaviorTreeData);
+
+        return behaviorTreeData;
     }
 
     private void SaveFile(string fileName)
     {
-        if (_behaviorTreeData == null)
+        SaveFile(fileName, _behaviorTreeData);
+    }
+
+    private void SaveFile(string fileName, BehaviorTreeData data)
+    {
+        if (data == null)
         {
             //ProDebug.Logger.LogError("rootNode is null");
             return;
+        }
+
+        if (string.IsNullOrEmpty(fileName))
+        {
+            if (EditorUtility.DisplayDialog("警告", "文件名不能为空", "确定"))
+            {
+                return;
+            }
+        }
+
+        if (fileName.Length > 30)
+        {
+            if (EditorUtility.DisplayDialog("警告", "文件名过长，不能大于20个字符", "确定"))
+            {
+                return;
+            }
         }
 
         string path = GetFilePath(fileName);
@@ -232,9 +293,11 @@ public class BehaviorManager
             Directory.CreateDirectory(directory);
         }
 
+        StandardID(data);
+        data.fileName = fileName;
+
         BehaviorReadWrite readWrite = new BehaviorReadWrite();
-        _behaviorTreeData.fileName = fileName;
-        readWrite.WriteJson(_behaviorTreeData, path);
+        readWrite.WriteJson(data, path);
     }
 
     private void DeleteFile(string fileName)
@@ -248,6 +311,119 @@ public class BehaviorManager
         }
 
         File.Delete(path);
+    }
+
+    private string SelectFile()
+    {
+        if (!System.IO.Directory.Exists(FilePath))
+        {
+            System.IO.Directory.CreateDirectory(FilePath);
+        }
+        GUILayout.Space(8);
+
+        string filePath = EditorUtility.OpenFilePanel("选择技能ID文件", FilePath, "bytes");
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            return fileName;
+        }
+
+        return string.Empty;
+    }
+
+    private void SaveSubTree(string subTreeConfigName, int subTreeNodeId)
+    {
+        //ProDebug.Logger.LogError("SaveSubTree:" + subTreeConfigName + "     " + subTreeNodeId);
+
+        NodeValue subTreeNode = GetNode(subTreeNodeId);
+        if (null == subTreeNode || subTreeNode.NodeType != (int)NODE_TYPE.SUB_TREE)
+        {
+            return;
+        }
+        if (subTreeNode.subTreeType != (int)SUB_TREE_TYPE.NORMAL)
+        {
+            return;
+        }
+
+        BehaviorTreeData subTreeData = new BehaviorTreeData();
+        subTreeData.fileName = subTreeConfigName;
+
+        List<NodeValue> nodeList = new List<NodeValue>();
+        FindChild(_behaviorTreeData, subTreeNodeId, ref nodeList);
+
+        List<NodeValue> newNodeList = new List<NodeValue>();
+        for (int i = 0; i < nodeList.Count; ++i)
+        {
+            NodeValue childNode = nodeList[i];
+            NodeValue newNodeValue = childNode.Clone();
+
+            if (newNodeValue.subTreeEntry)
+            {
+                newNodeValue.isRootNode = true;
+                newNodeValue.parentNodeID = -1;
+                subTreeData.rootNodeId = newNodeValue.id;
+            }
+            newNodeValue.parentSubTreeNodeId = -1;
+
+            subTreeData.nodeList.Add(newNodeValue);
+        }
+
+        for (int i = 0; i < _behaviorTreeData.parameterList.Count; ++i)
+        {
+            BehaviorParameter parameter = _behaviorTreeData.parameterList[i];
+            subTreeData.parameterList.Add(parameter.Clone());
+        }
+
+        subTreeData = StandardID(subTreeData);
+
+        SaveFile(subTreeConfigName, subTreeData);
+    }
+
+    private static void FindChild(BehaviorTreeData treeData, int nodeId, ref List<NodeValue> nodeList)
+    {
+        NodeValue nodeValue = GetNode(treeData, nodeId);
+        if (null == nodeValue)
+        {
+            return;
+        }
+
+        for (int i = 0; i < nodeValue.childNodeList.Count; ++i)
+        {
+            int childId = nodeValue.childNodeList[i];
+            NodeValue childNode = GetNode(treeData, childId);
+            if (null != childNode)
+            {
+                nodeList.Add(childNode);
+            }
+            FindChild(treeData, childNode.id, ref nodeList);
+        }
+    }
+
+    private BehaviorTreeData StandardID(BehaviorTreeData data)
+    {
+        data.rootNodeId = IdTransition(data.fileName, data.rootNodeId);
+        for (int i = 0; i < data.nodeList.Count; ++i)
+        {
+            NodeValue nodeValue = data.nodeList[i];
+
+            nodeValue.id = IdTransition(data.fileName, nodeValue.id);
+            if (nodeValue.parentNodeID >= 0)
+            {
+                nodeValue.parentNodeID = IdTransition(data.fileName, nodeValue.parentNodeID);
+            }
+
+            if (nodeValue.parentSubTreeNodeId >= 0)
+            {
+                nodeValue.parentSubTreeNodeId = IdTransition(data.fileName, nodeValue.parentSubTreeNodeId);
+            }
+
+            for (int j = 0; j < nodeValue.childNodeList.Count; ++j)
+            {
+                nodeValue.childNodeList[j] = IdTransition(data.fileName, nodeValue.childNodeList[j]);
+            }
+        }
+
+        return data;
     }
 
     private void NodeAddChild(int parentId, int childId)
@@ -334,6 +510,34 @@ public class BehaviorManager
         }
         
         nodeValue.parentNodeID = -1;
+    }
+
+    private void DebugNodeParentInfo(int nodeId)
+    {
+        if (nodeId < 0)
+        {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        NodeValue nodeValue = GetNode(nodeId);
+        while (null != nodeValue)
+        {
+            sb.AppendFormat("{0}->", nodeValue.id);
+
+            NodeValue parentNode = null;
+            if (nodeValue.parentNodeID < 0 && nodeValue.parentSubTreeNodeId > 0)
+            {
+                parentNode = GetNode(nodeValue.parentSubTreeNodeId);
+            }
+            else
+            {
+                parentNode = GetNode(nodeValue.parentNodeID);
+            }
+            nodeValue = parentNode;
+        }
+
+        Debug.LogError("ParentInfo:" + sb.ToString());
     }
 
     private void NodeParameterChange(int nodeId, BehaviorParameter parameter, bool isAdd)
@@ -509,6 +713,26 @@ public class BehaviorManager
 
     private void OpenSubTree(int nodeId)
     {
+        if (nodeId < 0)
+        {
+            _currentOpenSubTreeId = nodeId;
+            return;
+        }
+
+        NodeValue nodeValue = GetNode(nodeId);
+        if (nodeValue.NodeType != (int)NODE_TYPE.SUB_TREE)
+        {
+            return;
+        }
+
+        if (nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG && string.IsNullOrEmpty(nodeValue.subTreeConfig))
+        {
+            if (EditorUtility.DisplayDialog("警告", "配置文件为空", "确定"))
+            {
+                return;
+            }
+        }
+
         _currentOpenSubTreeId = nodeId;
     }
 
@@ -530,6 +754,11 @@ public class BehaviorManager
         {
             if (NodeList[i].parentSubTreeNodeId == nodeValue.parentSubTreeNodeId)
             {
+                if (NodeList[i].subTreeEntry)
+                {
+                    RemoveParentNode(NodeList[i].id);
+                }
+
                 NodeList[i].subTreeEntry = (NodeList[i].id == nodeId);
                 if (NodeList[i].subTreeEntry)
                 {
@@ -538,33 +767,8 @@ public class BehaviorManager
                 }
             }
         }
-    }
 
-    private void ShowChildNode(int nodeId, bool show)
-    {
-        NodeValue nodeValue = GetNode(nodeId);
-        if (null == nodeValue)
-        {
-            return;
-        }
-
-        SetChildNodeShow(nodeValue, show);
-    }
-
-    private void SetChildNodeShow(NodeValue nodeValue, bool show)
-    {
-        for (int i = 0; i < nodeValue.childNodeList.Count; ++i)
-        {
-            int childId = nodeValue.childNodeList[i];
-            NodeValue childNode = GetNode(childId);
-            if (null == childNode)
-            {
-                continue;
-            }
-
-            childNode.show = show;
-            SetChildNodeShow(childNode, show);
-        }
+        NodeAddChild(subTreeNodeId, nodeValue.id);
     }
 
     private void ChangeRootNode(int rootNodeId)
@@ -593,7 +797,49 @@ public class BehaviorManager
             }
         }
 
+        foreach (var kv in _configDataDic)
+        {
+            BehaviorTreeData treeData = kv.Value;
+
+            for (int i = 0; i < treeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = treeData.nodeList[i];
+                if (nodeValue.id == nodeId)
+                {
+                    return nodeValue;
+                }
+            }
+        }
+
         return null;
+    }
+
+    private static NodeValue GetNode(BehaviorTreeData treeData, int nodeId)
+    {
+        for (int i = 0; i < treeData.nodeList.Count; ++i)
+        {
+            NodeValue nodeValue = treeData.nodeList[i];
+            if (nodeValue.id == nodeId)
+            {
+                return nodeValue;
+            }
+        }
+        return null;
+    }
+
+    private void LoadAllSubConfig(BehaviorTreeData treeData)
+    {
+        for (int i = 0; i < treeData.nodeList.Count; ++i)
+        {
+            NodeValue nodeVlaue = treeData.nodeList[i];
+            if (nodeVlaue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeVlaue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+            {
+                BehaviorTreeData subTreeData = ReadFile(nodeVlaue.subTreeConfig, false);
+                _configDataDic[nodeVlaue.subTreeConfig] = subTreeData;
+
+                LoadAllSubConfig(subTreeData);
+            }
+        }
     }
 
     // 添加节点
@@ -608,7 +854,7 @@ public class BehaviorManager
         }
 
         newNodeValue.nodeName = info._nodeName;
-        newNodeValue.identification = info._identification;
+        newNodeValue.identificationName = info._identificationName;
         newNodeValue.NodeType = (int)info._nodeType;
         newNodeValue.parentNodeID = -1;
         newNodeValue.function = NodeDescript.GetFunction((NODE_TYPE)info._nodeType);
@@ -640,6 +886,11 @@ public class BehaviorManager
         }
     }
 
+    /// <summary>
+    /// NodeId 规则：文件名所有字符的 Assic码相加 * 10000 + 0 - N
+    /// 如名字 abc，则第2个ID 为 ((int)a + (int)b + (int)c) * 1000 + 2 = (61 + 62 + 63) * 1000 + 2 = 1860002
+    /// </summary>
+    /// <returns></returns>
     private int GetNewNodeId()
     {
         int id = -1;
@@ -650,13 +901,28 @@ public class BehaviorManager
             id = index;
             for (int i = 0; i < NodeList.Count; ++i)
             {
-                if (NodeList[i].id == index)
+                int value = NodeList[i].id % 10000;
+                if (value == index)
                 {
                     id = -1;
                 }
             }
         }
 
+        id = IdTransition(FileName, id);
+        return id;
+    }
+
+    private int IdTransition(string fileName, int id)
+    {
+        char[] charArr = fileName.ToCharArray();
+        int assic = 0;
+        for (int i = 0; i < charArr.Length; ++i)
+        {
+            assic += (int)charArr[i];
+        }
+
+        id = assic * 10000 + id % 10000;
         return id;
     }
 
@@ -683,16 +949,28 @@ public class BehaviorManager
 
             if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
             {
-                for (int j = NodeList.Count - 1; j >= 0; --j)
-                {
-                    NodeValue node = NodeList[j];
-                    if (node.parentSubTreeNodeId == nodeValue.id)
-                    {
-                        NodeList.RemoveAt(j);
-                    }
-                }
+                DeleteSubTreeChild(nodeValue.id);
             }
             break;
+        }
+    }
+
+    private void DeleteSubTreeChild(int subTreeNodeId)
+    {
+        NodeValue nodeValue = GetNode(subTreeNodeId);
+        if (nodeValue.childNodeList.Count <= 0)
+        {
+            return;
+        }
+        nodeValue.childNodeList.Clear();
+
+        for (int j = NodeList.Count - 1; j >= 0; --j)
+        {
+            NodeValue node = NodeList[j];
+            if (node.parentSubTreeNodeId == subTreeNodeId)
+            {
+                NodeList.RemoveAt(j);
+            }
         }
     }
 
@@ -802,6 +1080,22 @@ public class BehaviorManager
         {
             TreeNodeWindow.window.ShowNotification(meg);
         }
+    }
+
+    public bool CurrentOpenConfigSubTree()
+    {
+        if (BehaviorManager.Instance.CurrentOpenSubTreeId <= 0)
+        {
+            return false;
+        }
+
+        NodeValue subTreeNode = BehaviorManager.Instance.GetNode(BehaviorManager.Instance.CurrentOpenSubTreeId);
+        if (null == subTreeNode)
+        {
+            return false;
+        }
+
+        return subTreeNode.subTreeType == (int)SUB_TREE_TYPE.CONFIG;
     }
 
 }

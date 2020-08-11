@@ -9,10 +9,10 @@ namespace BehaviorTree
         /// </summary>
         /// <param name="name"></param>
         /// <param name="identification"></param>
-        public CustomIdentification(string name, int identification, Type t)
+        public CustomIdentification(string name, Type t)
         {
             Name = name;
-            Identification = identification;
+            IdentificationName = t.Name;
             ClassType = t;
             NodeType = (typeof(NodeAction).IsAssignableFrom(t)) ? NODE_TYPE.ACTION : NODE_TYPE.CONDITION;
         }
@@ -23,7 +23,7 @@ namespace BehaviorTree
             private set;
         }
 
-        public int Identification
+        public string IdentificationName
         {
             get;
             private set;
@@ -43,7 +43,7 @@ namespace BehaviorTree
 
         public bool Valid()
         {
-            return Identification > 0;
+            return !string.IsNullOrEmpty(IdentificationName);
         }
 
         public object Create()

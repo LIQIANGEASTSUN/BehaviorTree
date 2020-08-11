@@ -16,6 +16,7 @@ namespace BehaviorTree
 
     public class NodeValue
     {
+        public string identificationName = string.Empty;
         public int id = 0;
         public bool isRootNode = false;                    // 根节点
         public int NodeType = (int)(NODE_TYPE.SELECT);     // 节点类型 // NODE_TYPE NodeType = NODE_TYPE.SELECT;
@@ -25,29 +26,88 @@ namespace BehaviorTree
         public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
         public int repeatTimes = 0;
         public string nodeName = string.Empty;
-        public int identification = -1;
         public string descript = string.Empty;
         public string function = string.Empty;
         public List<ConditionGroup> conditionGroupList = new List<ConditionGroup>();
 
+        #region IfJudgeData
+        public List<IfJudgeData> ifJudgeDataList = new List<IfJudgeData>();
+        #endregion
+
         #region SubTree
         public int parentSubTreeNodeId = -1;
         public bool subTreeEntry = false;
+        public int subTreeType = (int)SUB_TREE_TYPE.NORMAL;
+        public string subTreeConfig = string.Empty;
         #endregion
 
         #region 编辑器用
         public RectT position = new RectT(); // 节点位置（编辑器显示使用）
-        public bool showChildNode = true;   // 显示子节点
-        public bool show = true;            // 隐藏
         public bool moveWithChild = false;  // 同步移动子节点
         #endregion
+
+        public NodeValue Clone()
+        {
+            NodeValue nodeValue = new NodeValue();
+
+            nodeValue.id = this.id;
+            nodeValue.isRootNode = isRootNode;                    // 根节点
+            nodeValue.NodeType = NodeType;     // 节点类型 // NODE_TYPE NodeType = NODE_TYPE.SELECT;
+            nodeValue.priority = priority;                          // 权重
+            nodeValue.parentNodeID = parentNodeID;                      // 父节点
+            nodeValue.childNodeList.AddRange(childNodeList);  // 子节点集合
+
+            for (int i = 0; i < parameterList.Count; ++i)
+            {
+                nodeValue.parameterList.Add(parameterList[i].Clone());
+            }
+
+            nodeValue.repeatTimes = repeatTimes;
+            nodeValue.nodeName = nodeName;
+            nodeValue.identificationName = identificationName;
+            nodeValue.descript = descript;
+            nodeValue.function = function;
+
+            for (int i = 0; i < conditionGroupList.Count; ++i)
+            {
+                nodeValue.conditionGroupList.Add(conditionGroupList[i].Clone());
+            }
+
+            #region SubTree
+            nodeValue.parentSubTreeNodeId = parentSubTreeNodeId;
+            nodeValue.subTreeEntry = subTreeEntry;
+            nodeValue.subTreeType = subTreeType;
+            nodeValue.subTreeConfig = subTreeConfig;
+            #endregion
+
+            #region 编辑器用
+            nodeValue.position = position.Clone(); // 节点位置（编辑器显示使用）
+            nodeValue.moveWithChild = moveWithChild;  // 同步移动子节点
+            #endregion
+            return nodeValue;
+        }
     }
 
     public class ConditionGroup
     {
         public int index;
         public List<string> parameterList = new List<string>();
+
+        public ConditionGroup Clone()
+        {
+            ConditionGroup group = new ConditionGroup();
+            group.index = this.index;
+            group.parameterList.AddRange(parameterList);
+            return group;
+        }
     } 
+
+    public class IfJudgeData
+    {
+        public int nodeId;
+        public int ifJudegType = (int)NodeIfJudgeEnum.IF;
+        public int ifResult = (int)ResultType.Fail;
+    }
 
     public enum BehaviorParameterType
     {
@@ -261,6 +321,16 @@ namespace BehaviorTree
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+
+        public RectT Clone()
+        {
+            RectT rectT = new RectT();
+            rectT.x = this.x;
+            rectT.y = this.y;
+            rectT.width = this.width;
+            rectT.height = this.height;
+            return rectT;
         }
     }
 

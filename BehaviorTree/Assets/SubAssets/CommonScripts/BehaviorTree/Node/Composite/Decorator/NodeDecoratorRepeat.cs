@@ -61,7 +61,7 @@ namespace BehaviorTree
                 }
             }
 
-            if (_executeCount < _repeatCount)
+            if (_repeatCount == -1 || _executeCount < _repeatCount)
             {
                 resultType = ResultType.Running;
             }
