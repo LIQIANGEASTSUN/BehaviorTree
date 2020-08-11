@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 using LitJson;
+using CommonUtils;
 
 public class BehaviorData
 {
 
     #region  BehaviorTree
     private Dictionary<string, BehaviorTreeData> _behaviorDic = new Dictionary<string, BehaviorTreeData>();
-    public void LoadData(string fileName)
+    public void LoadData(byte[] loadByteData)
     {
-        TextAsset textAsset = Resources.Load<TextAsset>(fileName);
-        BehaviorTreeData data = LitJson.JsonMapper.ToObject<BehaviorTreeData>(textAsset.text);
-        _behaviorDic[fileName] = data;
+        AnalysisBin.AnalysisData(loadByteData, Analysis);
+    }
+
+    private void Analysis(byte[] byteData)
+    {
+        string content = System.Text.Encoding.Default.GetString(byteData);
+        BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
+        _behaviorDic[behaviorTreeData.fileName] = behaviorTreeData;
     }
 
     public BehaviorTreeData GetBehaviorInfo(string handleFile)
@@ -29,3 +35,4 @@ public class BehaviorData
     #endregion
 
 }
+
