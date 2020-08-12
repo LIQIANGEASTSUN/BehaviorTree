@@ -437,6 +437,21 @@ public class BehaviorManager
             return;
         }
 
+        int findId = parentNode.childNodeList.Find((a)=> {
+            return a == childId;
+        });
+        if (findId == childId)
+        {
+            if (childNode.parentNodeID != parentId)
+            {
+                parentNode.childNodeList.Remove(childId);
+            }
+            else
+            {
+                return;
+            }
+        }
+
         string msg = string.Empty;
         bool result = true;
         if (childNode.parentNodeID >= 0)

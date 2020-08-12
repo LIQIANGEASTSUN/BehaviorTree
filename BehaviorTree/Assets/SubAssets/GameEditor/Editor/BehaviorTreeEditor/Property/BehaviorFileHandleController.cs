@@ -155,6 +155,7 @@ namespace BehaviorTree
                 if (hash.Contains(nodeValue.id))
                 {
                     treeData.nodeList.RemoveAt(i);
+                    continue;
                 }
 
                 hash.Add(nodeValue.id);
