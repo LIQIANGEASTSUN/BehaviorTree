@@ -51,6 +51,7 @@ public enum TargetTypeEnum
 
 public class BaseSprite : IBTNeedUpdate
 {
+    private int _spriteId;
     private BTConcrete _bt;
     public GameObject SpriteGameObject;
 
@@ -59,7 +60,7 @@ public class BaseSprite : IBTNeedUpdate
 
     public Npc _enemyNpc = null;
 
-    private string _btConfigFileName = string.Empty;
+    private string _btConfigFileName = "Player";
 
     public BTBase BTBase
     {
@@ -68,16 +69,31 @@ public class BaseSprite : IBTNeedUpdate
 
     public void Init(Vector3 position)
     {
-        _bt = new BTConcrete(_btConfigFileName);
-        _bt.SetOwner(this);
-
-        _bt.UpdateParameter(BTConstant.IsSurvial, true);
-
         SpriteGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         SpriteGameObject.transform.localScale = Vector3.one;
         SpriteGameObject.transform.position = position;
 
-        _energy = 100;
+        //_energy = 100;
+
+        _bt = new BTConcrete(_btConfigFileName);
+        _bt.SetOwner(this);
+
+        _bt.UpdateParameter(BTConstant.IsSurvial, true);
+    }
+
+    public void Update()
+    {
+
+        if (null != BTBase)
+        {
+            BTBase.UpdateParameter(BTConstant.Energy, Energy());
+        }
+
+    }
+
+    public int SpriteID
+    {
+        get { return _spriteId; }
     }
 
     public bool CanRunningBT()
@@ -96,8 +112,33 @@ public class BaseSprite : IBTNeedUpdate
         set { _enemyNpc = value; }
     }
 
+    public Vector3 Position
+    {
+        get
+        {
+            return SpriteGameObject.transform.position;
+        }
+        set
+        {
+            SpriteGameObject.transform.position = value;
+        }
+    }
+
     public IMove GetIMove(TargetTypeEnum targetType)
     {
+        if (targetType == TargetTypeEnum.ENEMY)
+        {
+
+        }
+        else if (targetType == TargetTypeEnum.ENERY_SUPPLY)
+        {
+
+        }
+        else if (targetType == TargetTypeEnum.PATROL)
+        {
+
+        }
+
         return null;
     }
 

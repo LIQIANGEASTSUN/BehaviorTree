@@ -505,7 +505,7 @@ public class BehaviorDrawView
 
             if (childHash.Contains(childNode.id))
             {
-                Debug.LogError(nodeValue.id + "    " + childNode.id);
+                //ProDebug.Logger.LogError(nodeValue.id + "    " + childNode.id);
                 break;
             }
             childHash.Add(childNode.id);

@@ -290,8 +290,6 @@ namespace BehaviorTree
                             IfJudgeData data = nodeValue.ifJudgeDataList[1];
                             JudgeNodeChangeChildCondition(nodeValue, data.nodeId, (ResultType)data.ifResult);
                         }
-
-                        nodeValue.ifJudgeDataList.Add(judgeData);
                     }
                     judgeData.ifJudegType = ((i == 0) ? (int)NodeIfJudgeEnum.IF : (int)NodeIfJudgeEnum.ACTION);
 

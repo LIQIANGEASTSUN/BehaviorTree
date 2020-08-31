@@ -552,7 +552,7 @@ public class BehaviorManager
             nodeValue = parentNode;
         }
 
-        Debug.LogError("ParentInfo:" + sb.ToString());
+        //ProDebug.Logger.LogError("ParentInfo:" + sb.ToString());
     }
 
     private void NodeParameterChange(int nodeId, BehaviorParameter parameter, bool isAdd)
@@ -960,12 +960,12 @@ public class BehaviorManager
                 childNode.parentNodeID = -1;
             }
 
-            NodeList.RemoveAt(i);
-
             if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
             {
                 DeleteSubTreeChild(nodeValue.id);
             }
+
+            NodeList.Remove(nodeValue);
             break;
         }
     }

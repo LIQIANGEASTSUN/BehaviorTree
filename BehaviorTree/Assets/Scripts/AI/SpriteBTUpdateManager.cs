@@ -44,19 +44,18 @@ public class SpriteBTUpdateManager
         }
     }
 
-    public void AddSprite(int spriteId)
+    public void AddSprite(BaseSprite baseSprite)
     {
-        if (_AiIDList.Contains(spriteId))
+        if (_AiIDList.Contains(baseSprite.SpriteID))
         {
             return;
         }
 
-        BaseSprite baseSprite = null;
         IBTNeedUpdate sprite = baseSprite as IBTNeedUpdate;
         if (sprite != null)
         {
             _AiList.Add(sprite);
-            _AiIDList.Add(spriteId);
+            _AiIDList.Add(baseSprite.SpriteID);
         }
         else
         {

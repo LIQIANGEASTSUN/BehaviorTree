@@ -23,11 +23,7 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
-        if (parameter.parameterType == (int)BehaviorParameterType.Bool)
-        {
-            parameter.boolValue = boolValue;
-            _environmentParameterDic[parameterName] = parameter;
-        }
+        parameter.boolValue = boolValue;
     }
 
     public void SetParameter(string parameterName, float floatValue)
@@ -38,11 +34,7 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
-        if (parameter.parameterType == (int)BehaviorParameterType.Float)
-        {
-            parameter.floatValue = floatValue;
-            _environmentParameterDic[parameterName] = parameter;
-        }
+        parameter.floatValue = floatValue;
     }
 
     public void SetParameter(string parameterName, int intValue)
@@ -53,11 +45,7 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
-        if (parameter.parameterType == (int)BehaviorParameterType.Int)
-        {
-            parameter.intValue = intValue;
-            _environmentParameterDic[parameterName] = parameter;
-        }
+        parameter.intValue = intValue;
     }
 
     public void SetParameter(string parameterName, string stringValue)
@@ -68,11 +56,7 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
-        if (parameter.parameterType == (int)BehaviorParameterType.String)
-        {
-            parameter.stringValue = stringValue;
-            _environmentParameterDic[parameterName] = parameter;
-        }
+        parameter.stringValue = stringValue;
     }
 
     public void SetParameter(BehaviorParameter parameter)
@@ -90,7 +74,6 @@ public class ConditionCheck : IConditionCheck
         }
 
         environmentParameter.CloneFrom(parameter);
-        _environmentParameterDic[parameter.parameterName] = environmentParameter;
     }
 
     private BehaviorParameter GetParameter(string parameterName)

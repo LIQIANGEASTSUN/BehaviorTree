@@ -15,11 +15,14 @@ public interface IMove
 /// </summary>
 public class PlayerMoveAction : ActionBase
 {
+    private BaseSprite _baseSprite;
     private IMove _iMove;
 
     public override void OnEnter()
     {
         base.OnEnter();
+        _baseSprite = _owner;
+        GetIMove();
     }
 
     public override ResultType DoAction()
@@ -29,7 +32,7 @@ public class PlayerMoveAction : ActionBase
             return ResultType.Fail;
         }
 
-
+        ResultType resultType = Move();
 
         return ResultType.Success;
     }
@@ -59,6 +62,26 @@ public class PlayerMoveAction : ActionBase
         }
 
         _iMove = _owner.GetIMove((TargetTypeEnum)targetType);
+    }
+
+    private ResultType Move()
+    {
+        if (null == _iMove)
+        {
+            return ResultType.Fail;   
+        }
+
+        float speed = 0;
+        Vector3 targetPos = Vector3.zero;
+        _iMove.Move(ref speed, ref targetPos);
+        _baseSprite.Position = Vector3.MoveTowards(_baseSprite.Position, targetPos, speed * Time.deltaTime);
+
+        if (Vector3.Distance(_baseSprite.Position, targetPos) > 0.2f)
+        {
+            return ResultType.Running;
+        }
+
+        return ResultType.Success;
     }
 
 }

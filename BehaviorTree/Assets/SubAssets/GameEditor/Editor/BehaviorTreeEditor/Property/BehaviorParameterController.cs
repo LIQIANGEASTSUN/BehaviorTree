@@ -53,19 +53,15 @@ namespace BehaviorTree
 
     public class BehaviorParameterView
     {
-        private int fileIndex;
-        private string[] fileCNArr = new string[2] { "道具参数表", "普通怪物参数表" };
-        private string[] fileArr = new string[2] { "BehaviorTreeArticle", "BehaviorTreeGeneral" };
         private Vector2 scrollPos = Vector2.zero;
         public void Draw(List<BehaviorParameter> parameterList)
         {
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUILayout.LabelField("全部变量", GUILayout.Width(100));
-                fileIndex = EditorGUILayout.Popup(fileIndex, fileCNArr, GUILayout.Width(100));
                 if (GUILayout.Button("导入变量"))
                 {
-                    BehaviorFileHandleView.ImportParameter(fileArr[fileIndex]);
+                    BehaviorFileHandleView.ImportParameter();
                 }
             }
             EditorGUILayout.EndHorizontal();

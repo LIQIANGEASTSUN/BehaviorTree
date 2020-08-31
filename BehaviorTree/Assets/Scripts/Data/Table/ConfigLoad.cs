@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ConfigLoad : MonoBehaviour
 {
-
+    public static Action loadEndCallBack;
     private void Start()
     {
         StartCoroutine(LoadConfig());
@@ -13,11 +14,13 @@ public class ConfigLoad : MonoBehaviour
 
     private byte[] byteData = new byte[] { };
     private string textContent = string.Empty;
-    private IEnumerator LoadConfig()
+    public IEnumerator LoadConfig()
     {
         yield return StartCoroutine(LoadData("Bina", "BehaviorTreeConfig.bytes", 1));
 
         DataCenter.behaviorData.LoadData(byteData);
+
+        loadEndCallBack?.Invoke();
     }
 
     IEnumerator LoadData(string directory, string name, int type)

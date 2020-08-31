@@ -121,6 +121,11 @@ namespace BehaviorTree
 
         private static void UpdateAllFile(string filePath)
         {
+            TableRead.Instance.Init();
+            string csvPath = string.Format("{0}/StreamingAssets/CSV/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            TableRead.Instance.ReadCustomPath(csvPath);
+
+
             DirectoryInfo dInfo = new DirectoryInfo(filePath);
             FileInfo[] fileInfoArr = dInfo.GetFiles("*.bytes", SearchOption.TopDirectoryOnly);
             for (int i = 0; i < fileInfoArr.Length; ++i)
@@ -147,20 +152,85 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            HashSet<int> hash = new HashSet<int>();
-            Debug.LogError("Begin=============:" + treeData.fileName);
-            for (int i = treeData.nodeList.Count - 1; i >= 0; --i)
+            HashSet<int> hash = new HashSet<int>() { 5000000, 5000001, 5000005, 5000009};
+            for (int i = 0; i < treeData.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = treeData.nodeList[i];
                 if (hash.Contains(nodeValue.id))
                 {
-                    treeData.nodeList.RemoveAt(i);
+                    //ProDebug.Logger.LogError("Update:" + treeData.fileName + "    exist Node:" + nodeValue.id);
+                }
+                else
+                {
+                    hash.Add(nodeValue.id);
+                    //ProDebug.Logger.LogError(nodeValue.subTreeConfig + "       " + nodeValue.parentSubTreeNodeId);
+                }
+            }
+
+            for (int i = treeData.nodeList.Count - 1; i >= 0; --i)
+            {
+                NodeValue nodeValue = treeData.nodeList[i];
+
+                if (nodeValue.parentNodeID >= 0)
+                {
+                    if (!hash.Contains(nodeValue.parentNodeID))
+                    {
+                        //ProDebug.Logger.LogError("Update ParentNode Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + nodeValue.parentNodeID);
+                        treeData.nodeList.RemoveAt(i);
+                        continue;
+                    }
+                }
+
+                if (nodeValue.parentSubTreeNodeId >= 0)
+                {
+                    if (!hash.Contains(nodeValue.parentSubTreeNodeId))
+                    {
+                        //ProDebug.Logger.LogError("Update parentSubTreeNodeId Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + nodeValue.parentSubTreeNodeId);
+                        treeData.nodeList.RemoveAt(i);
+                        continue;
+                    }
+                }
+
+                for (int j = nodeValue.childNodeList.Count - 1; j >= 0; --j)
+                {
+                    int childId = nodeValue.childNodeList[j];
+                    if (!hash.Contains(childId))
+                    {
+                        //ProDebug.Logger.LogError("Update childId Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + childId);
+                    }
+                }
+            }
+
+            return treeData;
+        }
+
+        private static BehaviorParameter GetTableParameter(string parameterName)
+        {
+            string tableName = "BehaviorTree";
+            List<int> keyList = TableRead.Instance.GetKeyList(tableName);
+
+            for (int i = 0; i < keyList.Count; ++i)
+            {
+                int key = keyList[i];
+
+                string enName = TableRead.Instance.GetData(tableName, key, "EnName");
+                if (enName.CompareTo(parameterName) != 0)
+                {
                     continue;
                 }
 
-                hash.Add(nodeValue.id);
+                string cnName = TableRead.Instance.GetData(tableName, key, "CnName");
+                int type = int.Parse(TableRead.Instance.GetData(tableName, key, "Type"));
+
+                BehaviorParameter parameter = new BehaviorParameter();
+                parameter.parameterName = enName;
+                parameter.CNName = cnName;
+                parameter.parameterType = type;
+
+                return parameter;
             }
-            return treeData;
+
+            return null;
         }
 
         private static BehaviorTreeData ChangeSubTree(BehaviorTreeData treeData)
@@ -291,14 +361,15 @@ namespace BehaviorTree
 
         }
 
-        public static void ImportParameter(string fileName)
+        public static void ImportParameter()
         {
             BehaviorTreeData behaviorData = BehaviorManager.Instance.BehaviorTreeData;
-            behaviorData = ImportParameter(behaviorData, fileName);
+            behaviorData = ImportParameter(behaviorData);
         }
 
-        private static BehaviorTreeData ImportParameter(BehaviorTreeData behaviorData, string fileName)
+        private static BehaviorTreeData ImportParameter(BehaviorTreeData behaviorData)
         {
+            string fileName = "BehaviorTree";
             TableRead.Instance.Init();
             string csvPath =string.Format("{0}/StreamingAssets/CSV/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
             TableRead.Instance.ReadCustomPath(csvPath);
@@ -332,60 +403,30 @@ namespace BehaviorTree
 
                 string stringValue = TableRead.Instance.GetData(fileName, key, "StringValue");
 
-                if (parameterDic.ContainsKey(EnName))
-                {
-                    if (parameterDic[EnName].parameterType != type)
-                    {
-                        Debug.LogError("已经存在参数:" + EnName + "   type:" + (BehaviorParameterType)parameterDic[EnName].parameterType + "   newType:" + (BehaviorParameterType)type);
-                    }
-                    else
-                    {
-                        //Debug.LogError("已经存在参数:" + EnName);
-                    }
-                    parameterDic.Remove(EnName);
-
-                    for (int j = 0; j < behaviorData.parameterList.Count; ++j)
-                    {
-                        BehaviorParameter cacheParameter = behaviorData.parameterList[j];
-                        if (cacheParameter.parameterName == EnName)
-                        {
-                            behaviorData.parameterList.RemoveAt(j);
-                            break;
-                        }
-                    }
-
-                    //continue;
-                }
-
-                //Debug.LogError(EnName + "    " +cnName + "    " + typeName);
-
                 BehaviorParameter parameter = new BehaviorParameter();
                 parameter.parameterName = EnName;
                 parameter.CNName = cnName;
                 parameter.compare = (int)BehaviorCompare.EQUALS;
                 parameter.parameterType = type;
 
-                if (type == (int)BehaviorParameterType.Float)
-                {
-                    parameter.floatValue = floatValue;
-                }
+                parameter.floatValue = floatValue;
+                parameter.intValue = intValue;
+                parameter.boolValue = boolValue;
+                parameter.stringValue = stringValue;
 
-                if (type == (int)BehaviorParameterType.Int)
+                if (parameterDic.ContainsKey(EnName))
                 {
-                    parameter.intValue = intValue;
-                }
+                    if (parameterDic[EnName].parameterType != type)
+                    {
+                        Debug.LogError("已经存在参数:" + EnName + "   type:" + (BehaviorParameterType)parameterDic[EnName].parameterType + "   newType:" + (BehaviorParameterType)type);
+                    }
 
-                if (type == (int)BehaviorParameterType.Float)
+                    parameterDic[EnName].CloneFrom(parameter);
+                }
+                else
                 {
-                    parameter.boolValue = boolValue;
+                    behaviorData.parameterList.Add(parameter);
                 }
-
-                if (type == (int)BehaviorParameterType.String)
-                {
-                    parameter.stringValue = stringValue;
-                }
-
-                behaviorData.parameterList.Add(parameter);
             }
 
             return behaviorData;

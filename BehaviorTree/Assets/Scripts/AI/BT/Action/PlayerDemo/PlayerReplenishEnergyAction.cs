@@ -8,9 +8,11 @@ using BehaviorTree;
 /// </summary>
 public class PlayerReplenishEnergyAction : ActionBase
 {
+    private BaseSprite _baseSprite;
     public override void OnEnter()
     {
         base.OnEnter();
+        _baseSprite = _owner;
     }
 
     public override ResultType DoAction()

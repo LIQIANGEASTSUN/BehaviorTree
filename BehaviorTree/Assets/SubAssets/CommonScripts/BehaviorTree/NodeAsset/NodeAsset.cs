@@ -100,7 +100,7 @@ namespace BehaviorTree
             group.parameterList.AddRange(parameterList);
             return group;
         }
-    } 
+    }
 
     public class IfJudgeData
     {
