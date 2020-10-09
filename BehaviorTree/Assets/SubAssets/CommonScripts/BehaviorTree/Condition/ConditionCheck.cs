@@ -23,6 +23,12 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
+        if (parameter.parameterType != (int)(BehaviorParameterType.Bool))
+        {
+            Debug.LogError("parameter not Bool Type:" + parameter.parameterName);
+            return;
+        }
+
         parameter.boolValue = boolValue;
     }
 
@@ -31,6 +37,12 @@ public class ConditionCheck : IConditionCheck
         BehaviorParameter parameter = null;
         if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
+            return;
+        }
+
+        if (parameter.parameterType != (int)(BehaviorParameterType.Float))
+        {
+            Debug.LogError("parameter not Float Type:" + parameter.parameterName);
             return;
         }
 
@@ -45,7 +57,30 @@ public class ConditionCheck : IConditionCheck
             return;
         }
 
+        if (parameter.parameterType != (int)(BehaviorParameterType.Int))
+        {
+            Debug.LogError("parameter not Int Type:" + parameter.parameterName);
+            return;
+        }
+
         parameter.intValue = intValue;
+    }
+
+    public void SetParameter(string parameterName, long longValue)
+    {
+        BehaviorParameter parameter = null;
+        if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
+        {
+            return;
+        }
+
+        if (parameter.parameterType != (int)(BehaviorParameterType.Long))
+        {
+            Debug.LogError("parameter not Long Type:" + parameter.parameterName);
+            return;
+        }
+
+        parameter.longValue = longValue;
     }
 
     public void SetParameter(string parameterName, string stringValue)
@@ -53,6 +88,12 @@ public class ConditionCheck : IConditionCheck
         BehaviorParameter parameter = null;
         if (!_environmentParameterDic.TryGetValue(parameterName, out parameter)) // 当前行为树不需要的参数值就不保存了
         {
+            return;
+        }
+
+        if (parameter.parameterType != (int)(BehaviorParameterType.String))
+        {
+            Debug.LogError("parameter not String Type:" + parameter.parameterName);
             return;
         }
 
@@ -69,7 +110,7 @@ public class ConditionCheck : IConditionCheck
 
         if (parameter.parameterType != environmentParameter.parameterType)
         {
-            //ProDebug.Logger.LogError("parameter type invalid:" + parameter.parameterName);
+            Debug.LogError("parameter type invalid:" + parameter.parameterName);
             return;
         }
 
@@ -94,7 +135,31 @@ public class ConditionCheck : IConditionCheck
             return false;
         }
 
+        if (environmentParameter.parameterType != (int)(BehaviorParameterType.Int))
+        {
+            Debug.LogError("parameter not Int Type:" + environmentParameter.parameterName);
+            return false;
+        }
+
         value = environmentParameter.intValue;
+        return true;
+    }
+
+    public bool GetParameterValue(string parameterName, ref long value)
+    {
+        BehaviorParameter environmentParameter = GetParameter(parameterName);
+        if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
+        {
+            return false;
+        }
+
+        if (environmentParameter.parameterType != (int)(BehaviorParameterType.Long))
+        {
+            Debug.LogError("parameter not Long Type:" + environmentParameter.parameterName);
+            return false;
+        }
+
+        value = environmentParameter.longValue;
         return true;
     }
 
@@ -103,6 +168,12 @@ public class ConditionCheck : IConditionCheck
         BehaviorParameter environmentParameter = GetParameter(parameterName);
         if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
+            return false;
+        }
+
+        if (environmentParameter.parameterType != (int)(BehaviorParameterType.Float))
+        {
+            Debug.LogError("parameter not Float Type:" + environmentParameter.parameterName);
             return false;
         }
 
@@ -118,6 +189,12 @@ public class ConditionCheck : IConditionCheck
             return false;
         }
 
+        if (environmentParameter.parameterType != (int)(BehaviorParameterType.Bool))
+        {
+            Debug.LogError("parameter not Bool Type:" + environmentParameter.parameterName);
+            return false;
+        }
+
         value = environmentParameter.boolValue;
         return true;
     }
@@ -127,6 +204,12 @@ public class ConditionCheck : IConditionCheck
         BehaviorParameter environmentParameter = GetParameter(parameterName);
         if (null == environmentParameter) // 当前行为树不需要的参数值就不保存了
         {
+            return false;
+        }
+
+        if (environmentParameter.parameterType != (int)(BehaviorParameterType.String))
+        {
+            Debug.LogError("parameter not String Type:" + environmentParameter.parameterName);
             return false;
         }
 
@@ -148,6 +231,7 @@ public class ConditionCheck : IConditionCheck
                 _environmentParameterDic[parameter.parameterName] = cacheParaemter;
             }
 
+            cacheParaemter.longValue = parameter.longValue;
             cacheParaemter.intValue = parameter.intValue;
             cacheParaemter.floatValue = parameter.floatValue;
             cacheParaemter.boolValue = parameter.boolValue;

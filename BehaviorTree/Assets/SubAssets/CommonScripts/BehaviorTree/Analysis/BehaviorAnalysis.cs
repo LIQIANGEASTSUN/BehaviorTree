@@ -47,7 +47,7 @@ namespace BehaviorTree
                         BehaviorTreeData subTreeData = _loadConfigInfoEvent(nodeValue.subTreeConfig);
                         if (null == subTreeData)
                         {
-                            //ProDebug.Logger.LogError("SubTreeData is null:" + nodeValue.subTreeConfig);
+                            Debug.LogError("SubTreeData is null:" + nodeValue.subTreeConfig);
                             continue;
                         }
                         _subTreeDataDic[nodeValue.subTreeConfig] = subTreeData;

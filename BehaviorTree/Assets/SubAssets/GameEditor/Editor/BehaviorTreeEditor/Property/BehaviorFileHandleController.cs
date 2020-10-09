@@ -152,56 +152,29 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            HashSet<int> hash = new HashSet<int>() { 5000000, 5000001, 5000005, 5000009};
+            for (int i = 0; i < treeData.parameterList.Count; ++i)
+            {
+                BehaviorParameter parameter = treeData.parameterList[i];
+                parameter = UpdateParameter(parameter);
+            }
+
             for (int i = 0; i < treeData.nodeList.Count; ++i)
             {
                 NodeValue nodeValue = treeData.nodeList[i];
-                if (hash.Contains(nodeValue.id))
+                
+                for (int j = 0; j < nodeValue.parameterList.Count; ++j)
                 {
-                    //ProDebug.Logger.LogError("Update:" + treeData.fileName + "    exist Node:" + nodeValue.id);
-                }
-                else
-                {
-                    hash.Add(nodeValue.id);
-                    //ProDebug.Logger.LogError(nodeValue.subTreeConfig + "       " + nodeValue.parentSubTreeNodeId);
-                }
-            }
-
-            for (int i = treeData.nodeList.Count - 1; i >= 0; --i)
-            {
-                NodeValue nodeValue = treeData.nodeList[i];
-
-                if (nodeValue.parentNodeID >= 0)
-                {
-                    if (!hash.Contains(nodeValue.parentNodeID))
-                    {
-                        //ProDebug.Logger.LogError("Update ParentNode Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + nodeValue.parentNodeID);
-                        treeData.nodeList.RemoveAt(i);
-                        continue;
-                    }
-                }
-
-                if (nodeValue.parentSubTreeNodeId >= 0)
-                {
-                    if (!hash.Contains(nodeValue.parentSubTreeNodeId))
-                    {
-                        //ProDebug.Logger.LogError("Update parentSubTreeNodeId Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + nodeValue.parentSubTreeNodeId);
-                        treeData.nodeList.RemoveAt(i);
-                        continue;
-                    }
-                }
-
-                for (int j = nodeValue.childNodeList.Count - 1; j >= 0; --j)
-                {
-                    int childId = nodeValue.childNodeList[j];
-                    if (!hash.Contains(childId))
-                    {
-                        //ProDebug.Logger.LogError("Update childId Not Exist:" + treeData.fileName + "    " + nodeValue.id + "    " + childId);
-                    }
+                    BehaviorParameter parameter = nodeValue.parameterList[j];
+                    parameter = UpdateParameter(parameter);
                 }
             }
 
             return treeData;
+        }
+
+        private static BehaviorParameter UpdateParameter(BehaviorParameter parameter)
+        {
+            return parameter;
         }
 
         private static BehaviorParameter GetTableParameter(string parameterName)
@@ -359,6 +332,7 @@ namespace BehaviorTree
                 FileReadWrite.Write(mergeFilePath, byteData);
             }
 
+            AssetDatabase.Refresh();
         }
 
         public static void ImportParameter()
@@ -398,6 +372,9 @@ namespace BehaviorTree
                 string intContent = TableRead.Instance.GetData(fileName, key, "IntValue");
                 int intValue = int.Parse(intContent);
 
+                string longContent = TableRead.Instance.GetData(fileName, key, "LongValue");
+                long longValue = long.Parse(intContent);
+
                 string boolContent = TableRead.Instance.GetData(fileName, key, "BoolValue");
                 bool boolValue = (int.Parse(boolContent) == 1);
 
@@ -411,6 +388,7 @@ namespace BehaviorTree
 
                 parameter.floatValue = floatValue;
                 parameter.intValue = intValue;
+                parameter.longValue = longValue;
                 parameter.boolValue = boolValue;
                 parameter.stringValue = stringValue;
 

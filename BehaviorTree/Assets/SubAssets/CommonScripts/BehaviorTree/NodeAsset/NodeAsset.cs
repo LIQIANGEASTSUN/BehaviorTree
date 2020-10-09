@@ -50,6 +50,7 @@ namespace BehaviorTree
         {
             NodeValue nodeValue = new NodeValue();
 
+            nodeValue.identificationName = identificationName;
             nodeValue.id = this.id;
             nodeValue.isRootNode = isRootNode;                    // 根节点
             nodeValue.NodeType = NodeType;     // 节点类型 // NODE_TYPE NodeType = NODE_TYPE.SELECT;
@@ -64,13 +65,17 @@ namespace BehaviorTree
 
             nodeValue.repeatTimes = repeatTimes;
             nodeValue.nodeName = nodeName;
-            nodeValue.identificationName = identificationName;
             nodeValue.descript = descript;
             nodeValue.function = function;
 
             for (int i = 0; i < conditionGroupList.Count; ++i)
             {
                 nodeValue.conditionGroupList.Add(conditionGroupList[i].Clone());
+            }
+
+            for (int i = 0; i < ifJudgeDataList.Count; ++i)
+            {
+                nodeValue.ifJudgeDataList.Add(ifJudgeDataList[i].Clone());
             }
 
             #region SubTree
@@ -107,6 +112,15 @@ namespace BehaviorTree
         public int nodeId;
         public int ifJudegType = (int)NodeIfJudgeEnum.IF;
         public int ifResult = (int)ResultType.Fail;
+
+        public IfJudgeData Clone()
+        {
+            IfJudgeData ifJudgeData = new IfJudgeData();
+            ifJudgeData.nodeId = nodeId;
+            ifJudgeData.ifJudegType = ifJudegType;
+            ifJudgeData.ifResult = ifResult;
+            return ifJudgeData;
+        }
     }
 
     public enum BehaviorParameterType
@@ -122,6 +136,12 @@ namespace BehaviorTree
         /// </summary>
         [EnumAttirbute("Int")]
         Int = 2,
+
+        /// <summary>
+        /// Long
+        /// </summary>
+        [EnumAttirbute("Long")]
+        Long = 3,
 
         /// <summary>
         /// Bool
@@ -179,6 +199,7 @@ namespace BehaviorTree
         public string CNName = string.Empty;
         public int index;
         public int intValue = 0;
+        public long longValue = 0;
         public float floatValue = 0;
         public bool boolValue = false;
         public string stringValue = string.Empty;
@@ -198,6 +219,7 @@ namespace BehaviorTree
             CNName = parameter.CNName;
             index = parameter.index;
             intValue =  parameter.intValue;
+            longValue = parameter.longValue;
             floatValue = parameter.floatValue;
             boolValue = parameter.boolValue;
             stringValue = parameter.stringValue;
@@ -220,6 +242,10 @@ namespace BehaviorTree
             else if (parameterType == (int)BehaviorParameterType.Int)
             {
                 behaviorCompare = CompareInt(parameter);
+            }
+            else if (parameterType == (int)BehaviorParameterType.Long)
+            {
+                behaviorCompare = CompareLong(parameter);
             }
             else if (parameterType == (int)BehaviorParameterType.Bool)
             {
@@ -280,6 +306,44 @@ namespace BehaviorTree
             }
 
             if (this.intValue <= parameter.intValue)
+            {
+                behaviorCompare |= BehaviorCompare.LESS_EQUAL;
+            }
+
+            return behaviorCompare;
+        }
+
+        public BehaviorCompare CompareLong(BehaviorParameter parameter)
+        {
+            BehaviorCompare behaviorCompare = BehaviorCompare.INVALID;
+            behaviorCompare = CompareFloat(parameter);
+
+            if (this.longValue > parameter.longValue)
+            {
+                behaviorCompare |= BehaviorCompare.GREATER;
+            }
+
+            if (this.longValue < parameter.longValue)
+            {
+                behaviorCompare |= BehaviorCompare.LESS;
+            }
+
+            if (this.longValue == parameter.longValue)
+            {
+                behaviorCompare |= BehaviorCompare.EQUALS;
+            }
+
+            if (this.longValue != parameter.longValue)
+            {
+                behaviorCompare |= BehaviorCompare.NOT_EQUAL;
+            }
+
+            if (this.longValue >= parameter.longValue)
+            {
+                behaviorCompare |= BehaviorCompare.GREATER_EQUALS;
+            }
+
+            if (this.longValue <= parameter.longValue)
             {
                 behaviorCompare |= BehaviorCompare.LESS_EQUAL;
             }

@@ -139,6 +139,10 @@ namespace BehaviorTree
                 {
                     compareEnumArr = new BehaviorCompare[] { BehaviorCompare.GREATER, BehaviorCompare.GREATER_EQUALS, BehaviorCompare.LESS_EQUAL, BehaviorCompare.LESS, BehaviorCompare.EQUALS, BehaviorCompare.NOT_EQUAL };
                 }
+                if (behaviorParameter.parameterType == (int)BehaviorParameterType.Long)
+                {
+                    compareEnumArr = new BehaviorCompare[] { BehaviorCompare.GREATER, BehaviorCompare.GREATER_EQUALS, BehaviorCompare.LESS_EQUAL, BehaviorCompare.LESS, BehaviorCompare.EQUALS, BehaviorCompare.NOT_EQUAL };
+                }
                 if (behaviorParameter.parameterType == (int)BehaviorParameterType.Float)
                 {
                     compareEnumArr = new BehaviorCompare[] { BehaviorCompare.GREATER, BehaviorCompare.LESS };
@@ -192,6 +196,11 @@ namespace BehaviorTree
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Int)
                     {
                         behaviorParameter.intValue = EditorGUILayout.IntField(behaviorParameter.intValue, GUILayout.Width(60));
+                    }
+
+                    if (behaviorParameter.parameterType == (int)BehaviorParameterType.Long)
+                    {
+                        behaviorParameter.longValue = EditorGUILayout.LongField(behaviorParameter.longValue, GUILayout.Width(60));
                     }
 
                     if (behaviorParameter.parameterType == (int)BehaviorParameterType.Float)

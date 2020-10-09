@@ -170,7 +170,12 @@ namespace BehaviorTree
                 {
                     parameter.CNName = item["CNName"].ToString();
                 }
+
                 parameter.intValue = int.Parse(item["intValue"].ToString());
+                if (((IDictionary)item).Contains("longValue"))
+                {
+                    parameter.longValue = long.Parse(item["longValue"].ToString());
+                }
                 parameter.floatValue = float.Parse(item["floatValue"].ToString());
                 parameter.boolValue = bool.Parse(item["boolValue"].ToString());
                 parameter.stringValue = item["stringValue"].ToString();

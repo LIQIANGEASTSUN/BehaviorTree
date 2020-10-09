@@ -421,6 +421,12 @@ public class BehaviorManager
             {
                 nodeValue.childNodeList[j] = IdTransition(data.fileName, nodeValue.childNodeList[j]);
             }
+
+            for (int j = 0; j < nodeValue.ifJudgeDataList.Count; ++j)
+            {
+                nodeValue.ifJudgeDataList[j].nodeId = IdTransition(data.fileName, nodeValue.ifJudgeDataList[j].nodeId);
+            }
+
         }
 
         return data;
@@ -552,7 +558,7 @@ public class BehaviorManager
             nodeValue = parentNode;
         }
 
-        //ProDebug.Logger.LogError("ParentInfo:" + sb.ToString());
+        Debug.LogError("ParentInfo:" + sb);
     }
 
     private void NodeParameterChange(int nodeId, BehaviorParameter parameter, bool isAdd)

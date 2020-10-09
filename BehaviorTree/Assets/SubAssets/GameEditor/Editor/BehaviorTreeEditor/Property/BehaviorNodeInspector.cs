@@ -283,13 +283,6 @@ namespace BehaviorTree
                         judgeData = new IfJudgeData();
                         judgeData.nodeId = childId;
                         nodeValue.ifJudgeDataList.Add(judgeData);
-                        judgeData.ifJudegType = ((i == 0) ? (int)NodeIfJudgeEnum.IF : (int)NodeIfJudgeEnum.ACTION);
-
-                        if (i == 2)
-                        {
-                            IfJudgeData data = nodeValue.ifJudgeDataList[1];
-                            JudgeNodeChangeChildCondition(nodeValue, data.nodeId, (ResultType)data.ifResult);
-                        }
                     }
                     judgeData.ifJudegType = ((i == 0) ? (int)NodeIfJudgeEnum.IF : (int)NodeIfJudgeEnum.ACTION);
 
@@ -308,8 +301,12 @@ namespace BehaviorTree
                         if (judgeData.ifJudegType == (int)NodeIfJudgeEnum.ACTION)
                         {
                             string[] nameArr = new string[] { "Fail", "Success"};
+                            int oldValue = judgeData.ifResult;
                             int result = EditorGUILayout.Popup(new GUIContent("执行条件"), judgeData.ifResult, nameArr);
-                            JudgeNodeChangeChildCondition(nodeValue, judgeData.nodeId, (ResultType)result);
+                            if (oldValue != result)
+                            {
+                                JudgeNodeChangeChildCondition(nodeValue, judgeData.nodeId, (ResultType)result);
+                            }
                         }
 
                     }
