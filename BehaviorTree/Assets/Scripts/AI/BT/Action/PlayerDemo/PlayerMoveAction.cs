@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public interface IMove
-{
 
-    void Move(ref float speed, ref Vector3 position);
-
-}
 
 /// <summary>
 /// 行为节点：移动
@@ -34,7 +29,7 @@ public class PlayerMoveAction : ActionBase
 
         ResultType resultType = Move();
 
-        return ResultType.Success;
+        return resultType;
     }
 
     public override void OnExit()
@@ -73,10 +68,16 @@ public class PlayerMoveAction : ActionBase
 
         float speed = 0;
         Vector3 targetPos = Vector3.zero;
-        _iMove.Move(ref speed, ref targetPos);
+        float distance = 0;
+        _iMove.Move(ref speed, ref targetPos, ref distance);
+        if (Vector3.Distance(_baseSprite.Position, targetPos) <= distance)
+        {
+            return ResultType.Success;
+        }
+
         _baseSprite.Position = Vector3.MoveTowards(_baseSprite.Position, targetPos, speed * Time.deltaTime);
 
-        if (Vector3.Distance(_baseSprite.Position, targetPos) > 0.2f)
+        if (Vector3.Distance(_baseSprite.Position, targetPos) > distance)
         {
             return ResultType.Running;
         }

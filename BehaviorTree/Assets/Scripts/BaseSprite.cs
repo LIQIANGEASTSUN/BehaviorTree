@@ -2,52 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BTConstant
-{
-    /// <summary>
-    /// 活着
-    /// </summary>
-    public const string IsSurvial = "IsSurvial";
-
-    /// <summary>
-    /// 有敌人
-    /// </summary>
-    public const string HasEneny = "HasEneny";
-
-    /// <summary>
-    /// 能量值
-    /// </summary>
-    public const string Energy = "Energy";
-
-    /// <summary>
-    /// 能量最小值
-    /// </summary>
-    public const string EnergyMin = "EnergyMin";
-
-    /// <summary>
-    /// 目标类型：敌人、能量补给站、溜达目的自
-    /// </summary>
-    public const string TargetType = "TargetType";
-
-}
-
-public enum TargetTypeEnum
-{
-    /// <summary>
-    /// 敌人
-    /// </summary>
-    ENEMY = 0,
-
-    /// <summary>
-    /// 能量补给站
-    /// </summary>
-    ENERY_SUPPLY = 1,
-
-    /// <summary>
-    /// 巡逻地
-    /// </summary>
-    PATROL = 2,
-}
 
 public class BaseSprite : IBTNeedUpdate
 {
@@ -56,8 +10,7 @@ public class BaseSprite : IBTNeedUpdate
     public GameObject SpriteGameObject;
 
     public float _energy;
-    public const float _energyMin = 10;
-
+    public float _energyFull = 100;
     public Npc _enemyNpc = null;
 
     private string _btConfigFileName = "Player";
@@ -70,24 +23,20 @@ public class BaseSprite : IBTNeedUpdate
     public void Init(Vector3 position)
     {
         SpriteGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        SpriteGameObject.name = "BaseSprite";
         SpriteGameObject.transform.localScale = Vector3.one;
         SpriteGameObject.transform.position = position;
-
-        //_energy = 100;
 
         _bt = new BTConcrete(_btConfigFileName);
         _bt.SetOwner(this);
 
         _bt.UpdateParameter(BTConstant.IsSurvial, true);
+
+        BTBase.UpdateParameter(BTConstant.Energy, Energy());
     }
 
     public void Update()
     {
-
-        if (null != BTBase)
-        {
-            BTBase.UpdateParameter(BTConstant.Energy, Energy());
-        }
 
     }
 
@@ -101,16 +50,45 @@ public class BaseSprite : IBTNeedUpdate
         return true;
     }
 
+    #region Energy
     public float Energy()
     {
         return _energy;
     }
 
+    public bool ReplenishEnergy(float vlaue)
+    {
+        _energy += vlaue;
+        _energy = Mathf.Min(_energy, _energyFull);
+        return _energy >= _energyFull;
+    }
+
+    public void SubEnergy(float value)
+    {
+        _energy -= value;
+        BTBase.UpdateParameter(BTConstant.Energy, Energy());
+    }
+
+    #endregion
+
+    #region Enemy
     public Npc Enemy
     {
         get { return _enemyNpc; }
         set { _enemyNpc = value; }
     }
+
+    private IMove _moveFollowEnemy;
+    private IMove MoveEnemy()
+    {
+        if (null == _moveFollowEnemy)
+        {
+            _moveFollowEnemy = new SpriteFollowEnemy(this);
+        }
+        return _moveFollowEnemy;
+    }
+
+    #endregion
 
     public Vector3 Position
     {
@@ -126,20 +104,41 @@ public class BaseSprite : IBTNeedUpdate
 
     public IMove GetIMove(TargetTypeEnum targetType)
     {
+        IMove iMove = null;
         if (targetType == TargetTypeEnum.ENEMY)
         {
-
+            iMove = MoveEnemy();
         }
         else if (targetType == TargetTypeEnum.ENERY_SUPPLY)
         {
-
+            iMove = EnergyStation.GetInstance();
         }
         else if (targetType == TargetTypeEnum.PATROL)
         {
-
         }
 
-        return null;
+        return iMove;
     }
 
+}
+
+
+public class SpriteFollowEnemy : IMove
+{
+    private BaseSprite _sprite;
+    public SpriteFollowEnemy(BaseSprite sprite)
+    {
+        _sprite = sprite;
+    }
+
+    public void Move(ref float speed, ref Vector3 position, ref float distance)
+    {
+        speed = 3;
+        position = Vector3.zero;
+        if (null != _sprite.Enemy)
+        {
+            position = _sprite.Enemy.Position();
+        }
+        distance = 2f;
+    }
 }

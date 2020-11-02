@@ -8,6 +8,7 @@ using BehaviorTree;
 /// </summary>
 public class PlayerSearchEnemyAction : ActionBase
 {
+
     public override void OnEnter()
     {
         base.OnEnter();
@@ -16,6 +17,9 @@ public class PlayerSearchEnemyAction : ActionBase
     public override ResultType DoAction()
     {
         bool result = SearchEnemy();
+
+        _owner.BTBase.UpdateParameter(BTConstant.HasEneny, result);
+
         if (!result)
         {
             return ResultType.Fail;

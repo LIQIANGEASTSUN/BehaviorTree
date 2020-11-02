@@ -17,11 +17,17 @@ public class PlayerReplenishEnergyAction : ActionBase
 
     public override ResultType DoAction()
     {
-        return ResultType.Success;
+        float value = EnergyStation.GetInstance().Execute();
+        bool isDone = _baseSprite.ReplenishEnergy(value);
+
+        ResultType resultType = isDone ? ResultType.Success : ResultType.Running;
+
+        return resultType;
     }
 
     public override void OnExit()
     {
         base.OnExit();
+        _baseSprite.BTBase.UpdateParameter(BTConstant.Energy, _baseSprite.Energy());
     }
 }

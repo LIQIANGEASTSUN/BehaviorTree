@@ -15,4 +15,9 @@ public class Npc : MonoBehaviour
     {
         
     }
+
+    public Vector3 Position()
+    {
+        return transform.position;
+    }
 }

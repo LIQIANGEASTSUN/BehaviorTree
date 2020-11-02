@@ -3,15 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public enum DecisionReason
-{
-    BySelfWhenIdle = 1, //IDLE下的自身决策
-    Opreation = 2, //玩家操作 点击，拖拽
-    MissionAlloc = 3,  //任务决策，双击某物品产生的任务
-    TargetReason = 4, //目标丢失 或者 目标被打断
-    PreTaskDone = 5, //之前的任务正常完成
-}
-
 public class BTConcrete : BTBase, IBTActionOwner
 {
     private BaseSprite _owner;

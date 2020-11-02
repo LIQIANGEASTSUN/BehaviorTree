@@ -37,5 +37,7 @@ public class TestAI : MonoBehaviour
         }
 
         _spriteBTUpdateManager.Update();
+
+        BulletManager.GetInstance().Update();
     }
 }
