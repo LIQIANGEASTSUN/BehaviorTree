@@ -8,6 +8,7 @@ public class BaseSprite : IBTNeedUpdate
     private int _spriteId;
     private BTConcrete _bt;
     public GameObject SpriteGameObject;
+    private TextMesh _textMesh;
 
     public float _energy;
     public float _energyFull = 100;
@@ -22,10 +23,14 @@ public class BaseSprite : IBTNeedUpdate
 
     public void Init(Vector3 position)
     {
-        SpriteGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        GameObject go = Resources.Load<GameObject>("BaseSprite");
+        SpriteGameObject = GameObject.Instantiate<GameObject>(go);
         SpriteGameObject.name = "BaseSprite";
         SpriteGameObject.transform.localScale = Vector3.one;
         SpriteGameObject.transform.position = position;
+
+        Transform textTr = SpriteGameObject.transform.Find("Text");
+        _textMesh = textTr.gameObject.GetComponent<TextMesh>();
 
         _bt = new BTConcrete(_btConfigFileName);
         _bt.SetOwner(this);
@@ -48,6 +53,11 @@ public class BaseSprite : IBTNeedUpdate
     public bool CanRunningBT()
     {
         return true;
+    }
+
+    public void SetText(string msg)
+    {
+        _textMesh.text = msg;
     }
 
     #region Energy
@@ -87,7 +97,23 @@ public class BaseSprite : IBTNeedUpdate
         }
         return _moveFollowEnemy;
     }
+    #endregion
 
+    #region Patrol
+    private Patrol _patrol;
+    private IMove PatrolMove()
+    {
+        if (null == _patrol)
+        {
+            _patrol = new Patrol();
+        }
+        return _patrol;
+    }
+
+    public void ChangePatrolPos()
+    {
+        (PatrolMove() as Patrol).ResetPos();
+    }
     #endregion
 
     public Vector3 Position
@@ -115,6 +141,7 @@ public class BaseSprite : IBTNeedUpdate
         }
         else if (targetType == TargetTypeEnum.PATROL)
         {
+            iMove = PatrolMove();
         }
 
         return iMove;
@@ -139,6 +166,31 @@ public class SpriteFollowEnemy : IMove
         {
             position = _sprite.Enemy.Position();
         }
-        distance = 2f;
+        distance = 5f;
+    }
+}
+
+
+partial class Patrol : IMove
+{
+    private Vector3 _position;
+
+    public Patrol()
+    {
+
+    }
+
+    public void ResetPos()
+    {
+        float x = UnityEngine.Random.Range(-10, 10);
+        float z = UnityEngine.Random.Range(-10, 10);
+        _position = new Vector3(x, 0, z);
+    }
+
+    public void Move(ref float speed, ref Vector3 position, ref float distance)
+    {
+        speed = 1;
+        position = _position;
+        distance = 0.5f;
     }
 }

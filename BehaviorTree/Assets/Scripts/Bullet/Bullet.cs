@@ -28,16 +28,36 @@ public class Bullet
 
     public void Update()
     {
+        if (null == _bulletData.target)
+        {
+            _isValid = false;
+            Destroy();
+            return;
+        }
+
         Vector3 forward = (_bulletData.target.position - _go.transform.position).normalized;
         _go.transform.position += forward * Time.deltaTime;
         if (Vector3.Distance(_go.transform.position, _bulletData.target.position) <= 0.2f)
         {
             _isValid = false;
+            Damage();
             Destroy();
         }
     }
 
-    public void Destroy()
+    private void Damage()
+    {
+        GameObject npcGo = GameObject.Find("Npc");
+        if (!npcGo)
+        {
+            return;
+        }
+
+        Npc npc = npcGo.GetComponent<Npc>();
+        npc.BeDamage(_bulletData.damage);
+    }
+
+    private void Destroy()
     {
         GameObject.Destroy(_go);
     }

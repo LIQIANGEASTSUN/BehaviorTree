@@ -12,12 +12,16 @@ public class PlayerMoveAction : ActionBase
 {
     private BaseSprite _baseSprite;
     private IMove _iMove;
+    private TargetTypeEnum _targetType = TargetTypeEnum.ENEMY;
 
     public override void OnEnter()
     {
         base.OnEnter();
         _baseSprite = _owner;
         GetIMove();
+
+        string msg = string.Format("GoTo:{0}", System.Enum.GetName(typeof(TargetTypeEnum), _targetType));
+        _baseSprite.SetText(msg);
     }
 
     public override ResultType DoAction()
@@ -39,14 +43,13 @@ public class PlayerMoveAction : ActionBase
 
     private void GetIMove()
     {
-        int targetType = 0;
         bool result = false;
         for (int i = 0; i < _parameterList.Count; ++i)
         {
             BehaviorParameter parameter = _parameterList[i];
             if (parameter.parameterName.CompareTo(BTConstant.TargetType) == 0)
             {
-                targetType = parameter.intValue;
+                _targetType = (TargetTypeEnum)parameter.intValue;
                 result = true;
             }
         }
@@ -56,7 +59,7 @@ public class PlayerMoveAction : ActionBase
             return;
         }
 
-        _iMove = _owner.GetIMove((TargetTypeEnum)targetType);
+        _iMove = _owner.GetIMove(_targetType);
     }
 
     private ResultType Move()

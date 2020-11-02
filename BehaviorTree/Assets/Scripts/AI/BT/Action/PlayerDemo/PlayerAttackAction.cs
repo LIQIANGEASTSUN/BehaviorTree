@@ -13,10 +13,20 @@ public class PlayerAttackAction : ActionBase
     public override void OnEnter()
     {
         base.OnEnter();
+
+        string msg = "Attack Enemy";
+        _owner.SetText(msg);
     }
 
     public override ResultType DoAction()
     {
+        if (null == _owner.Enemy)
+        {
+            return ResultType.Fail;
+        }
+
+        _owner.SubEnergy(0.01f);
+
         if (Time.realtimeSinceStartup - _lastAttackTime <= _attackInterval)
         {
             return ResultType.Running;
@@ -26,7 +36,7 @@ public class PlayerAttackAction : ActionBase
         BulletData bulletData = new BulletData();
         bulletData.startPos = _owner.Position;
         bulletData.target = _owner.Enemy.transform;
-        bulletData.speed = 1;
+        bulletData.speed = 2.8f;
         bulletData.damage = 5;
         BulletManager.GetInstance().AddBullet(bulletData);
 

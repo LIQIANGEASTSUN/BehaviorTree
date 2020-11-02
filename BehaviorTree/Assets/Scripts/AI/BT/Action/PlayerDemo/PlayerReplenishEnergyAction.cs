@@ -13,6 +13,9 @@ public class PlayerReplenishEnergyAction : ActionBase
     {
         base.OnEnter();
         _baseSprite = _owner;
+
+        string msg = "ReplenishEnergy";
+        _owner.SetText(msg);
     }
 
     public override ResultType DoAction()
