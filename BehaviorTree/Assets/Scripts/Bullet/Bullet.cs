@@ -36,7 +36,7 @@ public class Bullet
         }
 
         Vector3 forward = (_bulletData.target.position - _go.transform.position).normalized;
-        _go.transform.position += forward * Time.deltaTime;
+        _go.transform.position += _bulletData.speed * forward * Time.deltaTime;
         if (Vector3.Distance(_go.transform.position, _bulletData.target.position) <= 0.2f)
         {
             _isValid = false;

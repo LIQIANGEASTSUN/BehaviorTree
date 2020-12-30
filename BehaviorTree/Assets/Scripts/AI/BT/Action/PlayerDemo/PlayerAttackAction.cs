@@ -36,7 +36,7 @@ public class PlayerAttackAction : ActionBase
         BulletData bulletData = new BulletData();
         bulletData.startPos = _owner.Position;
         bulletData.target = _owner.Enemy.transform;
-        bulletData.speed = 2.8f;
+        bulletData.speed = 5f;
         bulletData.damage = 5;
         BulletManager.GetInstance().AddBullet(bulletData);
 
