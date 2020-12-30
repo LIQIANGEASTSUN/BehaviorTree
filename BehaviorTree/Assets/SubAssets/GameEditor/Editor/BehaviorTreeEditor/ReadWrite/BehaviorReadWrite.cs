@@ -92,7 +92,7 @@ namespace BehaviorTree
                 nodeValue.subTreeEntry = bool.Parse(item["subTreeEntry"].ToString());
                 nodeValue.subTreeType = int.Parse(item["subTreeType"].ToString());
                 nodeValue.subTreeConfig = item["subTreeConfig"].ToString();
-                //nodeValue.subTreeValue = long.Parse(item["subTreeValue"].ToString());
+                nodeValue.subTreeValue = long.Parse(item["subTreeValue"].ToString());
 
                 nodeList.Add(nodeValue);
             }

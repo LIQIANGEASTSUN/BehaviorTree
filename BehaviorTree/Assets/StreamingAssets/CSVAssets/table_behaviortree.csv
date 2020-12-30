@@ -1,0 +1,6 @@
+ID,EnName,CnName,Type,FloatValue,IntValue,LongValue,BoolValue,StringValue
+1,IsSurvial,Player/活着,5,0,0,0,0,
+2,HasEneny,Player/有敌人,5,0,0,0,0,
+3,Energy,Player/能量值,0,0,0,0,0,
+4,EnergyMin,Player/能量最小值,0,0,0,0,0,
+5,TargetType,Player/目标类型：敌人、能量补给站、溜达目的地,2,0,0,0,0,

@@ -20,6 +20,12 @@ public class BehaviorData
         string content = System.Text.Encoding.Default.GetString(byteData);
         BehaviorTreeData behaviorTreeData = JsonMapper.ToObject<BehaviorTreeData>(content);
         _behaviorDic[behaviorTreeData.fileName] = behaviorTreeData;
+
+        for (int i = 0; i < behaviorTreeData.nodeList.Count; ++i)
+        {
+            NodeValue nodeValue = behaviorTreeData.nodeList[i];
+            behaviorTreeData.nodeDic.Add(nodeValue.id, nodeValue);
+        }
     }
 
     public BehaviorTreeData GetBehaviorInfo(string handleFile)

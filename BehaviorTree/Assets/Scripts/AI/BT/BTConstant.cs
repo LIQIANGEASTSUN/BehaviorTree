@@ -21,7 +21,7 @@
     public const string EnergyMin = "EnergyMin";
 
     /// <summary>
-    /// 目标类型：敌人、能量补给站、溜达目的自
+    /// 目标类型：敌人、能量补给站、溜达目的地
     /// </summary>
     public const string TargetType = "TargetType";
 

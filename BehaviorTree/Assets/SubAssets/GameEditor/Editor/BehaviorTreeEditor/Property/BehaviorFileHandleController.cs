@@ -121,9 +121,9 @@ namespace BehaviorTree
 
         private static void UpdateAllFile(string filePath)
         {
-            TableRead.Instance.Init();
-            string csvPath = string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
-            TableRead.Instance.ReadCustomPath(csvPath);
+            //TableRead.Instance.Init();
+            //string csvPath = string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            //TableRead.Instance.ReadCustomPath(csvPath);
 
 
             DirectoryInfo dInfo = new DirectoryInfo(filePath);
