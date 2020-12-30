@@ -9,16 +9,21 @@ public class BTConcrete : BTBase, IBTActionOwner
     private BehaviorTreeData _data;
     private BehaviorTreeDebug _behaviorTreeDebug;
     
-    public BTConcrete(string aiConfig)
+    public BTConcrete(BaseSprite owner, long aiFunction, string aiConfig)
     {
+        _owner = owner;
         _data = DataCenter.behaviorData.GetBehaviorInfo(aiConfig);
-        SetData(_data, DataCenter.behaviorData.GetBehaviorInfo);
+        if (null == _data)
+        {
+            Debug.LogError("AIConfig not find:" + aiConfig);
+        }
+        SetData(aiFunction, _data, DataCenter.behaviorData.GetBehaviorInfo);
+        Init(_owner);
     }
 
     public void SetOwner(BaseSprite owner)
     {
         _owner = owner;
-        Init();
     }
 
     public virtual BaseSprite GetOwner()
@@ -26,28 +31,9 @@ public class BTConcrete : BTBase, IBTActionOwner
         return _owner;
     }
 
-    private void Init()
+    protected override void Init(BaseSprite owner)
     {
-        for (int i = 0; i < _btEntity.ActionNodeList.Count; ++i)
-        {
-            NodeAction action = _btEntity.ActionNodeList[i];
-            ActionBase actionBase = action as ActionBase;
-            if (null != actionBase)
-            {
-                actionBase.SetOwner(_owner);
-            }
-        }
-
-        for (int i = 0; i < _btEntity.ConditionNodeList.Count; ++i)
-        {
-            NodeCondition condition = _btEntity.ConditionNodeList[i];
-            ConditionBase conditionBase = condition as ConditionBase;
-            if (null != conditionBase)
-            {
-                conditionBase.SetOwner(_owner);
-            }
-        }
-
+        base.Init(owner);
         if (null == _behaviorTreeDebug && _owner.SpriteGameObject)
         {
             _behaviorTreeDebug = _owner.SpriteGameObject.AddComponent<BehaviorTreeDebug>();

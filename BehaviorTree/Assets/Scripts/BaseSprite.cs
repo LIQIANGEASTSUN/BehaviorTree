@@ -32,9 +32,7 @@ public class BaseSprite : IBTNeedUpdate
         Transform textTr = SpriteGameObject.transform.Find("Text");
         _textMesh = textTr.gameObject.GetComponent<TextMesh>();
 
-        _bt = new BTConcrete(_btConfigFileName);
-        _bt.SetOwner(this);
-
+        _bt = new BTConcrete(this, long.MaxValue, _btConfigFileName);
         _bt.UpdateParameter(BTConstant.IsSurvial, true);
 
         BTBase.UpdateParameter(BTConstant.Energy, Energy());

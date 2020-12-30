@@ -2,10 +2,9 @@
 using System;
 namespace BehaviorTree
 {
-
     public class ConfigBehaviorNode
     {
-        private Action<CustomIdentification> ConfigEvent;
+        private Action<ICustomIdentification<NodeLeaf>> ConfigEvent;
      
         public void Init()
         {
@@ -30,22 +29,21 @@ namespace BehaviorTree
             Config<NodeConditionCustom>("通用条件节点");
         }
 
-        private void Config<T>(string name)
+        private void Config<T>(string name) where T : NodeLeaf, new()
         {
-            CustomIdentification customIdentification = new CustomIdentification(name, typeof(T));
-
+            ICustomIdentification<NodeLeaf> customIdentification = new CustomIdentification<T>(name, typeof(T));
             if (null != ConfigEvent)
             {
                 ConfigEvent(customIdentification);
             }
         }
 
-        public void AddEvent(Action<CustomIdentification> callBack)
+        public void AddEvent(Action<ICustomIdentification<NodeLeaf>> callBack)
         {
             ConfigEvent += callBack;
         }
 
-        public void RemoveEvent(Action<CustomIdentification> callBack)
+        public void RemoveEvent(Action<ICustomIdentification<NodeLeaf>> callBack)
         {
             ConfigEvent -= callBack;
         }

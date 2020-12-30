@@ -6,10 +6,11 @@ namespace BehaviorTree
     /// 叶节点
     /// </summary>
     [System.Serializable]
-    public abstract class NodeLeaf : NodeBase
+    public class NodeLeaf : NodeBase
     {
-        public NodeLeaf(NODE_TYPE nodeType):base(nodeType)
-        { }
+        public NodeLeaf():base()
+        {
+        }
 
         public override ResultType Execute()
         {

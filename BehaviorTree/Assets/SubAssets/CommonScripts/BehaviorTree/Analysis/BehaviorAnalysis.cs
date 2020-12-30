@@ -11,143 +11,84 @@ namespace BehaviorTree
     public class BehaviorAnalysis
     {
         private LoadConfigInfoEvent _loadConfigInfoEvent;
-        private Dictionary<string, BehaviorTreeData> _subTreeDataDic = new Dictionary<string, BehaviorTreeData>();
 
-        public BehaviorAnalysis()
-        {
-
-        }
+        public BehaviorAnalysis() {       }
 
         public void SetLoadConfigEvent(LoadConfigInfoEvent loadEvent)
         {
             _loadConfigInfoEvent = loadEvent;
         }
 
-        public NodeBase Analysis(BehaviorTreeData data, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack, Action<NodeCondition> ConditionNodeCallBack)
+        public NodeBase Analysis(long aiFunction, BehaviorTreeData data, IConditionCheck iConditionCheck, Action<int> InvalidSubTreeCallBack)
         {
             NodeBase rootNode = null;
-            if (null == data)
+            if (null == data || data.rootNodeId < 0)
             {
                 //ProDebug.Logger.LogError("数据无效");
                 return rootNode;
             }
 
-            _subTreeDataDic.Clear();
-
-            List<BehaviorParameter> parameteList = new List<BehaviorParameter>();
-            parameteList.AddRange(data.parameterList);
-
-            for (int i = 0; i < data.nodeList.Count; ++i)
-            {
-                NodeValue nodeValue = data.nodeList[i];
-                if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
-                {
-                    if (null != _loadConfigInfoEvent)
-                    {
-                        BehaviorTreeData subTreeData = _loadConfigInfoEvent(nodeValue.subTreeConfig);
-                        if (null == subTreeData)
-                        {
-                            Debug.LogError("SubTreeData is null:" + nodeValue.subTreeConfig);
-                            continue;
-                        }
-                        _subTreeDataDic[nodeValue.subTreeConfig] = subTreeData;
-
-                        parameteList.AddRange(subTreeData.parameterList);
-                    }
-                }
-            }
-
-            iConditionCheck.AddParameter(parameteList);
+            iConditionCheck.AddParameter(data.parameterList);
 
             int entityId = NewEntityId;
-            rootNode = Analysis(entityId, data, iConditionCheck, ActionNodeCallBack, ConditionNodeCallBack);
+            rootNode = AnalysisNode(entityId, aiFunction, data, data.rootNodeId, iConditionCheck, InvalidSubTreeCallBack);
 
-            _subTreeDataDic.Clear();
             return rootNode;
         }
 
-        private NodeBase Analysis(int entityId, BehaviorTreeData data, IConditionCheck iConditionCheck, Action<NodeAction> ActionNodeCallBack, Action<NodeCondition> ConditionNodeCallBack)
+        private NodeBase AnalysisNode(int entityId, long aiFunction, BehaviorTreeData data, int nodeId, IConditionCheck iConditionCheck, Action<int> InvalidSubTreeCallBack)
         {
-            NodeBase rootNode = null;
-
-            if (null == data)
+            NodeValue nodeValue = null;
+            if (!data.nodeDic.TryGetValue(nodeId, out nodeValue))
             {
-                //ProDebug.Logger.LogError("数据无效");
-                return rootNode;
+                return null;
             }
 
-            if (data.rootNodeId < 0)
+            if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeValue > 0)
             {
-                //ProDebug.Logger.LogError("没有跟节点");
-                return rootNode;
-            }
-
-            Dictionary<int, NodeBase> compositeDic = new Dictionary<int, NodeBase>();
-            Dictionary<int, NodeBase> allNodeDic = new Dictionary<int, NodeBase>();
-            Dictionary<int, List<int>> childDic = new Dictionary<int, List<int>>();
-            for (int i = 0; i < data.nodeList.Count; ++i)
-            {
-                NodeValue nodeValue = data.nodeList[i];
-                NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
-                nodeBase.NodeId = nodeValue.id;
-                nodeBase.EntityId = entityId;
-                nodeBase.Priority = nodeValue.priority;
-
-                if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+                if ((aiFunction & nodeValue.subTreeValue) <= 0)
                 {
-                    BehaviorTreeData subTreeData = null;
-                    if (_subTreeDataDic.TryGetValue(nodeValue.subTreeConfig, out subTreeData))
+                    InvalidSubTreeCallBack?.Invoke(nodeValue.id);
+                    return null;
+                }
+            }
+
+            UnityEngine.Profiling.Profiler.BeginSample("AnalysisNode CreateNode");
+            NodeBase nodeBase = AnalysisNode(nodeValue, iConditionCheck);
+            nodeBase.NodeId = nodeValue.id;
+            nodeBase.EntityId = entityId;
+            nodeBase.Priority = nodeValue.priority;
+            UnityEngine.Profiling.Profiler.EndSample();
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
+            {
+                BehaviorTreeData subTreeData = _loadConfigInfoEvent(nodeValue.subTreeConfig);
+                if (null != subTreeData)
+                {
+                    NodeBase subTreeNode = Analysis(entityId, subTreeData, iConditionCheck, InvalidSubTreeCallBack);
+                    NodeComposite composite = (NodeComposite)(nodeBase);
+                    composite.AddNode(subTreeNode);
+                    iConditionCheck.AddParameter(subTreeData.parameterList);
+                }
+            }
+
+            UnityEngine.Profiling.Profiler.BeginSample("AnalysisNode IsLeafNode");
+            if (!IsLeafNode(nodeValue.NodeType))
+            {
+                NodeComposite composite = (NodeComposite)nodeBase;
+                for (int i = 0; i < nodeValue.childNodeList.Count; ++i)
+                {
+                    int childNodeId = nodeValue.childNodeList[i];
+                    NodeBase childNode = AnalysisNode(entityId, aiFunction, data, childNodeId, iConditionCheck, InvalidSubTreeCallBack);
+                    if (null != childNode)
                     {
-                        NodeBase subTreeNode = Analysis(entityId, subTreeData, iConditionCheck, ActionNodeCallBack, ConditionNodeCallBack);
-                        NodeComposite composite = (NodeComposite)(nodeBase);
-                        composite.AddNode(subTreeNode);
+                        composite.AddNode(childNode);
                     }
                 }
-
-                if (!IsLeafNode(nodeValue.NodeType))
-                {
-                    compositeDic[nodeValue.id] = nodeBase;
-                    childDic[nodeValue.id] = nodeValue.childNodeList;
-
-                    if (data.rootNodeId == nodeValue.id)
-                    {
-                        rootNode = nodeBase;
-                    }
-                }
-
-                if (nodeValue.NodeType == (int)NODE_TYPE.ACTION && null != ActionNodeCallBack)
-                {
-                    ActionNodeCallBack((NodeAction)nodeBase);
-                }
-
-                if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION && null != ConditionNodeCallBack)
-                {
-                    ConditionNodeCallBack((NodeCondition)nodeBase);
-                }
-
-                allNodeDic[nodeValue.id] = nodeBase;
             }
+            UnityEngine.Profiling.Profiler.EndSample();
 
-            foreach (var kv in compositeDic)
-            {
-                int id = kv.Key;
-                NodeComposite composite = (NodeComposite)(kv.Value);
-
-                List<int> childList = childDic[id];
-                for (int i = 0; i < childList.Count; ++i)
-                {
-                    int nodeId = childList[i];
-                    NodeBase childNode = allNodeDic[nodeId];
-                    if (null == childNode)
-                    {
-                        //ProDebug.Logger.LogError("null node :" + nodeId);
-                        continue;
-                    }
-                    composite.AddNode(childNode);
-                }
-            }
-
-            return rootNode;
+            return nodeBase;
         }
 
         private bool IsLeafNode(int type)
@@ -157,82 +98,6 @@ namespace BehaviorTree
 
         private NodeBase AnalysisNode(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
-            NodeBase node = null;
-            if (nodeValue.NodeType == (int)NODE_TYPE.SELECT)  // 选择节点
-            {
-                return GetSelect(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.SEQUENCE)  // 顺序节点
-            {
-                return GetSequence(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM)  // 随机节点
-            {
-                return GetRandom(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM_SEQUEUECE)// 随机顺序节点
-            {
-                return GetRandomSequence(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM_PRIORITY) // 随机权重节点
-            {
-                return GetRandomPriority(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL)  // 并行节点
-            {
-                return GetParallel(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL_SELECT)// 并行选择节点
-            {
-                return GetParallelSelect(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL_ALL)   // 并行执行所有节点
-            {
-                return GetParallelAll(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.IF_JUDEG)       // 判断节点
-            {
-                return GetIfJudge(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_INVERTER)  // 修饰节点_取反
-            {
-                return GetInverter(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_REPEAT)  // 修饰节点_重复
-            {
-                return GetRepeat(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_RETURN_FAIL)  // 修饰节点_返回Fail
-            {
-                return GetReturenFail(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_RETURN_SUCCESS)  // 修饰节点_返回Success
-            {
-                return GetReturnSuccess(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_UNTIL_FAIL)  // 修饰节点_直到Fail
-            {
-                return GetUntilFail(nodeValue);
-            }
-
-            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_UNTIL_SUCCESS)  // 修饰节点_直到Success
-            {
-                return GetUntilSuccess(nodeValue);
-            }
-
             if (nodeValue.NodeType == (int)NODE_TYPE.CONDITION)  // 条件节点
             {
                 return GetCondition(nodeValue, iConditionCheck);
@@ -245,49 +110,124 @@ namespace BehaviorTree
 
             if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE) // 子树
             {
-                return GetSubTree(nodeValue);
+                return GetSubTree();
             }
 
-            return node;
+            if (nodeValue.NodeType == (int)NODE_TYPE.SELECT)  // 选择节点
+            {
+                return GetSelect();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.SEQUENCE)  // 顺序节点
+            {
+                return GetSequence();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL)  // 并行节点
+            {
+                return GetParallel();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL_SELECT)// 并行选择节点
+            {
+                return GetParallelSelect();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.PARALLEL_ALL)   // 并行执行所有节点
+            {
+                return GetParallelAll();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.IF_JUDEG)       // 判断节点
+            {
+                return GetIfJudge(nodeValue);
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM)  // 随机节点
+            {
+                return GetRandom();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM_SEQUEUECE)// 随机顺序节点
+            {
+                return GetRandomSequence();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.RANDOM_PRIORITY) // 随机权重节点
+            {
+                return GetRandomPriority();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_INVERTER)  // 修饰节点_取反
+            {
+                return GetInverter();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_REPEAT)  // 修饰节点_重复
+            {
+                return GetRepeat(nodeValue);
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_RETURN_FAIL)  // 修饰节点_返回Fail
+            {
+                return GetReturenFail();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_RETURN_SUCCESS)  // 修饰节点_返回Success
+            {
+                return GetReturnSuccess();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_UNTIL_FAIL)  // 修饰节点_直到Fail
+            {
+                return GetUntilFail();
+            }
+
+            if (nodeValue.NodeType == (int)NODE_TYPE.DECORATOR_UNTIL_SUCCESS)  // 修饰节点_直到Success
+            {
+                return GetUntilSuccess();
+            }
+
+            return null;
         }
 
-        public NodeSelect GetSelect(NodeValue nodeValue)
+        public NodeSelect GetSelect()
         {
             NodeSelect nodeSelect = new NodeSelect();
             return nodeSelect;
         }
 
-        public NodeSequence GetSequence(NodeValue nodeValue)
+        public NodeSequence GetSequence()
         {
             NodeSequence nodeSequence = new NodeSequence();
             return nodeSequence;
         }
 
-        public NodeRandom GetRandom(NodeValue nodeValue)
+        public NodeRandom GetRandom()
         {
             NodeRandom nodeRandom = new NodeRandom();
             return nodeRandom;
         }
 
-        public NodeRandomSequence GetRandomSequence(NodeValue nodeValue)
+        public NodeRandomSequence GetRandomSequence()
         {
             NodeRandomSequence randomSequence = new NodeRandomSequence();
             return randomSequence;
         }
 
-        public NodeParallel GetParallel(NodeValue nodeValue)
+        public NodeParallel GetParallel()
         {
             NodeParallel nodeParallel = new NodeParallel();
             return nodeParallel;
         }
 
-        public NodeParallelSelect GetParallelSelect(NodeValue nodeValue)
+        public NodeParallelSelect GetParallelSelect()
         {
             NodeParallelSelect nodeParallelSelect = new NodeParallelSelect();
             return nodeParallelSelect;
         }
 
-        public NodeParallelAll GetParallelAll(NodeValue nodeValue)
+        public NodeParallelAll GetParallelAll()
         {
             NodeParallelAll nodeParallelAll = new NodeParallelAll();
             return nodeParallelAll;
@@ -296,17 +236,17 @@ namespace BehaviorTree
         private NodeIfJudge GetIfJudge(NodeValue nodeValue)
         {
             NodeIfJudge ifJudge = new NodeIfJudge();
-            ifJudge.SetData(nodeValue.ifJudgeDataList.ToArray());
+            ifJudge.SetData(nodeValue.ifJudgeDataList);
             return ifJudge;
         }
 
-        public NodeRandomPriority GetRandomPriority(NodeValue nodeValue)
+        public NodeRandomPriority GetRandomPriority()
         {
             NodeRandomPriority nodeRandomPriority = new NodeRandomPriority();
             return nodeRandomPriority;
         }
 
-        public NodeDecoratorInverter GetInverter(NodeValue nodeValue)
+        public NodeDecoratorInverter GetInverter()
         {
             NodeDecoratorInverter inverter = new NodeDecoratorInverter();
             return inverter;
@@ -319,25 +259,25 @@ namespace BehaviorTree
             return repeat;
         }
 
-        public NodeDecoratorReturnFail GetReturenFail(NodeValue nodeValue)
+        public NodeDecoratorReturnFail GetReturenFail()
         {
             NodeDecoratorReturnFail returnFail = new NodeDecoratorReturnFail();
             return returnFail;
         }
 
-        public NodeDecoratorReturnSuccess GetReturnSuccess(NodeValue nodeValue)
+        public NodeDecoratorReturnSuccess GetReturnSuccess()
         {
             NodeDecoratorReturnSuccess returnSuccess = new NodeDecoratorReturnSuccess();
             return returnSuccess;
         }
 
-        public NodeDecoratorUntilFail GetUntilFail(NodeValue nodeValue)
+        public NodeDecoratorUntilFail GetUntilFail()
         {
             NodeDecoratorUntilFail untilFail = new NodeDecoratorUntilFail();
             return untilFail;
         }
 
-        public NodeDecoratorUntilSuccess GetUntilSuccess(NodeValue nodeValue)
+        public NodeDecoratorUntilSuccess GetUntilSuccess()
         {
             NodeDecoratorUntilSuccess untilSuccess = new NodeDecoratorUntilSuccess();
             return untilSuccess;
@@ -345,24 +285,28 @@ namespace BehaviorTree
 
         public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
+            UnityEngine.Profiling.Profiler.BeginSample("GetCondition1");
             NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identificationName);
+            UnityEngine.Profiling.Profiler.EndSample();
+
             condition.SetData(nodeValue.parameterList, nodeValue.conditionGroupList);
             condition.SetConditionCheck(iConditionCheck);
+
             return condition;
         }
 
         public NodeAction GetAction(NodeValue nodeValue)
         {
+            UnityEngine.Profiling.Profiler.BeginSample("GetAction");
+
             NodeAction action = (NodeAction)CustomNode.Instance.GetNode(nodeValue.identificationName);
-            if (null == action)
-            {
-                Debug.LogError(nodeValue.id);
-            }
             action.SetParameters(nodeValue.parameterList);
+            UnityEngine.Profiling.Profiler.EndSample();
+
             return action;
         }
 
-        public NodeSubTree GetSubTree(NodeValue nodeValue)
+        public NodeSubTree GetSubTree()
         {
             NodeSubTree subTree = new NodeSubTree();
             return subTree;

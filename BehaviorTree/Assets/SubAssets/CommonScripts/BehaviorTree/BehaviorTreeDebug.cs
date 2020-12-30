@@ -9,7 +9,7 @@ public class BehaviorTreeDebug : MonoBehaviour
     private BehaviorTreeEntity _entity;
 
     public delegate void BehaviorTreeDebugEvent(BehaviorTreeData behaviorTreeData, BehaviorTreeEntity entity);
-    public static BehaviorTreeDebugEvent _treeDebugEvent;
+    private static BehaviorTreeDebugEvent _treeDebugEvent;
 
     private void Awake()
     {
@@ -37,11 +37,5 @@ public class BehaviorTreeDebug : MonoBehaviour
     public static void RemoveTreeDebugEvent(BehaviorTreeDebugEvent treeDebugEvent)
     {
         _treeDebugEvent -= treeDebugEvent;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

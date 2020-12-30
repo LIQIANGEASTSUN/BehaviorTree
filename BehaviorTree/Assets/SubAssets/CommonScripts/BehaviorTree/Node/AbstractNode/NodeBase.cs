@@ -33,9 +33,18 @@ namespace BehaviorTree
 
         protected NODE_STATUS nodeStatus = NODE_STATUS.READY;
 
-        public NodeBase(NODE_TYPE nodeType)
+        public NodeBase()
+        {
+        }
+
+        protected void SetNodeType(NODE_TYPE nodeType)
         {
             this.nodeType = nodeType;
+        }
+
+        public NODE_TYPE NodeType
+        {
+            get { return nodeType; }
         }
 
         public int NodeIndex
@@ -67,7 +76,7 @@ namespace BehaviorTree
         /// </summary>
         public virtual void OnEnter()
         {
-            //ProDebug.Logger.LogError("OnEnter:" + NodeId);
+            ////ProDebug.Logger.LogError("OnEnter:" + NodeId);
         }
 
         /// <summary>
@@ -81,7 +90,7 @@ namespace BehaviorTree
         /// </summary>
         public virtual void OnExit()
         {
-            //ProDebug.Logger.LogError("OnExit:" + NodeId);
+            ////ProDebug.Logger.LogError("OnExit:" + NodeId);
         }
 
         //执行 Execute 的前置方法，在 Execute() 方法的第一行调用

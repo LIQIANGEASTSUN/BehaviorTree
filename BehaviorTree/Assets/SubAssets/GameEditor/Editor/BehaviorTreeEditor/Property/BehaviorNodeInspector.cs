@@ -138,8 +138,8 @@ namespace BehaviorTree
                     string identificationName = string.Format("类标识_{0}", nodeValue.identificationName);
                     EditorGUILayout.LabelField(identificationName);
 
-                    CustomIdentification customIdentification = CustomNode.Instance.GetIdentification(nodeValue.identificationName);
-                    string className = customIdentification.ClassType.Name;
+                    ICustomIdentification<NodeLeaf> customIdentification = CustomNode.Instance.GetIdentification(nodeValue.identificationName);
+                    string className = customIdentification.IdentificationName;
                     EditorGUILayout.LabelField(className);
                 }
 
@@ -354,6 +354,7 @@ namespace BehaviorTree
 
         private void SubTreeNode(NodeValue nodeValue)
         {
+            nodeValue.subTreeValue = EditorGUILayout.LongField("SubTreeValue:", nodeValue.subTreeValue);
             string[] nameArr = EnumNames.GetEnumNames<SUB_TREE_TYPE>();
             int index = EnumNames.GetEnumIndex<SUB_TREE_TYPE>((SUB_TREE_TYPE)nodeValue.subTreeType);
             int result = EditorGUILayout.Popup(new GUIContent("子树类型"), index, nameArr);

@@ -10,7 +10,7 @@ namespace BehaviorTree
     public class NodeIfJudge : NodeComposite
     {
         private NodeBase lastRunningNode;
-        private Dictionary<int, IfJudgeData> _ifJudgeDataDic = new Dictionary<int, IfJudgeData>();
+        private List<IfJudgeData> _ifJudgeDataList;
         public static string descript = "if判断节点,最多只能有三个子节点(A、B、C)，第\n" +
                                         "一个节点A判断(只能返回Success、Fail),B、C节\n" +
                                         "点分别配置执行条件（Success、Fail），当A 返回\n" +
@@ -89,19 +89,23 @@ namespace BehaviorTree
             return resultType;
         }
 
-        public void SetData(IfJudgeData[] ifJudgeDataList)
+        public void SetData(List<IfJudgeData> ifJudgeDataList)
         {
-            _ifJudgeDataDic.Clear();
-            for (int i = 0; i < ifJudgeDataList.Length; ++i)
-            {
-                IfJudgeData data = ifJudgeDataList[i];
-                _ifJudgeDataDic[data.nodeId] = data;
-            }
+            _ifJudgeDataList = ifJudgeDataList;
+            
         }
 
         private IfJudgeData GetData(int nodeId)
         {
-            return _ifJudgeDataDic[nodeId];
+            for (int i = 0; i < _ifJudgeDataList.Count; ++i)
+            {
+                IfJudgeData data = _ifJudgeDataList[i];
+                if (data.nodeId == nodeId)
+                {
+                    return data;
+                }
+            }
+            return null;
         }
 
         private NodeBase GetBaseNode(ResultType resultType)

@@ -32,8 +32,16 @@ namespace BehaviorTree
 
         public void Reset(BehaviorTreeData behaviorTreeData)
         {
-            _behaviorTreeEntity = new BehaviorTreeEntity(behaviorTreeData, LoadConfig);
+            behaviorTreeData.nodeDic.Clear();
+            for (int i = 0; i < behaviorTreeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = behaviorTreeData.nodeList[i];
+                behaviorTreeData.nodeDic.Add(nodeValue.id, nodeValue);
+            }
+
+            _behaviorTreeEntity = new BehaviorTreeEntity(long.MaxValue, behaviorTreeData, LoadConfig);
             BehaviorTreeEntity.CurrentDebugEntityId = _behaviorTreeEntity.EntityId;
+            SetRunTimeDrawNode(_behaviorTreeEntity);
             NodeNotify.Clear();
         }
 
@@ -42,18 +50,39 @@ namespace BehaviorTree
             BehaviorManager.Instance.BehaviorTreeData = behaviorTreeData;
             _behaviorTreeEntity = behaviorTreeEntity;
             BehaviorTreeEntity.CurrentDebugEntityId = _behaviorTreeEntity.EntityId;
-
+            SetRunTimeDrawNode( behaviorTreeEntity);
             BehaviorManager.behaviorRuntimePlay(BehaviorPlayType.PLAY);
             NodeNotify.Clear();
         }
 
+        private void SetRunTimeDrawNode(BehaviorTreeEntity behaviorTreeEntity)
+        {
+            if (!Application.isPlaying || !Application.isEditor)
+            {
+                return;
+            }
+
+            foreach(var nodeId in behaviorTreeEntity.InvalidSubTreeList)
+            {
+                BehaviorManager.Instance.RunTimeInvalidSubTreeHash.Add(nodeId);
+            }
+        }
+
         private BehaviorTreeData LoadConfig(string fileName)
         {
-            if (null != BehaviorManager.behaviorReadFile)
+            if (null == BehaviorManager.behaviorReadFile)
             {
-                return BehaviorManager.behaviorReadFile(fileName, false);
+                return null;
             }
-            return null;
+            BehaviorTreeData behaviorTreeData = BehaviorManager.behaviorReadFile(fileName, false);
+            behaviorTreeData.nodeDic.Clear();
+            for (int i = 0; i < behaviorTreeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = behaviorTreeData.nodeList[i];
+                behaviorTreeData.nodeDic.Add(nodeValue.id, nodeValue);
+            }
+
+            return behaviorTreeData;
         }
 
         public void Update()

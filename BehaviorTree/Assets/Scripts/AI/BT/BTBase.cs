@@ -6,9 +6,50 @@ public abstract class BTBase : IAIPerformer
 {
     protected BehaviorTreeEntity _btEntity = null;
 
-    protected void SetData(BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
+    protected void SetData(long aiFunction, BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
     {
-        _btEntity = new BehaviorTreeEntity(data, loadEvent);
+        _btEntity = new BehaviorTreeEntity(aiFunction, data, loadEvent);
+    }
+
+    protected virtual void Init(BaseSprite owner)
+    {
+        InitNode(owner, _btEntity.RootNode);
+    }
+
+    private void InitNode(BaseSprite owner, NodeBase nodeBase)
+    {
+        if (nodeBase == null)
+        {
+            int a = 0;
+        }
+        if (nodeBase.NodeType == NODE_TYPE.ACTION)
+        {
+            ActionBase actionBase = nodeBase as ActionBase;
+            if (null != actionBase)
+            {
+                actionBase.SetOwner(owner);
+            }
+        }
+        else if (nodeBase.NodeType == NODE_TYPE.CONDITION)
+        {
+            ConditionBase conditionBase = nodeBase as ConditionBase;
+            if (null != conditionBase)
+            {
+                conditionBase.SetOwner(owner);
+            }
+        }
+        else
+        {
+            NodeComposite nodeComposite = nodeBase as NodeComposite;
+            if (null == nodeComposite)
+            {
+                return;
+            }
+            foreach (var childNode in nodeComposite.GetChilds())
+            {
+                InitNode(owner, childNode);
+            }
+        }
     }
 
     public void UpdateParameter(string name, bool para)

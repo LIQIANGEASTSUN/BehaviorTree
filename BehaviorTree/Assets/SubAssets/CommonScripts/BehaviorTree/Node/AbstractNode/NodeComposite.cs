@@ -10,14 +10,16 @@ namespace BehaviorTree
         // 保存子节点
         protected List<NodeBase> nodeChildList = new List<NodeBase>();
 
-        public NodeComposite(NODE_TYPE nodeType) : base(nodeType)
-        {}
+        public NodeComposite(NODE_TYPE nodeType) : base()
+        {
+            SetNodeType(nodeType);
+        }
 
-        public void AddNode(NodeBase nodeRoot)
+        public void AddNode(NodeBase node)
         {
             int count = nodeChildList.Count;
-            nodeRoot.NodeIndex = count;
-            nodeChildList.Add(nodeRoot);
+            node.NodeIndex = count;
+            nodeChildList.Add(node);
         }
 
         public List<NodeBase> GetChilds()

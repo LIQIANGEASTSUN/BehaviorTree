@@ -6,21 +6,30 @@ namespace BehaviorTree
     /// <summary>
     /// 条件节点(叶节点)
     /// </summary>
-    public abstract class NodeCondition : NodeLeaf, ICondition
+    public class NodeCondition : NodeLeaf, ICondition
     {
         private ICondition _iCondition;
         protected ConditionParameter conditionParameter = null;
-        protected List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
+        protected List<BehaviorParameter> _parameterList;
+        private List<ConditionGroup> _conditionGroupList;
         protected IConditionCheck _iconditionCheck = null;
 
-        public NodeCondition() : base(NODE_TYPE.CONDITION)
+        public NodeCondition() : base()
         {
+            SetNodeType(NODE_TYPE.CONDITION);
             SetCondition(this);
+            conditionParameter = new ConditionParameter();
         }
 
         public void SetCondition(ICondition iCondition)
         {
             _iCondition = iCondition;
+        }
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            conditionParameter.Init(_conditionGroupList, _parameterList);
         }
 
         public override ResultType Execute()
@@ -37,15 +46,20 @@ namespace BehaviorTree
 
         public void SetData(List<BehaviorParameter> parameterList, List<ConditionGroup> conditionGroupList)
         {
-            if (parameterList.Count > 0)
-            {
-                _parameterList.AddRange(parameterList);
-            }
+            _parameterList = parameterList;
+            _conditionGroupList = conditionGroupList;
 
-            conditionParameter = new ConditionParameter();
-            conditionParameter.SetGroup(conditionGroupList, _parameterList);
+            //if (parameterList.Count > 0)
+            //{
+            //    _parameterList.AddRange(parameterList);
+            //}
+
+            //conditionParameter.SetGroup(conditionGroupList, parameterList);
         }
 
-        public abstract ResultType Condition();
+        public virtual ResultType Condition()
+        {
+            return ResultType.Success;
+        }
     }
 }

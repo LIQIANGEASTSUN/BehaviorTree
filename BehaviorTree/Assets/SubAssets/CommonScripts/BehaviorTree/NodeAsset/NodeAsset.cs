@@ -12,6 +12,8 @@ namespace BehaviorTree
         public List<NodeValue> nodeList = new List<NodeValue>();
         public List<BehaviorParameter> parameterList = new List<BehaviorParameter>();
         public string descript = string.Empty;
+        // 存储时将 dic 清空，在 RunTime 时使用
+        public Dictionary<int, NodeValue> nodeDic = new Dictionary<int, NodeValue>();
     }
 
     public class NodeValue
@@ -39,6 +41,7 @@ namespace BehaviorTree
         public bool subTreeEntry = false;
         public int subTreeType = (int)SUB_TREE_TYPE.NORMAL;
         public string subTreeConfig = string.Empty;
+        public long subTreeValue = -1;
         #endregion
 
         #region 编辑器用
@@ -83,6 +86,7 @@ namespace BehaviorTree
             nodeValue.subTreeEntry = subTreeEntry;
             nodeValue.subTreeType = subTreeType;
             nodeValue.subTreeConfig = subTreeConfig;
+            nodeValue.subTreeValue = subTreeValue;
             #endregion
 
             #region 编辑器用
@@ -216,7 +220,7 @@ namespace BehaviorTree
         {
             parameterType = parameter.parameterType;
             parameterName = parameter.parameterName;
-            CNName = parameter.CNName;
+            //CNName = parameter.CNName;
             index = parameter.index;
             intValue =  parameter.intValue;
             longValue = parameter.longValue;
@@ -231,43 +235,42 @@ namespace BehaviorTree
             BehaviorCompare behaviorCompare = BehaviorCompare.NOT_EQUAL;
             if (parameterType != parameter.parameterType)
             {
-                //ProDebug.Logger.LogError("parameter Type not Equal:" + parameter.parameterName + "    " + parameter.parameterType + "    " + parameterType);
+                ////ProDebug.Logger.LogError("parameter Type not Equal:" + parameter.parameterName + "    " + parameter.parameterType + "    " + parameterType);
                 return behaviorCompare;
             }
 
             if (parameterType == (int)BehaviorParameterType.Float)
             {
-                behaviorCompare = CompareFloat(parameter);
+                behaviorCompare = CompareFloat(this.floatValue, parameter.floatValue);
             }
             else if (parameterType == (int)BehaviorParameterType.Int)
             {
-                behaviorCompare = CompareInt(parameter);
+                behaviorCompare = CompareInt(this.intValue, parameter.intValue);
             }
             else if (parameterType == (int)BehaviorParameterType.Long)
             {
-                behaviorCompare = CompareLong(parameter);
+                behaviorCompare = CompareLong(this.longValue, parameter.longValue);
             }
             else if (parameterType == (int)BehaviorParameterType.Bool)
             {
-                behaviorCompare = CompareBool(parameter);
+                behaviorCompare = CompareBool(this.boolValue, parameter.boolValue);
             }
             else if (parameterType == (int)BehaviorParameterType.String)
             {
-                behaviorCompare = CompareString(parameter);
+                behaviorCompare = CompareString(this.stringValue, parameter.stringValue);
             }
 
             return behaviorCompare;
         }
 
-        public BehaviorCompare CompareFloat(BehaviorParameter parameter)
+        public static BehaviorCompare CompareFloat(float floatValue1, float floatValue2)
         {
             BehaviorCompare BehaviorCompare = BehaviorCompare.INVALID;
-            if (this.floatValue > parameter.floatValue)
+            if (floatValue1 > floatValue2)
             {
                 BehaviorCompare |= BehaviorCompare.GREATER;
             }
-
-            if (this.floatValue < parameter.floatValue)
+            else if (floatValue1 < floatValue2)
             {
                 BehaviorCompare |= BehaviorCompare.LESS;
             }
@@ -275,37 +278,35 @@ namespace BehaviorTree
             return BehaviorCompare;
         }
 
-        public BehaviorCompare CompareInt(BehaviorParameter parameter)
+        public static BehaviorCompare CompareInt(int intValue1, int intValue2)
+        {
+            return CompareLong(intValue1, intValue2);
+        }
+
+        public static BehaviorCompare CompareLong(long longValue1, long longValue2)
         {
             BehaviorCompare behaviorCompare = BehaviorCompare.INVALID;
-            behaviorCompare = CompareFloat(parameter);
-
-            if (this.intValue > parameter.intValue)
+            if (longValue1 > longValue2)
             {
                 behaviorCompare |= BehaviorCompare.GREATER;
+                behaviorCompare |= BehaviorCompare.NOT_EQUAL;
             }
-
-            if (this.intValue < parameter.intValue)
+            else if (longValue1 < longValue2)
             {
                 behaviorCompare |= BehaviorCompare.LESS;
+                behaviorCompare |= BehaviorCompare.NOT_EQUAL;
             }
-
-            if (this.intValue == parameter.intValue)
+            else
             {
                 behaviorCompare |= BehaviorCompare.EQUALS;
             }
 
-            if (this.intValue != parameter.intValue)
-            {
-                behaviorCompare |= BehaviorCompare.NOT_EQUAL;
-            }
-
-            if (this.intValue >= parameter.intValue)
+            if (longValue1 >= longValue2)
             {
                 behaviorCompare |= BehaviorCompare.GREATER_EQUALS;
             }
 
-            if (this.intValue <= parameter.intValue)
+            if (longValue1 <= longValue2)
             {
                 behaviorCompare |= BehaviorCompare.LESS_EQUAL;
             }
@@ -313,53 +314,15 @@ namespace BehaviorTree
             return behaviorCompare;
         }
 
-        public BehaviorCompare CompareLong(BehaviorParameter parameter)
+        public static BehaviorCompare CompareBool(bool boolValue1, bool boolValue2)
         {
-            BehaviorCompare behaviorCompare = BehaviorCompare.INVALID;
-            behaviorCompare = CompareFloat(parameter);
-
-            if (this.longValue > parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.GREATER;
-            }
-
-            if (this.longValue < parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.LESS;
-            }
-
-            if (this.longValue == parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.EQUALS;
-            }
-
-            if (this.longValue != parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.NOT_EQUAL;
-            }
-
-            if (this.longValue >= parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.GREATER_EQUALS;
-            }
-
-            if (this.longValue <= parameter.longValue)
-            {
-                behaviorCompare |= BehaviorCompare.LESS_EQUAL;
-            }
-
+            BehaviorCompare behaviorCompare = (boolValue1 == boolValue2) ? BehaviorCompare.EQUALS : BehaviorCompare.NOT_EQUAL;
             return behaviorCompare;
         }
 
-        public BehaviorCompare CompareBool(BehaviorParameter parameter)
+        public static BehaviorCompare CompareString(string stringValue1, string stringValue2)
         {
-            BehaviorCompare behaviorCompare = (this.boolValue == parameter.boolValue) ? BehaviorCompare.EQUALS : BehaviorCompare.NOT_EQUAL;
-            return behaviorCompare;
-        }
-
-        public BehaviorCompare CompareString(BehaviorParameter parameter)
-        {
-            BehaviorCompare behaviorCompare = (this.stringValue.CompareTo(parameter.stringValue) == 0) ? BehaviorCompare.EQUALS : BehaviorCompare.NOT_EQUAL;
+            BehaviorCompare behaviorCompare = (stringValue1.CompareTo(stringValue2) == 0) ? BehaviorCompare.EQUALS : BehaviorCompare.NOT_EQUAL;
             return behaviorCompare;
         }
     }

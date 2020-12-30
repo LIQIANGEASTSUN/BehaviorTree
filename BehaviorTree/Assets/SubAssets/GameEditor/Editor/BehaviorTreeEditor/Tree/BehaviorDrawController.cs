@@ -41,7 +41,31 @@ public class BehaviorDrawController
             nodeList = _behaviorDrawModel.GetBaseNode();
         }
 
+        nodeList = CheckDrawNode(nodeList);
+
         _behaviorDrawView.Draw(_treeNodeWindow.position, currentNode, nodeList);
+    }
+
+    private List<NodeValue> CheckDrawNode(List<NodeValue> nodeList)
+    {
+        if ( BehaviorManager.Instance.RunTimeInvalidSubTreeHash.Count <= 0)
+        {
+            return nodeList;
+        }
+
+        for (int i = nodeList.Count - 1; i >= 0; --i)
+        {
+            NodeValue nodeValue = nodeList[i];
+            if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE)
+            {
+                if (BehaviorManager.Instance.RunTimeInvalidSubTreeHash.Contains(nodeValue.id))
+                {
+                    nodeList.RemoveAt(i);
+                }
+            }
+        }
+
+        return nodeList;
     }
 
 }
@@ -212,10 +236,10 @@ public class BehaviorDrawModel
             Node_Draw_Info actionDrawInfo = new Node_Draw_Info(actionName);
             infoList.Add(actionDrawInfo);
 
-            List<CustomIdentification> nodeList = CustomNode.Instance.GetNodeList();
-            for (int i = 0; i < nodeList.Count; ++i)
+            Dictionary<string, ICustomIdentification<NodeLeaf>> nodeDic = CustomNode.Instance.GetNodeDic();
+            foreach (var kv in nodeDic)
             {
-                CustomIdentification customIdentification = nodeList[i];
+                ICustomIdentification<NodeLeaf> customIdentification = kv.Value;
                 if (customIdentification.NodeType == NODE_TYPE.CONDITION)
                 {
                     conditionDrawInfo.AddNodeType(NODE_TYPE.CONDITION, customIdentification.Name, customIdentification.IdentificationName);
@@ -505,7 +529,7 @@ public class BehaviorDrawView
 
             if (childHash.Contains(childNode.id))
             {
-                Debug.LogError(nodeValue.id + "    " + childNode.id);
+                //ProDebug.Logger.LogError(//ProDebug.Logger.StrConcat(nodeValue.id, "    ", childNode.id));
                 break;
             }
             childHash.Add(childNode.id);
@@ -680,6 +704,11 @@ public class BehaviorDrawView
             {
                 continue;
             }
+            if (BehaviorManager.Instance.RunTimeInvalidSubTreeHash.Count > 0 && BehaviorManager.Instance.RunTimeInvalidSubTreeHash.Contains(childNode.id))
+            {
+                continue;
+            }
+
             DrawNodeCurve(nodeValue.position, childNode.position);
             DrawLabel(i.ToString(), nodeValue.position, childNode.position);
         }

@@ -18,7 +18,6 @@ public class BehaviorTreeDebugEditor : Editor
 
     private void OnDisable()
     {
-        _treeDebug.OnSelect(false);
     }
 
     public override void OnInspectorGUI()

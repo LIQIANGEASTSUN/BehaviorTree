@@ -38,6 +38,7 @@ public class BehaviorManager
     private BehaviorTreeData _behaviorTreeData;
     private BehaviorPlayType _playState = BehaviorPlayType.STOP;
     private Dictionary<string, BehaviorTreeData> _configDataDic = new Dictionary<string, BehaviorTreeData>();
+    private HashSet<int> _runTimeInvalidSubTreeHash = new HashSet<int>();
 
     // 当前选择的节点
     private int _currentSelectId = 0;
@@ -72,6 +73,7 @@ public class BehaviorManager
         _filePath = "Assets/SubAssets/GameData/BehaviorTree/";
         _fileName = string.Empty;
         _behaviorTreeData = new BehaviorTreeData();
+        _runTimeInvalidSubTreeHash.Clear();
 
         behaviorChangeRootNode += ChangeRootNode;
         behaviorChangeSelectId += ChangeSelectId;
@@ -167,6 +169,15 @@ public class BehaviorManager
         set { _behaviorTreeData = value;
             _fileName = _behaviorTreeData.fileName;
         }
+    }
+
+    public HashSet<int> RunTimeInvalidSubTreeHash
+    {
+        get
+        {
+            return _runTimeInvalidSubTreeHash;
+        }
+        set { _runTimeInvalidSubTreeHash = value; }
     }
 
     public int CurrentOpenSubTreeId
@@ -292,6 +303,8 @@ public class BehaviorManager
         {
             Directory.CreateDirectory(directory);
         }
+
+        data.nodeDic.Clear();
 
         StandardID(data);
         data.fileName = fileName;
@@ -558,7 +571,7 @@ public class BehaviorManager
             nodeValue = parentNode;
         }
 
-        Debug.LogError("ParentInfo:" + sb);
+        //ProDebug.Logger.LogError(//ProDebug.Logger.StrConcat("ParentInfo:", sb));
     }
 
     private void NodeParameterChange(int nodeId, BehaviorParameter parameter, bool isAdd)

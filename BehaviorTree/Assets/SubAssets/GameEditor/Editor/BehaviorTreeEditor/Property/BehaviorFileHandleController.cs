@@ -122,7 +122,7 @@ namespace BehaviorTree
         private static void UpdateAllFile(string filePath)
         {
             TableRead.Instance.Init();
-            string csvPath = string.Format("{0}/StreamingAssets/CSV/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            string csvPath = string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
             TableRead.Instance.ReadCustomPath(csvPath);
 
 
@@ -139,6 +139,8 @@ namespace BehaviorTree
                     treeData = BehaviorManager.behaviorStandardID(treeData);
                 }
 
+                CheckChildID(treeData, treeData.rootNodeId);
+
                 treeData = UpdateData( treeData);
 
                 string jsonFilePath = System.IO.Path.GetDirectoryName(filePath) + "/Json/" + System.IO.Path.GetFileName(fullName);
@@ -152,34 +154,41 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
-            for (int i = 0; i < treeData.parameterList.Count; ++i)
-            {
-                BehaviorParameter parameter = treeData.parameterList[i];
-                parameter = UpdateParameter(parameter);
-            }
-
-            for (int i = 0; i < treeData.nodeList.Count; ++i)
-            {
-                NodeValue nodeValue = treeData.nodeList[i];
-                
-                for (int j = 0; j < nodeValue.parameterList.Count; ++j)
-                {
-                    BehaviorParameter parameter = nodeValue.parameterList[j];
-                    parameter = UpdateParameter(parameter);
-                }
-            }
-
             return treeData;
         }
 
-        private static BehaviorParameter UpdateParameter(BehaviorParameter parameter)
+        private static void CheckChildID(BehaviorTreeData treeData, int id)
         {
-            return parameter;
+            NodeValue nodeValue = treeData.nodeList.Find((a)=> {
+                return a.id == id;
+            });
+
+            if (null == nodeValue || nodeValue.childNodeList.Count <= 0)
+            {
+                return;
+            }
+
+            HashSet<int> hash = new HashSet<int>();
+            for (int i = nodeValue.childNodeList.Count - 1; i >= 0 ; --i)
+            {
+                int childId = nodeValue.childNodeList[i];
+                if (hash.Contains(childId))
+                {
+                    nodeValue.childNodeList.RemoveAt(i);
+                    Debug.LogError(treeData.fileName + "   NodeValue:" + nodeValue.id + "  Has Same Child:" + childId);
+                }
+                else
+                {
+                    hash.Add(childId);
+                }
+
+                CheckChildID(treeData, childId);
+            }
         }
 
         private static BehaviorParameter GetTableParameter(string parameterName)
         {
-            string tableName = "BehaviorTree";
+            string tableName = "table_behaviortree";
             List<int> keyList = TableRead.Instance.GetKeyList(tableName);
 
             for (int i = 0; i < keyList.Count; ++i)
@@ -263,7 +272,7 @@ namespace BehaviorTree
             //FindChild(treeData, nodeId, ref nodeList);
             //for (int i = 0; i < nodeList.Count; ++i)
             //{
-            //    //ProDebug.Logger.LogError(nodeList[i].id);
+            //    ////ProDebug.Logger.LogError(nodeList[i].id);
 
             //    nodeList[i].parentSubTreeNodeId = subTreeId;
             //}
@@ -283,6 +292,7 @@ namespace BehaviorTree
 
                 BehaviorReadWrite readWrite = new BehaviorReadWrite();
                 BehaviorTreeData behaviorTreeData = readWrite.ReadJson(fullName);
+                behaviorTreeData = RemoveInvalidParameter(behaviorTreeData);
 
                 string content = LitJson.JsonMapper.ToJson(behaviorTreeData);
                 byte[] byteData = System.Text.Encoding.Default.GetBytes(content);
@@ -343,9 +353,9 @@ namespace BehaviorTree
 
         private static BehaviorTreeData ImportParameter(BehaviorTreeData behaviorData)
         {
-            string fileName = "BehaviorTree";
+            string fileName = "table_behaviortree";
             TableRead.Instance.Init();
-            string csvPath =string.Format("{0}/StreamingAssets/CSV/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            string csvPath =string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
             TableRead.Instance.ReadCustomPath(csvPath);
 
             // Debug.LogError(filePath + "   " + fileName);
@@ -404,6 +414,49 @@ namespace BehaviorTree
                 else
                 {
                     behaviorData.parameterList.Add(parameter);
+                }
+            }
+
+            return behaviorData;
+        }
+
+        private static BehaviorTreeData RemoveInvalidParameter(BehaviorTreeData behaviorData)
+        {
+            HashSet<string> _usedParameterHash = new HashSet<string>();
+
+            for (int i = 0; i < behaviorData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = behaviorData.nodeList[i];
+                
+                for (int j = 0; j < nodeValue.parameterList.Count; ++j)
+                {
+                    BehaviorParameter parameter = nodeValue.parameterList[j];
+                    if (!_usedParameterHash.Contains(parameter.parameterName))
+                    {
+                        _usedParameterHash.Add(parameter.parameterName);
+                    }
+                }
+
+                for (int j = 0; j < nodeValue.conditionGroupList.Count; ++j)
+                {
+                    ConditionGroup group = nodeValue.conditionGroupList[j];
+                    for (int k = 0; k < group.parameterList.Count; ++k)
+                    {
+                        string name = group.parameterList[k];
+                        if (!_usedParameterHash.Contains(name))
+                        {
+                            _usedParameterHash.Add(name);
+                        }
+                    }
+                }
+            }
+
+            for (int i = behaviorData.parameterList.Count - 1; i >= 0; --i)
+            {
+                BehaviorParameter parameter = behaviorData.parameterList[i];
+                if (!_usedParameterHash.Contains(parameter.parameterName))
+                {
+                    behaviorData.parameterList.RemoveAt(i);
                 }
             }
 

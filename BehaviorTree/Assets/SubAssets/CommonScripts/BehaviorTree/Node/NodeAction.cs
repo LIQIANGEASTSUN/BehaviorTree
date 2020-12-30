@@ -6,13 +6,14 @@ namespace BehaviorTree
     /// <summary>
     /// 行为节点(叶节点)
     /// </summary>
-    public abstract class NodeAction : NodeLeaf, IAction
+    public class NodeAction : NodeLeaf, IAction
     {
         protected IAction iAction;
         protected List<BehaviorParameter> _parameterList = new List<BehaviorParameter>();
 
-        public NodeAction() : base(NODE_TYPE.ACTION)
+        public NodeAction() : base()
         {
+            SetNodeType(NODE_TYPE.ACTION);
             SetIAction(this);
         }
 
@@ -40,13 +41,17 @@ namespace BehaviorTree
 
         public void SetParameters(List<BehaviorParameter> parameterList)
         {
-            if (parameterList.Count > 0)
-            {
-                _parameterList.AddRange(parameterList);
-            }
+            _parameterList = parameterList;
+            //if (parameterList.Count > 0)
+            //{
+            //    _parameterList.AddRange(parameterList);
+            //}
         }
 
-        public abstract ResultType DoAction();
+        public virtual ResultType DoAction()
+        {
+            return ResultType.Success;
+        }
 
     }
 

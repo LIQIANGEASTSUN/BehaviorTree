@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace BehaviorTree
 {
@@ -8,17 +9,18 @@ namespace BehaviorTree
     {
         private NodeBase _rootNode;
         private IConditionCheck _iconditionCheck = null;
-        private List<NodeAction> _actionNodeList = new List<NodeAction>();
-        private List<NodeCondition> _conditionNodeList = new List<NodeCondition>();
+        private List<int> _invalidSubTreeList = new List<int>();
         private int _entityId;
         private static int _currentDebugEntityId;
 
-        public BehaviorTreeEntity(BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
+        public BehaviorTreeEntity(long aiFunction, BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
         {
             _iconditionCheck = new ConditionCheck();
             BehaviorAnalysis analysis = new BehaviorAnalysis();
             analysis.SetLoadConfigEvent(loadEvent);
-            _rootNode = analysis.Analysis(data, _iconditionCheck, AddActionNode, AddConditionNode);
+            UnityEngine.Profiling.Profiler.BeginSample("Analysis");
+            _rootNode = analysis.Analysis(aiFunction, data, _iconditionCheck, AddInvalidSubTree);
+            UnityEngine.Profiling.Profiler.EndSample();
             if (null != _rootNode)
             {
                 _entityId = _rootNode.EntityId;
@@ -30,20 +32,17 @@ namespace BehaviorTree
             get { return (ConditionCheck)_iconditionCheck; }
         }
 
-        public List<NodeAction> ActionNodeList
+        public List<int> InvalidSubTreeList
         {
             get
             {
-                return _actionNodeList;
+                return _invalidSubTreeList;
             }
         }
 
-        public List<NodeCondition> ConditionNodeList
+        public NodeBase RootNode
         {
-            get
-            {
-                return _conditionNodeList;
-            }
+            get { return _rootNode; }
         }
 
         public int EntityId
@@ -51,14 +50,16 @@ namespace BehaviorTree
             get { return _entityId; }
         }
 
-        private void AddActionNode(NodeAction nodeAction)
+        private void AddInvalidSubTree(int nodeId)
         {
-            _actionNodeList.Add(nodeAction);
-        }
-
-        private void AddConditionNode(NodeCondition nodeCondition)
-        {
-            _conditionNodeList.Add(nodeCondition);
+            if (!Application.isEditor)
+            {
+                return;
+            }
+            if (!_invalidSubTreeList.Contains(nodeId))
+            {
+                _invalidSubTreeList.Add(nodeId);
+            }
         }
 
         public void Execute()
@@ -73,7 +74,11 @@ namespace BehaviorTree
 
         public void Clear()
         {
-            ConditionCheck.InitParmeter();
+            if (null != _rootNode)
+            {
+                _rootNode.Postposition(ResultType.Fail);
+            }
+            //ConditionCheck.InitParmeter();
         }
 
         public static int CurrentDebugEntityId

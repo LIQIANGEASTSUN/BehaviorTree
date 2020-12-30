@@ -18,15 +18,19 @@ namespace BehaviorTree
 
     public class ConditionParameter
     {
-        public List<ConditionGroupParameter> groupList = new List<ConditionGroupParameter>();
+        private bool init = false;
+        private List<ConditionGroupParameter> groupList = new List<ConditionGroupParameter>();
 
-        public ConditionParameter()
+        public ConditionParameter() {  }
+
+        public void Init(List<ConditionGroup> conditionGroupList, List<BehaviorParameter> parameterList)
         {
+            if (init)
+            {
+                return;
+            }
+            init = true;
 
-        }
-
-        public void SetGroup(List<ConditionGroup> conditionGroupList, List<BehaviorParameter> parameterList)
-        {
             for (int i = 0; i < conditionGroupList.Count; ++i)
             {
                 ConditionGroup conditionGroup = conditionGroupList[i];
@@ -53,5 +57,9 @@ namespace BehaviorTree
             return group;
         }
 
+        public List<ConditionGroupParameter> GetGroupList()
+        {
+            return groupList;
+        }
     }
 }

@@ -15,8 +15,7 @@ namespace BehaviorTree
         public readonly static CustomNode Instance = new CustomNode();
 
         private ConfigBehaviorNode configBehaviorNode = null;
-        //private HashSet<string> hash = new HashSet<string>();
-        private List<CustomIdentification> nodeList = new List<CustomIdentification>();
+        private Dictionary<string, ICustomIdentification<NodeLeaf>> nodeDic = new Dictionary<string, ICustomIdentification<NodeLeaf>>();
 
         public CustomNode()
         {
@@ -25,46 +24,32 @@ namespace BehaviorTree
             configBehaviorNode.Init();
         }
 
-        public object GetNode(string identificationName)
+        public NodeLeaf GetNode(string identificationName)
         {
-            object obj = null;
-            CustomIdentification info = GetIdentification(identificationName);
-            if (info.Valid())
-            {
-                obj = info.Create();
-            }
+            ICustomIdentification<NodeLeaf> info = GetIdentification(identificationName);
+            NodeLeaf obj = info.Create();
             return obj;
         }
 
-        public CustomIdentification GetIdentification(string identificationName)
+        public ICustomIdentification<NodeLeaf> GetIdentification(string identificationName)
         {
-            for (int i = 0; i < nodeList.Count; ++i)
+            ICustomIdentification<NodeLeaf> info;
+            if (nodeDic.TryGetValue(identificationName, out info))
             {
-                CustomIdentification info = nodeList[i];
-                if (info.IdentificationName.CompareTo(identificationName) == 0)
-                {
-                    return info;
-                }
+                return info;
             }
 
-            return new CustomIdentification();
+            return null;
         }
 
-        private void AddIdentification(CustomIdentification customIdentification)
+        private void AddIdentification(ICustomIdentification<NodeLeaf> customIdentification)
         {
-            //if (hash.Contains(customIdentification.IdentificationName))
-            //{
-            //    ProDebug.Logger.LogError("重复的 Identification:" + customIdentification.IdentificationName);
-            //    return;
-            //}
-            //hash.Add(customIdentification.IdentificationName);
-
-            nodeList.Add(customIdentification);
+            nodeDic[customIdentification.IdentificationName] = customIdentification;
         }
 
-        public List<CustomIdentification> GetNodeList()
+        public Dictionary<string, ICustomIdentification<NodeLeaf>> GetNodeDic()
         {
-            return nodeList;
+            return nodeDic;
         }
 
     }

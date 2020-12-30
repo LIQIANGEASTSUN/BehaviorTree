@@ -2,55 +2,101 @@
 
 namespace BehaviorTree
 {
-    public struct CustomIdentification
+    public interface ICustomIdentification<out T> where T : NodeLeaf, new()
     {
-        /// <summary>
-        /// 条件节点从 20000 开始， 行为节点从 10000 开始
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="identification"></param>
+        T Create();
+
+        string IdentificationName
+        {
+            get;
+            set;
+        }
+
+        string Name
+        {
+            get;
+            set;
+        }
+
+        NODE_TYPE NodeType
+        {
+            get;
+            set;
+        }
+    }
+
+    public class CustomIdentification<T> : ICustomIdentification<T> where T : NodeLeaf, new()
+    {
         public CustomIdentification(string name, Type t)
         {
             Name = name;
             IdentificationName = t.Name;
-            ClassType = t;
             NodeType = (typeof(NodeAction).IsAssignableFrom(t)) ? NODE_TYPE.ACTION : NODE_TYPE.CONDITION;
         }
 
-        public string Name
+        public T Create()
         {
-            get;
-            private set;
+            return new T();
         }
 
         public string IdentificationName
         {
             get;
-            private set;
+            set;
         }
 
-        public Type ClassType
+        public string Name
         {
             get;
-            private set;
+            set;
         }
 
         public NODE_TYPE NodeType
         {
             get;
-            private set;
-        }
-
-        public bool Valid()
-        {
-            return !string.IsNullOrEmpty(IdentificationName);
-        }
-
-        public object Create()
-        {
-            object o = Activator.CreateInstance(ClassType);
-            return o;
+            set;
         }
     }
+
+    //public struct CustomIdentification
+    //{
+    //    public CustomIdentification(string name, Type t)
+    //    {
+    //        Name = name;
+    //        IdentificationName = t.Name;
+    //        ClassType = t;
+    //        NodeType = (typeof(NodeAction).IsAssignableFrom(t)) ? NODE_TYPE.ACTION : NODE_TYPE.CONDITION;
+    //    }
+
+    //    public string Name
+    //    {
+    //        get;
+    //        private set;
+    //    }
+
+    //    public string IdentificationName
+    //    {
+    //        get;
+    //        private set;
+    //    }
+
+    //    public Type ClassType
+    //    {
+    //        get;
+    //        private set;
+    //    }
+
+    //    public NODE_TYPE NodeType
+    //    {
+    //        get;
+    //        private set;
+    //    }
+
+    //    public object Create()
+    //    {
+    //        object o = Activator.CreateInstance(ClassType);
+    //        return o;
+    //    }
+    //}
 
 }
