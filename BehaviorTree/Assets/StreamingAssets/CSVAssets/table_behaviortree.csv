@@ -1,6 +1,6 @@
-ID,EnName,CnName,Type,FloatValue,IntValue,LongValue,BoolValue,StringValue
-1,IsSurvial,Player/»î×Å,5,0,0,0,0,
-2,HasEneny,Player/ÓĞµĞÈË,5,0,0,0,0,
-3,Energy,Player/ÄÜÁ¿Öµ,0,0,0,0,0,
-4,EnergyMin,Player/ÄÜÁ¿×îĞ¡Öµ,0,0,0,0,0,
-5,TargetType,Player/Ä¿±êÀàĞÍ£ºµĞÈË¡¢ÄÜÁ¿²¹¸øÕ¾¡¢Áï´ïÄ¿µÄµØ,2,0,0,0,0,
+ï»¿ID,EnName,CnName,Type,FloatValue,IntValue,LongValue,BoolValue,StringValue
+1,IsSurvial,Player/æ´»ç€,5,0,0,0,0,
+2,HasEneny,Player/æœ‰æ•Œäºº,5,0,0,0,0,
+3,Energy,Player/èƒ½é‡å€¼,0,0,0,0,0,
+4,EnergyMin,Player/èƒ½é‡æœ€å°å€¼,0,0,0,0,0,
+5,TargetType,Player/ç›®æ ‡ç±»å‹ï¼šæ•Œäººã€èƒ½é‡è¡¥ç»™ç«™ã€æºœè¾¾ç›®çš„åœ°,2,0,0,0,0,
