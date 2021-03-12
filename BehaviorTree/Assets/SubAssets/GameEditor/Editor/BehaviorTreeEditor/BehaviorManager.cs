@@ -219,7 +219,7 @@ public class BehaviorManager
         BehaviorTreeData behaviorTreeData = ReadFile(fileName, true);
         if (null == behaviorTreeData)
         {
-            //ProDebug.Logger.LogError("file is null:" + fileName);
+            UnityEngine.Debug.LogError("file is null:" + fileName);
             return;
         }
 
@@ -268,7 +268,7 @@ public class BehaviorManager
     {
         if (data == null)
         {
-            //ProDebug.Logger.LogError("rootNode is null");
+            UnityEngine.Debug.LogError("rootNode is null");
             return;
         }
 
@@ -346,7 +346,7 @@ public class BehaviorManager
 
     private void SaveSubTree(string subTreeConfigName, int subTreeNodeId)
     {
-        //ProDebug.Logger.LogError("SaveSubTree:" + subTreeConfigName + "     " + subTreeNodeId);
+        UnityEngine.Debug.LogError("SaveSubTree:" + subTreeConfigName + "     " + subTreeNodeId);
 
         NodeValue subTreeNode = GetNode(subTreeNodeId);
         if (null == subTreeNode || subTreeNode.NodeType != (int)NODE_TYPE.SUB_TREE)
@@ -452,7 +452,7 @@ public class BehaviorManager
 
         if (null == parentNode || null == childNode)
         {
-            //ProDebug.Logger.LogError("node is null");
+            UnityEngine.Debug.LogError("node is null");
             return;
         }
 
@@ -571,7 +571,7 @@ public class BehaviorManager
             nodeValue = parentNode;
         }
 
-        //ProDebug.Logger.LogError(//ProDebug.Logger.StrConcat("ParentInfo:", sb));
+        UnityEngine.Debug.LogError("ParentInfo:" + sb.ToString());
     }
 
     private void NodeParameterChange(int nodeId, BehaviorParameter parameter, bool isAdd)

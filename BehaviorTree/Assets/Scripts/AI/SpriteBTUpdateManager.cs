@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BehaviorTree;
+using System.Collections.Generic;
 
 public interface IBTNeedUpdate
 {
@@ -16,6 +17,7 @@ public class SpriteBTUpdateManager
 
     public SpriteBTUpdateManager()
     {
+        BehaviorAnalysis.GetInstance().SetLoadConfigEvent(DataCenter.behaviorData.GetBehaviorInfo);
     }
 
     public void Release()

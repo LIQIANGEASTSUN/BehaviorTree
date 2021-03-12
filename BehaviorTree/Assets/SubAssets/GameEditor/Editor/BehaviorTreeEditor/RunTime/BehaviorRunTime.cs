@@ -39,7 +39,8 @@ namespace BehaviorTree
                 behaviorTreeData.nodeDic.Add(nodeValue.id, nodeValue);
             }
 
-            _behaviorTreeEntity = new BehaviorTreeEntity(long.MaxValue, behaviorTreeData, LoadConfig);
+            BehaviorAnalysis.GetInstance().SetLoadConfigEvent(LoadConfig);
+            _behaviorTreeEntity = new BehaviorTreeEntity(long.MaxValue, behaviorTreeData);
             BehaviorTreeEntity.CurrentDebugEntityId = _behaviorTreeEntity.EntityId;
             SetRunTimeDrawNode(_behaviorTreeEntity);
             NodeNotify.Clear();

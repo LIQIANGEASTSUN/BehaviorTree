@@ -6,9 +6,9 @@ public abstract class BTBase : IAIPerformer
 {
     protected BehaviorTreeEntity _btEntity = null;
 
-    protected void SetData(long aiFunction, BehaviorTreeData data, LoadConfigInfoEvent loadEvent)
+    protected void SetData(long aiFunction, BehaviorTreeData data)
     {
-        _btEntity = new BehaviorTreeEntity(aiFunction, data, loadEvent);
+        _btEntity = new BehaviorTreeEntity(aiFunction, data);
     }
 
     protected virtual void Init(BaseSprite owner)
@@ -18,10 +18,6 @@ public abstract class BTBase : IAIPerformer
 
     private void InitNode(BaseSprite owner, NodeBase nodeBase)
     {
-        if (nodeBase == null)
-        {
-            int a = 0;
-        }
         if (nodeBase.NodeType == NODE_TYPE.ACTION)
         {
             ActionBase actionBase = nodeBase as ActionBase;
@@ -45,7 +41,7 @@ public abstract class BTBase : IAIPerformer
             {
                 return;
             }
-            foreach (var childNode in nodeComposite.GetChilds())
+            foreach(var childNode in nodeComposite.GetChilds())
             {
                 InitNode(owner, childNode);
             }
@@ -62,6 +58,11 @@ public abstract class BTBase : IAIPerformer
         _btEntity.ConditionCheck.SetParameter(name, para);
     }
 
+    public void UpdateParameter(string name, long para)
+    {
+        _btEntity.ConditionCheck.SetParameter(name, para);
+    }
+
     public void UpdateParameter(string name, float para)
     {
         _btEntity.ConditionCheck.SetParameter(name, para);
@@ -73,6 +74,11 @@ public abstract class BTBase : IAIPerformer
     }
 
     public bool GetParameterValue(string parameterName, ref int value)
+    {
+        return _btEntity.ConditionCheck.GetParameterValue(parameterName, ref value);
+    }
+
+    public bool GetParameterValue(string parameterName, ref long value)
     {
         return _btEntity.ConditionCheck.GetParameterValue(parameterName, ref value);
     }

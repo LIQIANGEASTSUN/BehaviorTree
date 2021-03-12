@@ -17,7 +17,7 @@ public class BTConcrete : BTBase, IBTActionOwner
         {
             Debug.LogError("AIConfig not find:" + aiConfig);
         }
-        SetData(aiFunction, _data, DataCenter.behaviorData.GetBehaviorInfo);
+        SetData(aiFunction, _data);
         Init(_owner);
     }
 

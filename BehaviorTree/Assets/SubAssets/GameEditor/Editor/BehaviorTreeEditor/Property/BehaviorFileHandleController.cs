@@ -5,6 +5,7 @@ using UnityEditor;
 using System.IO;
 using System.Text;
 using System;
+using System.Reflection;
 
 namespace BehaviorTree
 {
@@ -121,10 +122,11 @@ namespace BehaviorTree
 
         private static void UpdateAllFile(string filePath)
         {
-            //TableRead.Instance.Init();
-            //string csvPath = string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
-            //TableRead.Instance.ReadCustomPath(csvPath);
+            TableRead.Instance.Init();
+            string csvPath = string.Format("{0}/StreamingAssets/CSVAssets/", Application.dataPath); // Extend.GameUtils.CombinePath(Application.dataPath, "StreamingAssets", "CSV"); //string.Format("{0}/StreamingAssets/CSV/", Application.dataPath);
+            TableRead.Instance.ReadCustomPath(csvPath);
 
+            //CompareTableParameter();
 
             DirectoryInfo dInfo = new DirectoryInfo(filePath);
             FileInfo[] fileInfoArr = dInfo.GetFiles("*.bytes", SearchOption.TopDirectoryOnly);
@@ -141,9 +143,11 @@ namespace BehaviorTree
 
                 CheckChildID(treeData, treeData.rootNodeId);
 
-                treeData = UpdateData( treeData);
+                treeData = UpdateData(treeData);
 
-                string jsonFilePath = System.IO.Path.GetDirectoryName(filePath) + "/Json/" + System.IO.Path.GetFileName(fullName);
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(fullName);
+
+                string jsonFilePath = System.IO.Path.GetDirectoryName(filePath) + "/Json/" + fileName + ".bytes";
                 bool value = readWrite.WriteJson(treeData, jsonFilePath);
                 if (!value)
                 {
@@ -154,6 +158,48 @@ namespace BehaviorTree
 
         private static BehaviorTreeData UpdateData(BehaviorTreeData treeData)
         {
+            //treeData = CheckParameter(treeData);
+            return treeData;
+        }
+
+        private static BehaviorTreeData CheckParameter(BehaviorTreeData treeData)
+        {
+            for (int i = treeData.parameterList.Count - 1; i >= 0; --i)
+            {
+                BehaviorParameter parameter = treeData.parameterList[i];
+                if (parameter.parameterName.CompareTo(BTConstant.IsSurvial) == 0)
+                {
+                    //ProDebug.Logger.LogError(3 + "    " + treeData.fileName);
+                    treeData.parameterList.RemoveAt(i);
+                }
+            }
+
+            for (int i = 0; i < treeData.nodeList.Count; ++i)
+            {
+                NodeValue nodeValue = treeData.nodeList[i];
+
+                for (int j = 0; j < nodeValue.parameterList.Count; ++j)
+                {
+                    BehaviorParameter parameter = nodeValue.parameterList[j];
+                    if (parameter.parameterName.CompareTo(BTConstant.IsSurvial) == 0)
+                    {
+                        //ProDebug.Logger.LogError(1 + "    " + treeData.fileName + "     " + nodeValue.id);
+                    }
+                }
+
+                for (int j = 0; j < nodeValue.conditionGroupList.Count; ++j)
+                {
+                    ConditionGroup group = nodeValue.conditionGroupList[j];
+                    for (int k = 0; k < group.parameterList.Count; ++k)
+                    {
+                        if (group.parameterList[k].CompareTo(BTConstant.IsSurvial) == 0)
+                        {
+                            //ProDebug.Logger.LogError(2 + "   " + treeData.fileName + "     " + nodeValue.id);
+                        }
+                    }
+                }
+            }
+
             return treeData;
         }
 
@@ -184,35 +230,6 @@ namespace BehaviorTree
 
                 CheckChildID(treeData, childId);
             }
-        }
-
-        private static BehaviorParameter GetTableParameter(string parameterName)
-        {
-            string tableName = "table_behaviortree";
-            List<int> keyList = TableRead.Instance.GetKeyList(tableName);
-
-            for (int i = 0; i < keyList.Count; ++i)
-            {
-                int key = keyList[i];
-
-                string enName = TableRead.Instance.GetData(tableName, key, "EnName");
-                if (enName.CompareTo(parameterName) != 0)
-                {
-                    continue;
-                }
-
-                string cnName = TableRead.Instance.GetData(tableName, key, "CnName");
-                int type = int.Parse(TableRead.Instance.GetData(tableName, key, "Type"));
-
-                BehaviorParameter parameter = new BehaviorParameter();
-                parameter.parameterName = enName;
-                parameter.CNName = cnName;
-                parameter.parameterType = type;
-
-                return parameter;
-            }
-
-            return null;
         }
 
         private static BehaviorTreeData ChangeSubTree(BehaviorTreeData treeData)
@@ -272,7 +289,7 @@ namespace BehaviorTree
             //FindChild(treeData, nodeId, ref nodeList);
             //for (int i = 0; i < nodeList.Count; ++i)
             //{
-            //    ////ProDebug.Logger.LogError(nodeList[i].id);
+            //    //ProDebug.Logger.LogError(nodeList[i].id);
 
             //    nodeList[i].parentSubTreeNodeId = subTreeId;
             //}
@@ -331,7 +348,7 @@ namespace BehaviorTree
             }
 
             {
-                string mergeFilePath = string.Format("{0}/StreamingAssets/Bina/BehaviorTreeConfig.bytes", Application.dataPath);
+                string mergeFilePath = string.Format("{0}/StreamingAssets/Bina/behavior_tree_config.bytes", Application.dataPath);
 
                 if (System.IO.File.Exists(mergeFilePath))
                 {
@@ -461,6 +478,38 @@ namespace BehaviorTree
             }
 
             return behaviorData;
+        }
+
+        private static void CompareTableParameter()
+        {
+            // Debug.LogError(filePath + "   " + fileName);
+            List<int> keyList = TableRead.Instance.GetKeyList("table_behaviortree");
+            HashSet<string> tableHash = new HashSet<string>();
+            for (int i = 0; i < keyList.Count; ++i)
+            {
+                string enName = TableRead.Instance.GetData("table_behaviortree", keyList[i], "EnName");
+                tableHash.Add(enName);
+            }
+
+            FieldInfo[] infoArr = typeof(BTConstant).GetFields(BindingFlags.Static | BindingFlags.Public);
+            HashSet<string> btConstantHash = new HashSet<string>();
+            foreach(var info in infoArr)
+            {
+                string name = info.Name;
+                btConstantHash.Add(name);
+                if (!tableHash.Contains(name))
+                {
+                    Debug.LogError("BTConstant has table not found:" + info.Name);
+                }
+            }
+
+            foreach(var name in tableHash)
+            {
+                if (!btConstantHash.Contains(name))
+                {
+                    Debug.LogError("Table has BTConstant not found:" + name);
+                }
+            }
         }
 
     }

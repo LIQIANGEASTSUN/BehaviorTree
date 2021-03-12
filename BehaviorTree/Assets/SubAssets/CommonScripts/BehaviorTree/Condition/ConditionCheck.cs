@@ -68,7 +68,7 @@ public class ConditionCheck : IConditionCheck
         {
             return true;
         }
-        ////ProDebug.Logger.Log(//ProDebug.Logger.StrConcat("Not Fount Parameter:", parameterName));
+        //ProDebug.Logger.Log(//ProDebug.Logger.StrConcat("Not Fount Parameter:", parameterName));
         return false;
     }
 
@@ -120,13 +120,13 @@ public class ConditionCheck : IConditionCheck
 
     public void AddParameter(List<BehaviorParameter> parameterList)
     {
-        UnityEngine.Profiling.Profiler.BeginSample("AddParameter");
+        //UnityEngine.Profiling.Profiler.BeginSample("AddParameter");
         for (int i = 0; i < parameterList.Count; ++i)
         {
             BehaviorParameter parameter = parameterList[i];
             SetParameter(parameter);
         }
-        UnityEngine.Profiling.Profiler.EndSample();
+        //UnityEngine.Profiling.Profiler.EndSample();
     }
 
     public bool Condition(BehaviorParameter parameter)

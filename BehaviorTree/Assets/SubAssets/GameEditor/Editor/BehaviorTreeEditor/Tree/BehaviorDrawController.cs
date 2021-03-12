@@ -529,7 +529,7 @@ public class BehaviorDrawView
 
             if (childHash.Contains(childNode.id))
             {
-                //ProDebug.Logger.LogError(//ProDebug.Logger.StrConcat(nodeValue.id, "    ", childNode.id));
+                UnityEngine.Debug.LogError(nodeValue.id + "    " + childNode.id);
                 break;
             }
             childHash.Add(childNode.id);

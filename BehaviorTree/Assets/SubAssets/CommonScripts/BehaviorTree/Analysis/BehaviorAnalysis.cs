@@ -10,9 +10,21 @@ namespace BehaviorTree
 
     public class BehaviorAnalysis
     {
-        private LoadConfigInfoEvent _loadConfigInfoEvent;
+        private static BehaviorAnalysis _instance;
+        private static object lockObj = new object();
+        public static BehaviorAnalysis GetInstance()
+        {
+            lock (lockObj)
+            {
+                if (null == _instance)
+                {
+                    _instance = new BehaviorAnalysis();
+                }
+            }
+            return _instance;
+        }
 
-        public BehaviorAnalysis() {       }
+        private LoadConfigInfoEvent _loadConfigInfoEvent;
 
         public void SetLoadConfigEvent(LoadConfigInfoEvent loadEvent)
         {
@@ -21,16 +33,22 @@ namespace BehaviorTree
 
         public NodeBase Analysis(long aiFunction, BehaviorTreeData data, IConditionCheck iConditionCheck, Action<int> InvalidSubTreeCallBack)
         {
+            int entityId = NewEntityId;
+            NodeBase rootNode = AnalysisTree(entityId, aiFunction, data, iConditionCheck, InvalidSubTreeCallBack);
+            return rootNode;
+        }
+
+        private NodeBase AnalysisTree(int entityId, long aiFunction, BehaviorTreeData data, IConditionCheck iConditionCheck, Action<int> InvalidSubTreeCallBack)
+        {
             NodeBase rootNode = null;
             if (null == data || data.rootNodeId < 0)
             {
-                //ProDebug.Logger.LogError("数据无效");
+                ////ProDebug.Logger.LogError("数据无效");
                 return rootNode;
             }
 
             iConditionCheck.AddParameter(data.parameterList);
 
-            int entityId = NewEntityId;
             rootNode = AnalysisNode(entityId, aiFunction, data, data.rootNodeId, iConditionCheck, InvalidSubTreeCallBack);
 
             return rootNode;
@@ -62,13 +80,16 @@ namespace BehaviorTree
 
             if (nodeValue.NodeType == (int)NODE_TYPE.SUB_TREE && nodeValue.subTreeType == (int)SUB_TREE_TYPE.CONFIG)
             {
+                if (null == _loadConfigInfoEvent)
+                {
+                    int a = 0;
+                }
                 BehaviorTreeData subTreeData = _loadConfigInfoEvent(nodeValue.subTreeConfig);
                 if (null != subTreeData)
                 {
-                    NodeBase subTreeNode = Analysis(entityId, subTreeData, iConditionCheck, InvalidSubTreeCallBack);
+                    NodeBase subTreeNode = AnalysisTree(entityId, aiFunction, subTreeData, iConditionCheck, InvalidSubTreeCallBack);
                     NodeComposite composite = (NodeComposite)(nodeBase);
                     composite.AddNode(subTreeNode);
-                    iConditionCheck.AddParameter(subTreeData.parameterList);
                 }
             }
 
@@ -191,43 +212,43 @@ namespace BehaviorTree
             return null;
         }
 
-        public NodeSelect GetSelect()
+        private NodeSelect GetSelect()
         {
             NodeSelect nodeSelect = new NodeSelect();
             return nodeSelect;
         }
 
-        public NodeSequence GetSequence()
+        private NodeSequence GetSequence()
         {
             NodeSequence nodeSequence = new NodeSequence();
             return nodeSequence;
         }
 
-        public NodeRandom GetRandom()
+        private NodeRandom GetRandom()
         {
             NodeRandom nodeRandom = new NodeRandom();
             return nodeRandom;
         }
 
-        public NodeRandomSequence GetRandomSequence()
+        private NodeRandomSequence GetRandomSequence()
         {
             NodeRandomSequence randomSequence = new NodeRandomSequence();
             return randomSequence;
         }
 
-        public NodeParallel GetParallel()
+        private NodeParallel GetParallel()
         {
             NodeParallel nodeParallel = new NodeParallel();
             return nodeParallel;
         }
 
-        public NodeParallelSelect GetParallelSelect()
+        private NodeParallelSelect GetParallelSelect()
         {
             NodeParallelSelect nodeParallelSelect = new NodeParallelSelect();
             return nodeParallelSelect;
         }
 
-        public NodeParallelAll GetParallelAll()
+        private NodeParallelAll GetParallelAll()
         {
             NodeParallelAll nodeParallelAll = new NodeParallelAll();
             return nodeParallelAll;
@@ -240,50 +261,50 @@ namespace BehaviorTree
             return ifJudge;
         }
 
-        public NodeRandomPriority GetRandomPriority()
+        private NodeRandomPriority GetRandomPriority()
         {
             NodeRandomPriority nodeRandomPriority = new NodeRandomPriority();
             return nodeRandomPriority;
         }
 
-        public NodeDecoratorInverter GetInverter()
+        private NodeDecoratorInverter GetInverter()
         {
             NodeDecoratorInverter inverter = new NodeDecoratorInverter();
             return inverter;
         }
 
-        public NodeDecoratorRepeat GetRepeat(NodeValue nodeValue)
+        private NodeDecoratorRepeat GetRepeat(NodeValue nodeValue)
         {
             NodeDecoratorRepeat repeat = new NodeDecoratorRepeat();
             repeat.SetRepeatCount(nodeValue.repeatTimes);
             return repeat;
         }
 
-        public NodeDecoratorReturnFail GetReturenFail()
+        private NodeDecoratorReturnFail GetReturenFail()
         {
             NodeDecoratorReturnFail returnFail = new NodeDecoratorReturnFail();
             return returnFail;
         }
 
-        public NodeDecoratorReturnSuccess GetReturnSuccess()
+        private NodeDecoratorReturnSuccess GetReturnSuccess()
         {
             NodeDecoratorReturnSuccess returnSuccess = new NodeDecoratorReturnSuccess();
             return returnSuccess;
         }
 
-        public NodeDecoratorUntilFail GetUntilFail()
+        private NodeDecoratorUntilFail GetUntilFail()
         {
             NodeDecoratorUntilFail untilFail = new NodeDecoratorUntilFail();
             return untilFail;
         }
 
-        public NodeDecoratorUntilSuccess GetUntilSuccess()
+        private NodeDecoratorUntilSuccess GetUntilSuccess()
         {
             NodeDecoratorUntilSuccess untilSuccess = new NodeDecoratorUntilSuccess();
             return untilSuccess;
         }
 
-        public NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
+        private NodeCondition GetCondition(NodeValue nodeValue, IConditionCheck iConditionCheck)
         {
             UnityEngine.Profiling.Profiler.BeginSample("GetCondition1");
             NodeCondition condition = (NodeCondition)CustomNode.Instance.GetNode(nodeValue.identificationName);
@@ -295,7 +316,7 @@ namespace BehaviorTree
             return condition;
         }
 
-        public NodeAction GetAction(NodeValue nodeValue)
+        private NodeAction GetAction(NodeValue nodeValue)
         {
             UnityEngine.Profiling.Profiler.BeginSample("GetAction");
 
@@ -306,7 +327,7 @@ namespace BehaviorTree
             return action;
         }
 
-        public NodeSubTree GetSubTree()
+        private NodeSubTree GetSubTree()
         {
             NodeSubTree subTree = new NodeSubTree();
             return subTree;
