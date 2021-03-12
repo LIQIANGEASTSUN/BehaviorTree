@@ -235,7 +235,7 @@ namespace BehaviorTree
             BehaviorCompare behaviorCompare = BehaviorCompare.NOT_EQUAL;
             if (parameterType != parameter.parameterType)
             {
-                ////ProDebug.Logger.LogError("parameter Type not Equal:" + parameter.parameterName + "    " + parameter.parameterType + "    " + parameterType);
+                //ProDebug.Logger.LogError("parameter Type not Equal:" + parameter.parameterName + "    " + parameter.parameterType + "    " + parameterType);
                 return behaviorCompare;
             }
 

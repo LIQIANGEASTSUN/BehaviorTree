@@ -48,13 +48,6 @@ namespace BehaviorTree
         {
             _parameterList = parameterList;
             _conditionGroupList = conditionGroupList;
-
-            //if (parameterList.Count > 0)
-            //{
-            //    _parameterList.AddRange(parameterList);
-            //}
-
-            //conditionParameter.SetGroup(conditionGroupList, parameterList);
         }
 
         public virtual ResultType Condition()
